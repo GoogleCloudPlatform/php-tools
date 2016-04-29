@@ -1,0 +1,24 @@
+{
+    "name": "google/cloud-testutils",
+    "description": "Testing utilities for Google Cloud Platform",
+    "keywords": ["test", "appengine", "gcp"],
+    "homepage": "https://github.com/GoogleCloudPlatform/php-testutils",
+    "type": "library",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Takashi Matsuo",
+            "email": "tmatsuo@google.com",
+            "homepage": "https://wp.gaeflex.ninja/"
+        }
+    ],
+    "require": {
+        "php": ">=5.5",
+        "phpunit/phpunit": "~4|~5",
+        "symfony/browser-kit": "~2|~3",
+        "symfony/process": "~2|~3"
+    },
+    "autoload": {
+        "psr-4": { "Google\\Cloud\\TestUtils\\": "src/" }
+    }
+}
