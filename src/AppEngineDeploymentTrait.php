@@ -20,25 +20,45 @@ namespace Google\Cloud\TestUtils;
 use GuzzleHttp\Client;
 
 /**
- * Class E2eDeploymentTrait.
+ * Trait AppEngineDeploymentTrait
  * @package Google\Cloud\TestUtils
  *
  * Use this trait to deploy the project to GCP for an end-to-end test.
  */
-trait E2eDeploymentTrait
+trait AppEngineDeploymentTrait
 {
-    /** @var  \Google\Cloud\TestUtils\GaeApp */
-    private static $gaeApp;
+    /** @var  \Google\Cloud\TestUtils\GcloudWrapper */
+    private static $gcloudWrapper;
     /** @var  \GuzzleHttp\Client */
     private $client;
-    /** @var string */
-    private static $projectEnv = 'GOOGLE_PROJECT_ID';
-    /** @var string */
-    private static $versionEnv = 'GOOGLE_VERSION_ID';
-    /** @var string */
-    private static $projectId;
-    /** @var string */
-    private static $versionId;
+
+    /**
+     * Return the project id for the test.
+     *
+     * @return string
+     */
+    private static function getProjectId()
+    {
+        $projectId = getenv('GOOGLE_PROJECT_ID');
+        if ($projectId === false) {
+            self::fail('Please set GOOGLE_PROJECT_ID env var.');
+        }
+        return $projectId;
+    }
+
+    /**
+     * Return the version id for the test.
+     *
+     * @return string
+     */
+    private static function getVersionId()
+    {
+        $versionId = getenv('GOOGLE_VERSION_ID');
+        if ($versionId === false) {
+            self::fail('Please set GOOGLE_VERSION_ID env var.');
+        }
+        return $versionId;
+    }
 
     /**
      * Deploy the application.
@@ -52,19 +72,11 @@ trait E2eDeploymentTrait
                 'To run this test, set RUN_DEPLOYMENT_TESTS env to true.'
             );
         }
-        self::$projectId = getenv(self::$projectEnv);
-        self::$versionId = getenv(self::$versionEnv);
-        if (self::$projectId === false) {
-            self::fail('Please set ' . self::$projectEnv . ' env var.');
-        }
-        if (self::$versionId === false) {
-            self::fail('Please set ' . self::$versionEnv . ' env var.');
-        }
-        self::$gaeApp = new GaeApp(
-            self::$projectId,
-            self::$versionId
+        self::$gcloudWrapper = new GcloudWrapper(
+            self::getProjectId(),
+            self::getVersionId()
         );
-        if (self::$gaeApp->deploy() === false) {
+        if (self::$gcloudWrapper->deploy() === false) {
             self::fail('Deployment failed.');
         }
     }
@@ -76,7 +88,7 @@ trait E2eDeploymentTrait
      */
     public static function deleteApp()
     {
-        self::$gaeApp->delete();
+        self::$gcloudWrapper->delete();
     }
 
     /**
@@ -86,7 +98,7 @@ trait E2eDeploymentTrait
      */
     public function setUpClient()
     {
-        $url = self::$gaeApp->getBaseUrl();
+        $url = self::$gcloudWrapper->getBaseUrl();
         $this->client = new Client(['base_uri' => $url]);
     }
 }

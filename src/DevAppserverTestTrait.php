@@ -20,15 +20,15 @@ namespace Google\Cloud\TestUtils;
 use GuzzleHttp\Client;
 
 /**
- * Class LocalTestTrait
+ * Trait DevAppserverTestTrait
  * @package Google\Cloud\TestUtils
  *
  * Use this trait to use dev_appserver for testing.
  */
-trait LocalTestTrait
+trait DevAppserverTestTrait
 {
-    /** @var  \Google\Cloud\TestUtils\GaeApp */
-    private static $gaeApp;
+    /** @var  \Google\Cloud\TestUtils\GcloudWrapper */
+    private static $gcloudWrapper;
     /** @var  \GuzzleHttp\Client */
     private $client;
 
@@ -52,8 +52,8 @@ trait LocalTestTrait
         if ($targets === false) {
             $targets = 'app.yaml';
         }
-        self::$gaeApp = new GaeApp('', '');
-        if (self::$gaeApp->run($targets, $phpCgi) === false) {
+        self::$gcloudWrapper = new GcloudWrapper('', '');
+        if (self::$gcloudWrapper->run($targets, $phpCgi) === false) {
             self::fail('dev_appserver failed');
         }
     }
@@ -65,7 +65,7 @@ trait LocalTestTrait
      */
     public static function stopServer()
     {
-        self::$gaeApp->stop();
+        self::$gcloudWrapper->stop();
     }
 
     /**
@@ -75,7 +75,7 @@ trait LocalTestTrait
      */
     public function setUpClient()
     {
-        $url = self::$gaeApp->getLocalBaseUrl();
+        $url = self::$gcloudWrapper->getLocalBaseUrl();
         $this->client = new Client(['base_uri' => $url]);
     }
 }
