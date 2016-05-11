@@ -2,13 +2,13 @@
 
 ## Install
 
-Add `google/cloud-testutils` to the `require-dev` section of your
+Add `google/cloud-tools` to the `require-dev` section of your
 `composer.json`.
 
 You can also run the following command:
 
 ```
-$ composer require google/cloud-testutils --dev
+$ composer require google/cloud-tools --dev
 ```
 
 ## Examples
