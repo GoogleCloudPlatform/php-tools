@@ -16,10 +16,10 @@
  */
 namespace Google\Cloud\Test;
 
-use Google\Cloud\TestUtils\E2eDeploymentTrait;
+use Google\Cloud\TestUtils\AppEngineDeploymentTrait;
 
 class DeployTest extends \PHPUnit_Framework_TestCase
 {
-    use E2eDeploymentTrait;
+    use AppEngineDeploymentTrait;
     use HelloTestTrait;
 }

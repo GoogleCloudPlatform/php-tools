@@ -20,12 +20,12 @@ namespace Google\Cloud\TestUtils;
 use Symfony\Component\Process\Process;
 
 /**
- * Class GaeApp
+ * Class GcloudWrapper
  * @package Google\Cloud\TestUtils
  *
  * A class representing App Engine application.
  */
-class GaeApp
+class GcloudWrapper
 {
     /** @var string */
     private $project;

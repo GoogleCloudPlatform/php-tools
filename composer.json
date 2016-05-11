@@ -1,8 +1,8 @@
 {
-    "name": "google/cloud-testutils",
-    "description": "Testing utilities for Google Cloud Platform",
+    "name": "google/cloud-tools",
+    "description": "PHP tools for Google Cloud Platform",
     "keywords": ["test", "appengine", "gcp"],
-    "homepage": "https://github.com/GoogleCloudPlatform/php-testutils",
+    "homepage": "https://github.com/GoogleCloudPlatform/php-tools",
     "type": "library",
     "license": "Apache-2.0",
     "authors": [
