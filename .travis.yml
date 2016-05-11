@@ -1,0 +1,49 @@
+# Copyright 2015 Google Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+branches:
+  only:
+    - master
+
+language: php
+
+matrix:
+  include:
+    - php: 5.5
+      env: RUN_DEPLOYMENT_TESTS=true RUN_DEVSERVER_TESTS=true RUN_CS_FIXER=true
+    #- php: 5.6
+    #- php: 7.0
+
+env:
+  global:
+    - GOOGLE_APPLICATION_CREDENTIALS=$TRAVIS_BUILD_DIR/credentials.json
+    - GOOGLE_VERSION_ID=$TRAVIS_JOB_ID
+    - PATH=${HOME}/google-cloud-sdk/bin:${PATH}
+    - PHP_CGI_PATH=/home/travis/.phpenv/shims/php-cgi
+    - TEST_BUILD_DIR=$TRAVIS_BUILD_DIR
+
+before_install:
+  - php scripts/dump_credentials.php
+  - travis_retry scripts/install_test_deps.sh
+
+script:
+  - composer install
+  - pushd test/fixtures/appengine-standard
+  - composer install
+  - phpunit
+  - popd
+
+after_success:
+  - composer require "satooshi/php-coveralls:^1.0"
+  - travis_retry php vendor/bin/coveralls -v
