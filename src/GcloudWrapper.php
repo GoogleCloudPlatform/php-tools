@@ -57,7 +57,7 @@ class GcloudWrapper
         fwrite(STDERR, $message . "\n");
     }
 
-    private function execWithRetry($cmd, $retries = self::DEFAULT_RETRIES)
+    protected function execWithRetry($cmd, $retries = self::DEFAULT_RETRIES)
     {
         for ($i = 0; $i <= $retries; $i++) {
             exec($cmd, $output, $ret);
@@ -71,7 +71,7 @@ class GcloudWrapper
     }
 
     /**
-     * Constructor of GaeApp.
+     * Constructor of GcloudWrapper.
      *
      * @param string $project
      * @param string $version
@@ -138,6 +138,17 @@ class GcloudWrapper
     }
 
     /**
+     * Create \Symfony\Component\Process\Process with a given string.
+     *
+     * @param string $cmd
+     * @return \Symfony\Component\Process\Process
+     */
+    protected function createProcess($cmd)
+    {
+        return new Process($cmd);
+    }
+
+    /**
      * Run the app with dev_appserver.
      *
      * @param string $targets optional The yaml files for local run.
@@ -157,7 +168,7 @@ class GcloudWrapper
             $this->errorLog('Can not chdir to ' . $this->dir);
             return false;
         }
-        $this->process = new Process($cmd);
+        $this->process = $this->createProcess($cmd);
         $this->process->start();
         chdir($orgDir);
         sleep(3);
@@ -196,6 +207,9 @@ class GcloudWrapper
             . "--service " . $service . " "
             . $this->version . " --project " . $this->project;
         $ret = $this->execWithRetry($cmd, $retries);
+        if ($ret) {
+            $this->deployed = false;
+        }
         return $ret;
     }
 
