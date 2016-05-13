@@ -22,4 +22,23 @@ class DeployTest extends \PHPUnit_Framework_TestCase
 {
     use AppEngineDeploymentTrait;
     use HelloTestTrait;
+
+    /**
+     * Called before deploying the app.
+     */
+    private static function beforeDeploy()
+    {
+        // Just copy app.yaml, making sure this function is called before the
+        // deployment.
+        copy('app.yaml.dist', 'app.yaml');
+    }
+
+    /**
+     * Called after deploying the app.
+     */
+    private static function afterDeploy()
+    {
+        // Delete app.yaml.
+        unlink('app.yaml');
+    }
 }

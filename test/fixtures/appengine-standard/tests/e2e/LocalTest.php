@@ -22,4 +22,23 @@ class LocalTest extends \PHPUnit_Framework_TestCase
 {
     use DevAppserverTestTrait;
     use HelloTestTrait;
+
+    /**
+     * Called before starting dev_appserver.
+     */
+    private static function beforeRun()
+    {
+        // Just copy app.yaml, making sure this function is called before the
+        // deployment.
+        copy('app.yaml.dist', 'app.yaml');
+    }
+
+    /**
+     * Called after starting dev_appserver.
+     */
+    private static function afterRun()
+    {
+        // Delete app.yaml.
+        unlink('app.yaml');
+    }
 }

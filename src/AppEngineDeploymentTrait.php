@@ -61,6 +61,22 @@ trait AppEngineDeploymentTrait
     }
 
     /**
+     * Called before deploying the app. The concrete test class can override
+     * this.
+     */
+    private static function beforeDeploy()
+    {
+    }
+
+    /**
+     * Called after deploying the app. The concrete test class can override
+     * this.
+     */
+    private static function afterDeploy()
+    {
+    }
+
+    /**
      * Deploy the application.
      *
      * @beforeClass
@@ -76,9 +92,11 @@ trait AppEngineDeploymentTrait
             self::getProjectId(),
             self::getVersionId()
         );
+        static::beforeDeploy();
         if (self::$gcloudWrapper->deploy() === false) {
             self::fail('Deployment failed.');
         }
+        static::afterDeploy();
     }
 
     /**

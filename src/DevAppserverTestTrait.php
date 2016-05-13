@@ -33,6 +33,22 @@ trait DevAppserverTestTrait
     private $client;
 
     /**
+     * Called before running the dev_appserver. The concrete class can
+     * override this.
+     */
+    private static function beforeRun()
+    {
+    }
+
+    /**
+     * Called after running the dev_appserver. The concrete class can
+     * override this.
+     */
+    private static function afterRun()
+    {
+    }
+
+    /**
      * Start Google App Engine devserver.
      *
      * @beforeClass
@@ -53,9 +69,11 @@ trait DevAppserverTestTrait
             $targets = 'app.yaml';
         }
         self::$gcloudWrapper = new GcloudWrapper('', '');
+        static::beforeRun();
         if (self::$gcloudWrapper->run($targets, $phpCgi) === false) {
             self::fail('dev_appserver failed');
         }
+        static::afterRun();
     }
 
     /**
