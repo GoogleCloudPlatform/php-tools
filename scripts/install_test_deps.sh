@@ -35,8 +35,8 @@ install_gcloud()
 
 configure_gcloud()
 {
-    if [! -z "${CLOUDSDK_ACTIVE_CONFIG_NAME}"]; then
-        gcloud config configrations create ${CLOUDSDK_ACTIVE_CONFIG_NAME} \
+    if [ -n "${CLOUDSDK_ACTIVE_CONFIG_NAME}" ]; then
+        gcloud config configurations create ${CLOUDSDK_ACTIVE_CONFIG_NAME} \
             || /bin/true
     fi
     # Configure gcloud
