@@ -35,6 +35,10 @@ install_gcloud()
 
 configure_gcloud()
 {
+    if [! -z "${CLOUDSDK_ACTIVE_CONFIG_NAME}"]; then
+        gcloud config configrations create ${CLOUDSDK_ACTIVE_CONFIG_NAME} \
+            || /bin/true
+    fi
     # Configure gcloud
     gcloud config set project ${GOOGLE_PROJECT_ID}
     gcloud config set app/promote_by_default false
