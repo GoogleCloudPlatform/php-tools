@@ -38,7 +38,7 @@ before_install:
   - travis_retry scripts/install_test_deps.sh
 
 script:
-  - if [ "${RUN_CS_FIXER}" = "true" ]; then ./php-cs-fixer fix --dry-run --diff --config-file=.php_cs .; fi;
+  - if [ "${RUN_CS_FIXER}" = "true" ]; then ./php-cs-fixer fix --dry-run --diff .; fi;
   - composer install
   - phpunit
   - pushd test/fixtures/appengine-standard
