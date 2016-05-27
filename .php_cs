@@ -1,11 +1,14 @@
 <?php
 
-return Symfony\CS\Config\Config::create()
-    ->level(Symfony\CS\FixerInterface::PSR2_LEVEL)
-    ->fixers([
-        'concat_with_spaces',
-        'unused_use',
-        'trailing_spaces',
-        'indentation'
-    ])
-;
+$finder = PhpCsFixer\Finder::create()
+    ->in(__DIR__);
+
+return PhpCsFixer\Config::create()
+    ->setRules(array(
+        '@PSR2' => true,
+        'concat_with_spaces' => true,
+        'no_unused_imports' => true,
+        'no_trailing_whitespace' => true,
+        'no_tab_indentation' => true,
+    ))
+    ->finder($finder);

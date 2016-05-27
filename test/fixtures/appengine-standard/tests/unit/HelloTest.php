@@ -18,7 +18,6 @@ use Silex\WebTestCase;
 
 class HelloTest extends WebTestCase
 {
-
     public function createApplication()
     {
         $app = require __DIR__ . '/../../app.php';
