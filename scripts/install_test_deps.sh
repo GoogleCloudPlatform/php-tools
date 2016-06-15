@@ -42,7 +42,6 @@ configure_gcloud()
     # Configure gcloud
     gcloud config set project ${GOOGLE_PROJECT_ID}
     gcloud config set app/promote_by_default false
-    gcloud config set app/use_cloud_build true
     gcloud config set disable_prompts true
     if [ -f ${GOOGLE_APPLICATION_CREDENTIALS} ]; then
         gcloud auth activate-service-account --key-file \
