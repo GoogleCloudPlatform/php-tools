@@ -99,6 +99,17 @@ class GcloudWrapper
     }
 
     /**
+     * A setter for $dir, it's handy for using different directory for the
+     * test.
+     *
+     * @param string $dir
+     */
+    public function setDir(string $dir)
+    {
+        $this->dir = $dir;
+    }
+
+    /**
      * Deploy the app to the Google Cloud Platform.
      *
      * @param string $targets optional The yaml files for deployments.
