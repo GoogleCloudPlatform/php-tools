@@ -104,7 +104,7 @@ class GcloudWrapper
      *
      * @param string $dir
      */
-    public function setDir(string $dir)
+    public function setDir($dir)
     {
         $this->dir = $dir;
     }
