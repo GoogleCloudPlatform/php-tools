@@ -49,7 +49,7 @@ class GcloudWrapper
     private $dir;
 
     const DEFAULT_RETRIES = 3;
-    const GCLOUD_APP = 'preview app';
+    const GCLOUD_APP = 'app';
     const DEFAULT_PORT = 8080;
 
     private function errorLog($message)

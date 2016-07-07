@@ -55,10 +55,10 @@ class GcloudWrapperTest extends \PHPUnit_Framework_TestCase
             ->setConstructorArgs(array('project', 'version'))
             ->getMock();
         $this->mockGcloudWrapper->method('execWithRetry')->willReturn(true);
-        $deployCmd = 'gcloud -q preview app deploy '
+        $deployCmd = 'gcloud -q app deploy '
             . '--project project --version version '
             . '--no-promote app.yaml';
-        $deleteCmd = 'gcloud -q preview app versions delete '
+        $deleteCmd = 'gcloud -q app versions delete '
             . '--service default version '
             . '--project project';
         $this->mockGcloudWrapper->expects($this->exactly(2))
@@ -89,10 +89,10 @@ class GcloudWrapperTest extends \PHPUnit_Framework_TestCase
             ->setConstructorArgs(array('project', 'version'))
             ->getMock();
         $this->mockGcloudWrapper->method('execWithRetry')->willReturn(true);
-        $deployCmd = 'gcloud -q preview app deploy '
+        $deployCmd = 'gcloud -q app deploy '
             . '--project project --version version '
             . '--promote app.yaml backend.yaml';
-        $deleteCmd = 'gcloud -q preview app versions delete '
+        $deleteCmd = 'gcloud -q app versions delete '
             . '--service myservice version '
             . '--project project';
         $this->mockGcloudWrapper->expects($this->exactly(2))
