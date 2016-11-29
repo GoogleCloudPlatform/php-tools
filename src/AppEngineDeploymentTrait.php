@@ -96,6 +96,9 @@ trait AppEngineDeploymentTrait
         if (self::$gcloudWrapper->deploy() === false) {
             self::fail('Deployment failed.');
         }
+        if ((int) $delay = getenv('GOOGLE_DEPLOYMENT_DELAY')) {
+            sleep($delay);
+        }
         static::afterDeploy();
     }
 
@@ -106,7 +109,9 @@ trait AppEngineDeploymentTrait
      */
     public static function deleteApp()
     {
-        self::$gcloudWrapper->delete();
+        if (getenv('GOOGLE_KEEP_DEPLOYMENT') !== 'true') {
+            self::$gcloudWrapper->delete();
+        }
     }
 
     /**
