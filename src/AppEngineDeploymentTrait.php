@@ -109,7 +109,9 @@ trait AppEngineDeploymentTrait
      */
     public static function deleteApp()
     {
-        self::$gcloudWrapper->delete();
+        if (getenv('GOOGLE_KEEP_DEPLOYMENT') !== 'true') {
+            self::$gcloudWrapper->delete();
+        }
     }
 
     /**
