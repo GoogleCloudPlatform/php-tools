@@ -68,6 +68,11 @@ trait AppEngineDeploymentTrait
     {
     }
 
+    private static function doDeploy()
+    {
+        return self::$gcloudWrapper->deploy();
+    }
+
     /**
      * Called after deploying the app. The concrete test class can override
      * this.
@@ -93,7 +98,7 @@ trait AppEngineDeploymentTrait
             self::getVersionId()
         );
         static::beforeDeploy();
-        if (self::$gcloudWrapper->deploy() === false) {
+        if (static::doDeploy() === false) {
             self::fail('Deployment failed.');
         }
         if ((int) $delay = getenv('GOOGLE_DEPLOYMENT_DELAY')) {
