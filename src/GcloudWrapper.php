@@ -18,6 +18,7 @@
 namespace Google\Cloud\TestUtils;
 
 use Symfony\Component\Process\Process;
+use Google\Cloud\ExponentialBackoff;
 
 /**
  * Class GcloudWrapper
@@ -48,6 +49,9 @@ class GcloudWrapper
     /** @var string */
     private $dir;
 
+    /** @var string */
+    private $ip;
+
     const DEFAULT_RETRIES = 3;
     const GCLOUD_APP = 'app';
     const DEFAULT_PORT = 8080;
@@ -55,6 +59,11 @@ class GcloudWrapper
     private function errorLog($message)
     {
         fwrite(STDERR, $message . "\n");
+    }
+
+    private function log($message)
+    {
+        fwrite(STDOUT, $message . "\n");
     }
 
     protected function execWithRetry($cmd, $retries = self::DEFAULT_RETRIES)
@@ -252,6 +261,10 @@ class GcloudWrapper
             $this->errorLog('The app has not been deployed.');
             return false;
         }
+        // For container engine deployment.
+        if ($this->ip) {
+            return 'http://' . $this->ip;
+        }
         if ($service === 'default') {
             $url = sprintf(
                 'https://%s-dot-%s.appspot.com',
@@ -267,5 +280,55 @@ class GcloudWrapper
             );
         }
         return $url;
+    }
+
+    public function deleteContainer(
+        $retries = self::DEFAULT_RETRIES
+    ) {
+        // remove the service if it exists
+        $deleteCmd = 'kubectl delete -f ' . $targets;
+        $this->execWithRetry($deleteCmd, $retries);
+    }
+
+    public function deployContainer(
+        $kubeService,
+        $targets = 'container-engine.yaml',
+        $retries = self::DEFAULT_RETRIES
+    ) {
+        if ($this->deployed) {
+            $this->errorLog('The app has been already deployed.');
+            return false;
+        }
+        $orgDir = getcwd();
+        if (chdir($this->dir) === false) {
+            $this->errorLog('Can not chdir to ' . $this->dir);
+            return false;
+        }
+
+        $getCmd = 'kubectl get service ' . $kubeService;
+        // remove the service if it exists
+        if (0 === self::createProcess($getCmd)->run()) {
+            $deleteCmd = 'kubectl delete -f ' . $targets;
+            $this->execWithRetry($deleteCmd, $retries);
+        }
+        // create it (so we actually test something!)
+        $createCmd = 'kubectl create -f ' . $targets;
+        $ret = $this->execWithRetry($cmd, $retries);
+        // wait until the container is deployed
+        $backoff = new ExponentialBackoff(10);
+        $backoff->execute(function() use ($kubeService) {
+            $process = self::createProcess($getCmd);
+            $process->run();
+            $line = explode("\n", $process->getOutput())[1];
+            $status = preg_split('/\s+/', $line)[2];
+            if ($status === '<pending>') {
+                $msg = "Waiting for service $kubeService to deploy...";
+                $this->log($msg);
+                throw new \Exception($msg);
+            }
+            $this->ip = $status;
+        });
+        chdir($orgDir);
+        return $this->deployed = (bool) $this->ip;
     }
 }

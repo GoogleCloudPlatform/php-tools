@@ -17,25 +17,26 @@
 
 namespace Google\Cloud\TestUtils;
 
-use GuzzleHttp\Client;
-
 /**
- * Trait AppEngineDeploymentTrait
+ * Trait ContainerEngineDeploymentTrait
  * @package Google\Cloud\TestUtils
  *
- * Use this trait to deploy the project to GAE for an end-to-end test.
+ * Use this trait to deploy the project to GKE for an end-to-end test.
  */
-trait AppEngineDeploymentTrait
+trait ContainerEngineDeploymentTrait
 {
     use DeploymentTrait;
 
+    // required for container engine
+    private static $kubeService;
+
     private static function doDeploy()
     {
-        return self::$gcloudWrapper->deploy();
+        return self::$gcloudWrapper->deployContainer(self::$kubeService);
     }
 
     public static function doDelete()
     {
-        self::$gcloudWrapper->delete();
+        self::$gcloudWrapper->deleteContainer();
     }
 }
