@@ -18,7 +18,6 @@
 namespace Google\Cloud\TestUtils;
 
 use Symfony\Component\Process\Process;
-use Google\Cloud\ExponentialBackoff;
 
 /**
  * Class GcloudWrapper
