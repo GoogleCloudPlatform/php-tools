@@ -50,6 +50,7 @@ configure_gcloud()
     gcloud -q components install app-engine-python
     gcloud -q components install app-engine-php
     gcloud -q components update
+    gcloud -q config set verbosity debug
     gcloud info
 }
 
