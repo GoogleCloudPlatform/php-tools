@@ -27,13 +27,16 @@ use PHPUnit_Framework_ExpectationFailedException;
  */
 trait EventuallyConsistentTestTrait
 {
-    /* @var int The number of retries for eventually consistent tests */
-    protected static $eventuallyConsistentRetryCount = 3;
-
-    private function runEventuallyConsistentTest(
-        callable $func,
-        $retries = self::$eventuallyConsistentRetryCount
-    ) {
+    private function runEventuallyConsistentTest(callable $func, $retries = 0)
+    {
+        if ($retries <= 0) {
+            // It doesn't make sense, we'll use the default value. You can
+            // also define the static property $eventuallyConsistentRetryCount in
+            // your concrete class then we'll use that value.
+            $retries = isset(static::$eventuallyConsistentRetryCount)
+                ? static::$eventuallyConsistentRetryCount
+                : 3;
+        }
         $attempts = 0;
         while ($attempts <= $retries) {
             try {
