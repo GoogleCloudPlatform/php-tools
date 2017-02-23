@@ -27,14 +27,20 @@ use PHPUnit_Framework_ExpectationFailedException;
  */
 trait EventuallyConsistentTestTrait
 {
-    private function runEventuallyConsistentTest(callable $func, $retries = 3)
-    {
+    /* @var int The number of retries for eventually consistent tests */
+    protected static $eventuallyConsistentRetryCount = 3;
+
+    private function runEventuallyConsistentTest(
+        callable $func,
+        $retries = self::$eventuallyConsistentRetryCount
+    ) {
         $attempts = 0;
         while ($attempts <= $retries) {
             try {
                 $func();
                 return;
-            } catch (PHPUnit_Framework_ExpectationFailedException $testException) {
+            } catch (
+                PHPUnit_Framework_ExpectationFailedException $testException) {
                 sleep(++$attempts * 2);
             }
         }
