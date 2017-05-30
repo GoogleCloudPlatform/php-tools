@@ -65,6 +65,35 @@ install_php_cs_fixer()
     fi
 }
 
+install_grpc()
+{
+    # Ensure gRPC compiles
+    ## sudo apt-get update && apt-get install libc6-dev
+    ## apt-get upgrade gcc-core gcc-g++ --fix-missing
+    sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+    sudo apt-get update
+    sudo apt-get install gcc-4.7
+    sudo ln -sf /usr/bin/gcc-4.7 /usr/bin/gcc
+
+    # Compile gRPC
+    git clone -b $(curl -L http://grpc.io/release) https://github.com/grpc/grpc
+    pushd grpc
+    git pull origin $(curl -L http://grpc.io/release) --recurse-submodules && git submodule update --init --recursive
+    make && sudo make install
+    popd
+
+    # Compile gRPC PHP Extension
+    pushd grpc/src/php/ext/grpc
+    phpize
+    ./configure
+    make
+    sudo make install
+    popd
+
+    # Activate PHP Extension
+    echo "extension=grpc.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+}
+
 if [ "${RUN_DEPLOYMENT_TESTS}" = "true" ] \
     || [ "${RUN_DEVSERVER_TESTS}" = "true" ]; then
     install_gcloud
