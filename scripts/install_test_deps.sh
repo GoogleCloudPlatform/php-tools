@@ -60,7 +60,7 @@ install_php_cs_fixer()
 {
     # Install PHP-cs-fixer
     if [ ! -f php-cs-fixer ]; then
-        wget http://get.sensiolabs.org/php-cs-fixer.phar -O php-cs-fixer
+        wget http://cs.sensiolabs.org/download/php-cs-fixer-v2.phar -O php-cs-fixer
         chmod a+x php-cs-fixer
     fi
 }
