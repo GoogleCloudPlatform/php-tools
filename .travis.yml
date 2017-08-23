@@ -40,10 +40,10 @@ before_install:
 script:
   - if [ "${RUN_CS_FIXER}" = "true" ]; then ./php-cs-fixer fix --dry-run --diff .; fi;
   - composer install
-  - phpunit
+  - vendor/bin/phpunit
   - pushd test/fixtures/appengine-standard
   - composer install
-  - phpunit
+  - ${TRAVIS_BUILD_DIR}/vendor/bin/phpunit
   - popd
 
 after_success:

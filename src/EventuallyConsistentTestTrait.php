@@ -31,9 +31,16 @@ trait EventuallyConsistentTestTrait
      * override this value in your concrete class. */
     protected $eventuallyConsistentRetryCount = 3;
 
+    /**
+     * @param callable $func The callable that runs tests
+     * @param int $retries The number of retry
+     * @param bool $catchAllExceptions Indicates whether or not catch all the
+     *             exceptions other than the test failure.
+     */
     private function runEventuallyConsistentTest(
         callable $func,
-        $retries = null
+        $retries = null,
+        $catchAllExceptions = false
     ) {
         if (is_null($retries)) {
             $retries = $this->eventuallyConsistentRetryCount;
@@ -46,6 +53,12 @@ trait EventuallyConsistentTestTrait
             } catch (
                 PHPUnit_Framework_ExpectationFailedException $testException) {
                 sleep(++$attempts * 2);
+            } catch (\Exception $testException) {
+                if ($catchAllExceptions) {
+                    sleep(++$attempts * 2);
+                } else {
+                    throw $testException;
+                }
             }
         }
         throw $testException;
