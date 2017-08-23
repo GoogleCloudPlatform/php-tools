@@ -40,7 +40,7 @@ trait EventuallyConsistentTestTrait
     private function runEventuallyConsistentTest(
         callable $func,
         $retries = null,
-        $catchAllExceptions = false,
+        $catchAllExceptions = false
     ) {
         if (is_null($retries)) {
             $retries = $this->eventuallyConsistentRetryCount;
