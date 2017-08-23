@@ -16,16 +16,17 @@
 -->
 <phpunit bootstrap="test/bootstrap.php">
     <testsuites>
-        <testsuite name="Unit tests for php-tools">
-            <file>test/GcloudWrapperTest.php</file>
-        </testsuite>
+      <testsuite name="Unit tests for php-tools">
+        <file>test/GcloudWrapperTest.php</file>
+        <file>test/EventuallyConsistentTestTraitTest.php</file>
+      </testsuite>
     </testsuites>
     <logging>
         <log type="coverage-clover" target="build/logs/clover.xml"/>
     </logging>
     <filter>
         <whitelist>
-            <file>src/GcloudWrapper.php</file>
+            <file>src/*.php</file>
         </whitelist>
     </filter>
 </phpunit>
