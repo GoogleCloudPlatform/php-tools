@@ -29,6 +29,13 @@ class EventuallyConsistentTestTraitTest extends \PHPUnit_Framework_TestCase
 {
     use EventuallyConsistentTestTrait;
 
+    public function setUp()
+    {
+        // Setting the default value. Each test should set it again in the
+        // test itself if necessary.
+        $this->catchAllExceptions = false;
+    }
+
     public function testRunEventuallyConsistentTest()
     {
         $retries = 4;
@@ -57,5 +64,37 @@ class EventuallyConsistentTestTraitTest extends \PHPUnit_Framework_TestCase
         };
         $this->runEventuallyConsistentTest($func, $retries, true);
         $this->assertEquals($i, $retries);
+    }
+
+    public function testCatchAllExceptionsWithInstanceVarTest()
+    {
+        $retries = 4;
+        $i = 0;
+        $func = function () use (&$i, $retries) {
+            if (++$i == $retries) {
+                // return on the final retry
+                return;
+            }
+            throw new \Exception('Something goes wrong');
+        };
+        $this->catchAllExceptions = true;
+        $this->runEventuallyConsistentTest($func, $retries);
+        $this->assertEquals($i, $retries);
+    }
+    /**
+     * @expectedException \Exception
+     */
+    public function testNoCatchAllExceptionsTest()
+    {
+        $retries = 4;
+        $i = 0;
+        $func = function () use (&$i, $retries) {
+            if (++$i == $retries) {
+                // return on the final retry
+                return;
+            }
+            throw new \Exception('Something goes wrong');
+        };
+        $this->runEventuallyConsistentTest($func, $retries);
     }
 }
