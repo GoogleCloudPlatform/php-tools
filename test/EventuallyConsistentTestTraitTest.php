@@ -43,4 +43,19 @@ class EventuallyConsistentTestTraitTest extends \PHPUnit_Framework_TestCase
         $this->runEventuallyConsistentTest($func, $retries);
         $this->assertEquals($i, $retries);
     }
+
+    public function testCatchAllExceptionsTest()
+    {
+        $retries = 4;
+        $i = 0;
+        $func = function () use (&$i, $retries, true) {
+            if (++$i == $retries) {
+                // return on the final retry
+                return;
+            }
+            throw new \Exception('Something goes wrong');
+        };
+        $this->runEventuallyConsistentTest($func, $retries);
+        $this->assertEquals($i, $retries);
+    }
 }
