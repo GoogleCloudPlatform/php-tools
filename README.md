@@ -1,4 +1,4 @@
-# Testing utilities for Google Cloud Platform
+# Utilities for Google Cloud Platform
 
 ## Install
 
