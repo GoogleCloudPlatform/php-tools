@@ -1,0 +1,20 @@
+steps:
+{% if cloud_sql_instances %}
+  - name: gcr.io/cloud-builders/docker
+    args: ['pull', '{{ cloud_sql_proxy_image }}']
+    id: cloud-sql-proxy-pull
+  - name: gcr.io/cloud-builders/docker
+    args: ['run', '-d', '--network=cloudbuild', '-v', '/cloudsql:/cloudsql', '{{ cloud_sql_proxy_image }}', '/cloud_sql_proxy', '-dir=/cloudsql', '-instances={{ cloud_sql_instances }}']
+    wait_for: ['cloud-sql-proxy-pull']
+    id: cloud-sql-proxy-run
+{% endif %}
+  - name: gcr.io/cloud-builders/docker
+    args: ['pull', '{{ target_image }}']
+    id: target-image-pull
+{% if cloud_sql_instances %}
+    wait_for: ['cloud-sql-proxy-run']
+{% endif %}
+  - name: gcr.io/cloud-builders/docker
+    args: ['run', '-t', '--network=cloudbuild', '-v', '/cloudsql:/cloudsql', '{{ target_image }}', {{ commands|raw }}]
+    wait_for: ['target-image-pull']
+    id: target-image-run

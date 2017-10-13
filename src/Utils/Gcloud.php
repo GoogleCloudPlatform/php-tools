@@ -55,33 +55,34 @@ class Gcloud
             self::warn('gcloud not authenticated');
             exit(1);
         }
+        $project = exec(
+            escapeshellcmd(
+                'gcloud config list core/project --format=value(core.project)'
+            )
+        );
+        if (empty($project)) {
+            self::warn('gcloud project configuration not set');
+            exit(1);
+        }
     }
 
     /**
      * Execute gcloud with the given argument.
      *
-     * @param string $args
-     * @param bool $capture If true, return the output. If false, return the
-     *        shell return value. **Defaults to** false.
-     * @param bool $echo If true, print the output. **Defaults to** false.
-     * @return int|string The shell return value, or the command output.
+     * @param array<string> $args
+     * @param string $output It will capture the command output and set the
+     *        output to this variable.
+     * @return int The shell return value
      */
-    function exec($args, $capture=false, $echo=false)
+    function exec($args, &$output)
     {
+        $cmd = 'gcloud ' . implode(' ', array_map('escapeshellarg', $args));
         exec(
-            escapeshellcmd("gcloud $args"),
-            $output,
+            $cmd,
+            $output_array,
             $ret
         );
-        if ($echo) {
-            echo implode(PHP_EOL, $output) . PHP_EOL;
-        }
-        if ($capture) {
-            if ($ret !== 0) {
-                self::warn('gcloud failed');
-            }
-            return implode(PHP_EOL, $output);
-        }
+        $output = implode(PHP_EOL, $output_array);
         return $ret;
     }
 }
