@@ -16,4 +16,4 @@
  */
 
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/sleeper.php';
+require_once __DIR__ . '/TestUtils/sleeper.php';

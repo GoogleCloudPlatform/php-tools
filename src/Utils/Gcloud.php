@@ -22,23 +22,7 @@ class Gcloud
     const E_NOTFOUND = 127;
 
     /**
-     * Print out the message to STDERR.
-     *
-     * @param string $message
-     */
-    private static function warn($message)
-    {
-        if (defined('STDERR')) {
-            fwrite(STDERR, $message . PHP_EOL);
-        } else {
-            $stderr = fopen('php://stderr', 'w');
-            fwrite($stderr, $message . PHP_EOL);
-            fclose($stderr);
-        }
-    }
-
-    /**
-     * Make sure gcloud is authenticated.
+     * Make sure gcloud is authenticated and the project is configured.
      */
     public function __construct()
     {
@@ -48,21 +32,20 @@ class Gcloud
             $ret
         );
         if ($ret !== 0) {
-            self::warn('gcloud failed');
-            exit($ret);
+            throw new \RuntimeException('gcloud failed');
         }
         if (empty($auths)) {
-            self::warn('gcloud not authenticated');
-            exit(1);
+            throw new \RuntimeException('gcloud not authenticated');
         }
         $project = exec(
             escapeshellcmd(
                 'gcloud config list core/project --format=value(core.project)'
-            )
+            ),
+            $output,
+            $ret
         );
         if (empty($project)) {
-            self::warn('gcloud project configuration not set');
-            exit(1);
+            throw new \RuntimeException('gcloud project configuration not set');
         }
     }
 
