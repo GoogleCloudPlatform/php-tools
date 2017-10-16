@@ -28,7 +28,6 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
 class FlexExecCommand extends Command
 {
-    const CLOUD_SQL_PROXY_IMAGE = 'gcr.io/cloudsql-docker/gce-proxy:1.11';
     const DEFAULT_SERVICE = 'default';
 
     /* @var Gcloud */
@@ -37,7 +36,7 @@ class FlexExecCommand extends Command
     /* @var \Twig_Environment */
     private $twig;
 
-    function __construct()
+    public function __construct()
     {
         parent::__construct();
         $this->gcloud = new Gcloud();
@@ -122,7 +121,7 @@ class FlexExecCommand extends Command
         // Use tempnam for unique dir name
         $tempnam = tempnam(sys_get_temp_dir(), 'flex-exec');
         // Delete on shutdown
-        register_shutdown_function(function() use ($tempnam) {
+        register_shutdown_function(function () use ($tempnam) {
             unlink($tempnam);
         });
         $workdir = $tempnam . '_workdir';
@@ -137,59 +136,22 @@ class FlexExecCommand extends Command
         if ($preserveWorkdir) {
             $output->writeln("<info>Preserving the workdir</info>");
         } else {
-            register_shutdown_function(function() use ($workdir, $fs) {
+            register_shutdown_function(function () use ($workdir, $fs) {
                 $fs->remove($workdir);
             });
         }
-        $template = $this->twig->load('cloudbuild.yaml.tmpl');
-        $context = [
-            'cloud_sql_instances' => $cloudSqlInstances,
-            'cloud_sql_proxy_image' => self::CLOUD_SQL_PROXY_IMAGE,
-            'target_image' => $image,
-            'commands' => implode(
-                ',',
-                array_map('escapeshellarg', $commands)
-            )
-        ];
-        $cloudBuildYaml = $template->render($context);
-        file_put_contents("$workdir/cloudbuild.yaml", $cloudBuildYaml);
         $output->writeln(
             'Running command: <info>'
             . implode(' ', $commands)
             . '</info>'
         );
-        $ret = $this->gcloud->exec(
-            [
-                'container',
-                'builds',
-                'submit',
-                "--config=$workdir/cloudbuild.yaml",
-                "$workdir"
-            ],
-            $cmdOutput
+        $flexExec = new FlexExec(
+            $image,
+            $commands,
+            $workdir,
+            $cloudSqlInstances
         );
-        // Save the command output for debugging
-        if ($preserveWorkdir) {
-            file_put_contents("$workdir/cloudbuild.log", $cmdOutput);
-        }
-        // Only print out the output for the relevant step
-        $separator = "\r\n";
-        $line = \strtok($cmdOutput, $separator);
-        while ($line != false) {
-            if ($cloudSqlInstances) {
-                $targetStep = 'Step #3';
-            } else {
-                $targetStep = 'Step #1';
-            }
-            if (\strpos($line, $targetStep) !== false) {
-                $output->writeln($line);
-            }
-            $line = \strtok($separator);
-        }
-        if ($ret !== 0) {
-            $output->writeln("<error>Failed to run the command</error>");
-            exit(1);
-        }
+        $output->writeln($flexExec->run());
         $output->writeln(
             '<info>`'
             . implode(' ', $commands)
@@ -197,6 +159,16 @@ class FlexExecCommand extends Command
         );
     }
 
+    /**
+     * Resolve the image name for the command execution. If the service is not
+     * specified, it uses `default` service. If the version is not specified,
+     * it will use the version of the latest deployment for the service.
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return array An array with two values, the first is the image name and
+     *         the second is the Cloud SQL instance names.
+     */
     protected function resolveImage(
         InputInterface $input,
         OutputInterface $output
@@ -205,7 +177,14 @@ class FlexExecCommand extends Command
         if (empty($service)) {
             $service = self::DEFAULT_SERVICE;
         }
-        $version = $this->resolveVersion($service, $input, $output);
+        $version = $input->getOption('version');
+        if (empty($version)) {
+            $version = $this->detectLatestDeployedVersion(
+                $service,
+                $input,
+                $output
+            );
+        }
         $output->writeln("Using service: <info>$service</info>");
         $output->writeln("Using version: <info>$version</info>");
         $ret = $this->gcloud->exec(
@@ -223,7 +202,7 @@ class FlexExecCommand extends Command
             $output->writeln('<error>Failed running `gcloud app versions describe`</error>');
             exit(1);
         }
-        $describe = json_decode($cmdOutput, true);
+        $describe = json_decode(implode(PHP_EOL, $cmdOutput), true);
         if (empty($describe)) {
             $output->writeln('<error>Could not decode the result of `gcloud app versions describe`</error>');
             exit(1);
@@ -240,22 +219,15 @@ class FlexExecCommand extends Command
         return [$image, $cloudSqlInstances];
     }
 
-    protected function resolveVersion(
-        $service,
-        InputInterface $input,
-        OutputInterface $output
-    ) {
-        $version = $input->getOption('target-version');
-        if (empty($version)) {
-            $version = $this->detectLatestDeployedVersion(
-                $service,
-                $input,
-                $output
-            );
-        }
-        return $version;
-    }
-
+    /**
+     * Detect the version of the latest deployment for the given service.
+     *
+     * @param string $service
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return string The version for the latest deployment for the given
+     *         service.
+     */
     protected function detectLatestDeployedVersion(
         $service,
         InputInterface $input,
@@ -274,7 +246,7 @@ class FlexExecCommand extends Command
             $cmdOutput
         );
         if (!empty($cmdOutput)) {
-            return  preg_split('/\s+/', $cmdOutput)[0];
+            return  preg_split('/\s+/', $cmdOutput[0])[0];
         }
     }
 }

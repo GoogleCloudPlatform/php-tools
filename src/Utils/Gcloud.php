@@ -40,7 +40,7 @@ class Gcloud
     /**
      * Make sure gcloud is authenticated.
      */
-    function __construct()
+    public function __construct()
     {
         $auths = exec(
             escapeshellcmd("gcloud auth list --format=value(account)"),
@@ -70,19 +70,18 @@ class Gcloud
      * Execute gcloud with the given argument.
      *
      * @param array<string> $args
-     * @param string $output It will capture the command output and set the
+     * @param array $output It will capture the command output and set the
      *        output to this variable.
      * @return int The shell return value
      */
-    function exec($args, &$output)
+    public function exec($args, &$output)
     {
         $cmd = 'gcloud ' . implode(' ', array_map('escapeshellarg', $args));
         exec(
             $cmd,
-            $output_array,
+            $output,
             $ret
         );
-        $output = implode(PHP_EOL, $output_array);
         return $ret;
     }
 }
