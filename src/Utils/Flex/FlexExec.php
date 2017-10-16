@@ -93,13 +93,13 @@ class FlexExec
             ],
             $cmdOutput
         );
-        if ($result !== 0) {
-            throw new \RuntimeException("Failed to run the command");
-        }
         file_put_contents(
             "$this->workdir/cloudbuild.log",
             implode(PHP_EOL, $cmdOutput)
         );
+        if ($result !== 0) {
+            throw new \RuntimeException("Failed to run the command");
+        }
         $ret = '';
         if ($this->cloudSqlInstances) {
             $targetStep = 'Step #3';
