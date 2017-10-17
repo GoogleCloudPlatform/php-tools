@@ -53,18 +53,12 @@ class Gcloud
      * Execute gcloud with the given argument.
      *
      * @param array<string> $args
-     * @param array $output It will capture the command output and set the
-     *        output to this variable.
-     * @return int The shell return value
+     * @return array [int, string] The shell return value and the command output
      */
-    public function exec($args, &$output)
+    public function exec($args)
     {
         $cmd = 'gcloud ' . implode(' ', array_map('escapeshellarg', $args));
-        exec(
-            $cmd,
-            $output,
-            $ret
-        );
-        return $ret;
+        exec($cmd, $output, $ret);
+        return [$ret, $output];
     }
 }

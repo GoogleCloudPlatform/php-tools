@@ -51,13 +51,19 @@ class FlexExec
      * @param array $commands The commands to run on the image
      * @param string $workdir Working directory
      * @param string $cloudSqlInstances Comma delimited Cloud SQL instance names
+     * @param Gcloud $gcloud Mainly for testing purpose
      */
-    public function __construct($image, $commands, $workdir, $cloudSqlInstances)
-    {
+    public function __construct(
+        $image,
+        $commands,
+        $workdir,
+        $cloudSqlInstances,
+        $gcloud = null
+    ) {
         if (!is_dir($workdir)) {
             throw new \InvalidArgumentException("$workdir is not a directory");
         }
-        $this->gcloud = new Gcloud();
+        $this->gcloud = ($gcloud == null) ? new Gcloud() : $gcloud;
         $loader = new \Twig_Loader_Filesystem(__DIR__ . '/templates');
         $this->twig = new \Twig_Environment($loader);
         $this->image = $image;
@@ -87,15 +93,14 @@ class FlexExec
         ];
         $cloudBuildYaml = $template->render($context);
         file_put_contents("$this->workdir/cloudbuild.yaml", $cloudBuildYaml);
-        $result = $this->gcloud->exec(
+        list($result, $cmdOutput) = $this->gcloud->exec(
             [
                 'container',
                 'builds',
                 'submit',
                 "--config=$this->workdir/cloudbuild.yaml",
                 "$this->workdir"
-            ],
-            $cmdOutput
+            ]
         );
         file_put_contents(
             "$this->workdir/cloudbuild.log",

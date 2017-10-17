@@ -194,7 +194,7 @@ class FlexExecCommand extends Command
         }
         $output->writeln("Using service: <info>$service</info>");
         $output->writeln("Using version: <info>$version</info>");
-        $ret = $this->gcloud->exec(
+        list($ret, $cmdOutput) = $this->gcloud->exec(
             [
                 'app',
                 'versions',
@@ -202,8 +202,7 @@ class FlexExecCommand extends Command
                 $version,
                 "--service=$service",
                 "--format=json"
-            ],
-            $cmdOutput
+            ]
         );
         if ($ret !== 0) {
             $output->writeln('<error>Failed running `gcloud app versions describe`</error>');
@@ -240,7 +239,7 @@ class FlexExecCommand extends Command
         InputInterface $input,
         OutputInterface $output
     ) {
-        $this->gcloud->exec(
+        list($_, $cmdOutput) = $this->gcloud->exec(
             [
                 'app',
                 'versions',
@@ -249,8 +248,7 @@ class FlexExecCommand extends Command
                 "--format=get(version.id)",
                 "--sort-by=~version.createTime",
                 "--limit=1"
-            ],
-            $cmdOutput
+            ]
         );
         if (!empty($cmdOutput)) {
             return  preg_split('/\s+/', $cmdOutput[0])[0];

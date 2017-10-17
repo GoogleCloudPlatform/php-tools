@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2016 Google Inc.
+ * Copyright 2017 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,7 +109,7 @@ class GcloudTest extends \PHPUnit_Framework_TestCase
             ['user@example.com', 'my-project', 'result']
         );
         $gcloud = new Gcloud();
-        $ret = $gcloud->exec(['app',  'deploy', 'my dir'], $output);
+        list($ret, $output) = $gcloud->exec(['app',  'deploy', 'my dir']);
         $this->assertEquals(0, $ret);
         $this->assertEquals(['output'], $output);
         global $_commands;
