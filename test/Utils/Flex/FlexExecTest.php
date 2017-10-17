@@ -19,7 +19,6 @@ namespace Google\Cloud\Utils\Flex\Test;
 
 use Google\Cloud\Utils\Flex\FlexExec;
 use Google\Cloud\Utils\Gcloud;
-use Prophecy\Argument;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
