@@ -19,6 +19,9 @@ namespace Google\Cloud\Utils\Flex;
 
 use Google\Cloud\Utils\Gcloud;
 
+/**
+ * A class for running command within a Docker image.
+ */
 class FlexExec
 {
     const CLOUD_SQL_PROXY_IMAGE = 'gcr.io/cloudsql-docker/gce-proxy:1.11';
@@ -42,6 +45,7 @@ class FlexExec
     private $workdir;
 
     /**
+     * FlexExec constructor
      *
      * @param string $image The target image
      * @param array $commands The commands to run on the image
@@ -63,7 +67,7 @@ class FlexExec
     }
 
     /**
-     * Run the commands on the image, using Cloud Container Builder
+     * Run the commands within the image, using Cloud Container Builder
      *
      * @return string The output of the relevant build step of the Container
      *         Builder job.

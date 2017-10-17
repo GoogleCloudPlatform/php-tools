@@ -26,6 +26,18 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
+/**
+ * CLI command for running a command with an image deployed to App Engine
+ * Flex.
+ *
+ * You can specify `--service` and `--target-version`, or leave it to the
+ * tool's automatic detection. The `service` defaults to `default` and the
+ * `version` is resolved to the latest deployed version on the service. You
+ * can also specify the image directly with `--image` option.
+ *
+ * When using the deployed image, it also detects the Cloud SQL connection
+ * configured for the deployment, and enable it for the command execution.
+ */
 class FlexExecCommand extends Command
 {
     const DEFAULT_SERVICE = 'default';
@@ -33,15 +45,10 @@ class FlexExecCommand extends Command
     /* @var Gcloud */
     private $gcloud;
 
-    /* @var \Twig_Environment */
-    private $twig;
-
     public function __construct()
     {
         parent::__construct();
         $this->gcloud = new Gcloud();
-        $loader = new \Twig_Loader_Filesystem(__DIR__ . '/templates');
-        $this->twig = new \Twig_Environment($loader);
     }
 
     protected function configure()
