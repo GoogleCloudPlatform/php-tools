@@ -17,8 +17,6 @@
 
 namespace Google\Cloud\Utils;
 
-use Google\Cloud\Utils\Gcloud;
-
 /**
  * A class for running command within a Docker image.
  */
