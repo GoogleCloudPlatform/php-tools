@@ -15,20 +15,20 @@
  * limitations under the License.
  */
 
-namespace Google\Cloud\Utils\Flex\Test;
+namespace Google\Cloud\Utils\Test;
 
-use Google\Cloud\Utils\Flex\FlexExec;
+use Google\Cloud\Utils\ContainerExec;
 use Google\Cloud\Utils\Gcloud;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
 /**
- * Class FlexExecTest
- * @package Google\Cloud\Utils\Flex\Test
+ * Class ContainerExecTest
+ * @package Google\Cloud\Utils\Test
  *
- * A class for testing FlexExec class
+ * A class for testing ContainerExec class
  */
-class FlexExecTest extends \PHPUnit_Framework_TestCase
+class ContainerExecTest extends \PHPUnit_Framework_TestCase
 {
     private $gcloud;
     private $fs;
@@ -54,10 +54,10 @@ class FlexExecTest extends \PHPUnit_Framework_TestCase
         $this->fs->remove($this->workdir);
     }
 
-    public function testFlexExecInit()
+    public function testContainerExecInit()
     {
         $image = 'gcr.io/my-project/my-image';
-        $flexExec = new FlexExec(
+        $containerExec = new ContainerExec(
             $image,
             ['ls', '-al', 'my dir'],
             $this->workdir,
@@ -66,11 +66,11 @@ class FlexExecTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testFlexExecNonDir()
+    public function testContainerExecNonDir()
     {
         $image = 'gcr.io/my-project/my-image';
         try {
-            $flexExec = new FlexExec(
+            $containerExec = new ContainerExec(
                 $image,
                 ['ls', '-al', 'my dir'],
                 $this->workdir . '-non-existing',
@@ -87,7 +87,7 @@ class FlexExecTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testFlexExecRun()
+    public function testContainerExecRun()
     {
         $image = 'gcr.io/my-project/my-image';
         $this->gcloud->exec(
@@ -99,13 +99,13 @@ class FlexExecTest extends \PHPUnit_Framework_TestCase
                 "$this->workdir"
             ]
         )->shouldBeCalledTimes(1)->willReturn([0, ['output']]);
-        $flexExec = new FlexExec(
+        $containerExec = new ContainerExec(
             $image,
             ['ls', '-al', 'my dir'],
             $this->workdir,
             '',
             $this->gcloud->reveal()
         );
-        $flexExec->run();
+        $containerExec->run();
     }
 }

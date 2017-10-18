@@ -17,6 +17,7 @@
 
 namespace Google\Cloud\Utils\Flex;
 
+use Google\Cloud\Utils\ContainerExec;
 use Google\Cloud\Utils\Gcloud;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -152,13 +153,13 @@ class FlexExecCommand extends Command
             . implode(' ', $commands)
             . '</info>'
         );
-        $flexExec = new FlexExec(
+        $containerExec = new ContainerExec(
             $image,
             $commands,
             $workdir,
             $cloudSqlInstances
         );
-        $output->writeln($flexExec->run());
+        $output->writeln($containerExec->run());
         $output->writeln(
             '<info>`'
             . implode(' ', $commands)
@@ -218,6 +219,7 @@ class FlexExecCommand extends Command
             exit(1);
         }
         $image = $describe['deployment']['container']['image'];
+        $cloudSqlInstances = '';
         if (array_key_exists('betaSettings', $describe)
             && array_key_exists('cloud_sql_instances', $describe['betaSettings'])) {
             $cloudSqlInstances = $describe['betaSettings']['cloud_sql_instances'];
