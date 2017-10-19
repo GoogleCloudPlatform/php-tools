@@ -18,7 +18,13 @@
 
 namespace Google\Cloud\Utils\Flex;
 
-require_once __DIR__ . '/../../../vendor/autoload.php';
+if (file_exists(__DIR__ . '/../../../vendor/autoload.php')) {
+    // Run the command from the git clone.
+    require_once __DIR__ . '/../../../vendor/autoload.php';
+} else if (file_exists(__DIR__ . '/../../../../../../vendor/autoload.php')) {
+    // Run the command from the vendor dir installation.
+    require_once __DIR__ . '/../../../../../../vendor/autoload.php';
+}
 
 use Google\Cloud\Utils\Flex\FlexExecCommand;
 
