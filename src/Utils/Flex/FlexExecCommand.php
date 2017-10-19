@@ -46,10 +46,10 @@ class FlexExecCommand extends Command
     /* @var Gcloud */
     private $gcloud;
 
-    public function __construct()
+    public function __construct(Gcloud $gcloud = null)
     {
         parent::__construct();
-        $this->gcloud = new Gcloud();
+        $this->gcloud = ($gcloud == null) ? new Gcloud() : $gcloud;
     }
 
     protected function configure()
@@ -91,6 +91,12 @@ class FlexExecCommand extends Command
                 InputOption::VALUE_NONE,
                 'Preserve the temporary workdir'
             )
+            ->addOption(
+                'workdir',
+                'd',
+                InputOption::VALUE_NONE,
+                'Temporary workdir'
+            )
             ->addArgument(
                 'commands',
                 InputArgument::IS_ARRAY | InputArgument::REQUIRED,
@@ -126,19 +132,22 @@ class FlexExecCommand extends Command
                 "Using cloudSqlInstances: <info>$cloudSqlInstances</info>"
             );
         }
-        // Use tempnam for unique dir name
-        $tempnam = tempnam(sys_get_temp_dir(), 'flex-exec');
-        // Delete on shutdown
-        register_shutdown_function(function () use ($tempnam) {
-            unlink($tempnam);
-        });
-        $workdir = $tempnam . '_workdir';
-        try {
-            $fs->mkdir($workdir);
-        } catch (IOExceptionInterface $e) {
-            $output->writeln("<error>Failed to create $workdir</error>");
-            $output->writeln($e->getTraceAsString());
-            exit(1);
+        $workdir = $input->getOption('workdir');
+        if (empty($workdir)) {
+            // Use tempnam for unique dir name
+            $tempnam = tempnam(sys_get_temp_dir(), 'flex-exec');
+            // Delete on shutdown
+            register_shutdown_function(function () use ($tempnam) {
+                unlink($tempnam);
+            });
+            $workdir = $tempnam . '_workdir';
+            try {
+                $fs->mkdir($workdir);
+            } catch (IOExceptionInterface $e) {
+                $output->writeln("<error>Failed to create $workdir</error>");
+                $output->writeln($e->getTraceAsString());
+                exit(1);
+            }
         }
         $output->writeln("Using workdir: <info>$workdir</info>");
         if ($preserveWorkdir) {
@@ -157,7 +166,8 @@ class FlexExecCommand extends Command
             $image,
             $commands,
             $workdir,
-            $cloudSqlInstances
+            $cloudSqlInstances,
+            $this->gcloud
         );
         $output->writeln($containerExec->run());
         $output->writeln(
@@ -185,7 +195,7 @@ class FlexExecCommand extends Command
         if (empty($service)) {
             $service = self::DEFAULT_SERVICE;
         }
-        $version = $input->getOption('version');
+        $version = $input->getOption('target-version');
         if (empty($version)) {
             $version = $this->detectLatestDeployedVersion(
                 $service,

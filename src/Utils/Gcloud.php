@@ -17,10 +17,11 @@
 
 namespace Google\Cloud\Utils;
 
+/**
+ * A class for executing gcloud commmands
+ */
 class Gcloud
 {
-    const E_NOTFOUND = 127;
-
     /**
      * Make sure gcloud is authenticated and the project is configured.
      */

@@ -1,0 +1,8 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ['pull', 'us.gcr.io/my-project/appengine/default.my-version@sha256:sha256valuefortest']
+    id: target-image-pull
+  - name: gcr.io/cloud-builders/docker
+    args: ['run', '-t', '--network=cloudbuild', '-v', '/cloudsql:/cloudsql', 'us.gcr.io/my-project/appengine/default.my-version@sha256:sha256valuefortest', 'ls','my dir']
+    wait_for: ['target-image-pull']
+    id: target-image-run
