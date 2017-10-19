@@ -1,0 +1,42 @@
+{
+  "automaticScaling": {
+    "coolDownPeriod": "120s",
+    "cpuUtilization": {
+      "targetUtilization": 0.5
+    },
+    "maxTotalInstances": 20,
+    "minTotalInstances": 2
+  },
+  "betaSettings": {
+    "cloud_sql_instances": "my-project:us-central1:my-instance",
+    "has_docker_image": "true",
+    "module_yaml_path": "app.yaml",
+    "no_appserver_affinity": "true",
+    "use_deployment_manager": "true"
+  },
+  "createTime": "2017-10-10T18:04:31Z",
+  "createdBy": "tmatsuo@google.com",
+  "deployment": {
+    "container": {
+      "image": "us.gcr.io/my-project/appengine/default.my-version@sha256:sha256valuefortest"
+    }
+  },
+  "env": "flexible",
+  "handlers": [
+    {
+      "authFailAction": "AUTH_FAIL_ACTION_REDIRECT",
+      "login": "LOGIN_OPTIONAL",
+      "script": {
+        "scriptPath": "PLACEHOLDER"
+      },
+      "securityLevel": "SECURE_OPTIONAL",
+      "urlRegex": ".*"
+    }
+  ],
+  "id": "my-version",
+  "name": "apps/my-project/services/default/versions/my-version",
+  "runtime": "php",
+  "servingStatus": "SERVING",
+  "threadsafe": true,
+  "versionUrl": "https://my-version-dot-my-project.appspot.com"
+}

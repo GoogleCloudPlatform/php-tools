@@ -1,6 +1,7 @@
+#!/usr/bin/env php
 <?php
 /**
- * Copyright 2016 Google Inc.
+ * Copyright 2017 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,5 +16,14 @@
  * limitations under the License.
  */
 
-require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/TestUtils/sleeper.php';
+namespace Google\Cloud\Utils\Flex;
+
+require_once __DIR__ . '/../../../vendor/autoload.php';
+
+use Google\Cloud\Utils\Flex\FlexExecCommand;
+
+use Symfony\Component\Console\Application;
+
+$app = new Application();
+$app->add(new FlexExecCommand());
+$app->run();

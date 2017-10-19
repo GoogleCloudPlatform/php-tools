@@ -17,8 +17,8 @@
 <phpunit bootstrap="test/bootstrap.php">
     <testsuites>
       <testsuite name="Unit tests for php-tools">
-        <file>test/GcloudWrapperTest.php</file>
-        <file>test/EventuallyConsistentTestTraitTest.php</file>
+        <directory suffix="Test.php">test/Utils</directory>
+        <directory suffix="Test.php">test/TestUtils</directory>
       </testsuite>
     </testsuites>
     <logging>
