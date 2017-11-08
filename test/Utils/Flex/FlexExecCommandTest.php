@@ -22,6 +22,7 @@ use Google\Cloud\Utils\Gcloud;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class FlexExecCommandTest
@@ -29,7 +30,7 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
  *
  * A class for testing FlexExecCommand class
  */
-class FlexExecCommandTest extends \PHPUnit_Framework_TestCase
+class FlexExecCommandTest extends TestCase
 {
     private $gcloud;
     private $fs;

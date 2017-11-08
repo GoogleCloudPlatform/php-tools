@@ -21,6 +21,7 @@ use Google\Cloud\Utils\ContainerExec;
 use Google\Cloud\Utils\Gcloud;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class ContainerExecTest
@@ -28,7 +29,7 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
  *
  * A class for testing ContainerExec class
  */
-class ContainerExecTest extends \PHPUnit_Framework_TestCase
+class ContainerExecTest extends TestCase
 {
     private $gcloud;
     private $fs;

@@ -18,6 +18,7 @@
 namespace Google\Cloud\TestUtils\test;
 
 use Google\Cloud\TestUtils\EventuallyConsistentTestTrait;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class EventuallyConsistentTestTrait
@@ -25,7 +26,7 @@ use Google\Cloud\TestUtils\EventuallyConsistentTestTrait;
  *
  * A class for testing EventuallyConsistentTestTrait.
  */
-class EventuallyConsistentTestTraitTest extends \PHPUnit_Framework_TestCase
+class EventuallyConsistentTestTraitTest extends TestCase
 {
     use EventuallyConsistentTestTrait;
 
