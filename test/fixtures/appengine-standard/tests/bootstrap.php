@@ -20,5 +20,4 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use Google\Cloud\TestUtils\PHPUnit4To6Sim;
 
-// Commented out for intentionally failure
-// PHPUnit4To6Sim::install();
+PHPUnit4To6Sim::install();
