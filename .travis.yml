@@ -36,6 +36,7 @@ env:
 before_install:
   - php scripts/dump_credentials.php
   - travis_retry scripts/install_test_deps.sh
+  - sudo apt-get update && sudo apt-get install python-ipaddr
 
 script:
   - if [ "${RUN_CS_FIXER}" = "true" ]; then ./php-cs-fixer fix --dry-run --diff .; fi;
