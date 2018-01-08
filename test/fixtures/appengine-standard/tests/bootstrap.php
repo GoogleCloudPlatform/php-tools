@@ -18,6 +18,6 @@
 require_once __DIR__ . '/../../../../vendor/autoload.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use Google\Cloud\TestUtils\PHPUnit4To6Sim;
+use Google\Cloud\TestUtils\PHPUnit4To6Shim;
 
-PHPUnit4To6Sim::install();
+PHPUnit4To6Shim::install();

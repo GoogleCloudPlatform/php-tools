@@ -17,7 +17,7 @@
 
 namespace Google\Cloud\TestUtils;
 
-class PHPUnit4To6Sim
+class PHPUnit4To6Shim
 {
     public static function install()
     {
