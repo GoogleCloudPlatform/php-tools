@@ -17,7 +17,12 @@
 
 namespace Google\Cloud\TestUtils;
 
-use PHPUnit_Framework_ExpectationFailedException;
+if (!class_exists('\PHPUnit\Framework\ExpectationFailedException', true)) {
+    class_alias(
+        '\PHPUnit_Framework_ExpectationFailedException',
+        '\PHPUnit\Framework\ExpectationFailedException'
+    );
+}
 
 /**
  * Trait EventuallyConsistentTestTrait
@@ -59,7 +64,7 @@ trait EventuallyConsistentTestTrait
                 $func();
                 return;
             } catch (
-                PHPUnit_Framework_ExpectationFailedException $testException) {
+                \PHPUnit\Framework\ExpectationFailedException $testException) {
                 sleep(++$attempts * 2);
             } catch (\Exception $testException) {
                 if ($catchAllExceptions) {
