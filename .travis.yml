@@ -43,7 +43,7 @@ script:
   - phpunit
   - pushd test/fixtures/appengine-standard
   - composer install
-  - ${TRAVIS_BUILD_DIR}/vendor/bin/phpunit
+  - phpunit
   - popd
 
 after_success:
