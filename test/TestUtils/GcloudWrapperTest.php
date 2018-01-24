@@ -18,6 +18,7 @@
 namespace Google\Cloud\TestUtils\test;
 
 use Google\Cloud\TestUtils\GcloudWrapper;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class GcloudWrapperTest
@@ -25,7 +26,7 @@ use Google\Cloud\TestUtils\GcloudWrapper;
  *
  * A class for testing GcloudWrapper class.
  */
-class GcloudWrapperTest extends \PHPUnit_Framework_TestCase
+class GcloudWrapperTest extends TestCase
 {
     /** @var \Symfony\Component\Process\Process */
     private $mockProcess;
