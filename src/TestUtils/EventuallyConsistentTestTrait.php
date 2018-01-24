@@ -65,10 +65,10 @@ trait EventuallyConsistentTestTrait
                 return;
             } catch (
                 \PHPUnit\Framework\ExpectationFailedException $testException) {
-                sleep(++$attempts * 2);
+                sleep(pow(2, ++$attempts));
             } catch (\Exception $testException) {
                 if ($catchAllExceptions) {
-                    sleep(++$attempts * 2);
+                    sleep(pow(2, ++$attempts));
                 } else {
                     throw $testException;
                 }
