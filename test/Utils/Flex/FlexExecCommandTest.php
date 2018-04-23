@@ -125,10 +125,9 @@ class FlexExecCommandTest extends \PHPUnit_Framework_TestCase
             ]
         );
         // Check the contents of the generated cloudbuild.yaml
-        $cloudbuild = file_get_contents("$this->workdir/cloudbuild.yaml");
-        $this->assertEquals(
-            file_get_contents($cloudbuildYaml),
-            $cloudbuild
+        $this->assertFileEquals(
+            $cloudbuildYaml,
+            "$this->workdir/cloudbuild.yaml"
         );
     }
 
