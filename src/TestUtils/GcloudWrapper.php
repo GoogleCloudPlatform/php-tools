@@ -183,7 +183,7 @@ class GcloudWrapper
         $this->process->start();
         chdir($orgDir);
         sleep(3);
-        if (! $this->process->isRunning()) {
+        if (!$this->process->isRunning()) {
             $this->errorLog('dev_appserver failed to run.');
             $this->errorLog($this->process->getErrorOutput());
             return false;
@@ -232,7 +232,7 @@ class GcloudWrapper
      */
     public function getLocalBaseUrl()
     {
-        if (! $this->isRunning) {
+        if (!$this->isRunning) {
             $this->errorLog('The app is not running.');
             return false;
         }
@@ -248,9 +248,8 @@ class GcloudWrapper
      */
     public function getBaseUrl($service = 'default')
     {
-        if (! $this->deployed) {
+        if (!$this->deployed) {
             $this->errorLog('The app has not been deployed.');
-            return false;
         }
         if ($service === 'default') {
             $url = sprintf(

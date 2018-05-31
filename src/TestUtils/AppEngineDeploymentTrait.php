@@ -27,9 +27,9 @@ use GuzzleHttp\Client;
  */
 trait AppEngineDeploymentTrait
 {
-    /** @var  \Google\Cloud\TestUtils\GcloudWrapper */
+    /** @var \Google\Cloud\TestUtils\GcloudWrapper */
     private static $gcloudWrapper;
-    /** @var  \GuzzleHttp\Client */
+    /** @var \GuzzleHttp\Client */
     private $client;
 
     /**
@@ -70,7 +70,9 @@ trait AppEngineDeploymentTrait
 
     private static function doDeploy()
     {
-        return self::$gcloudWrapper->deploy();
+        if (getenv('GOOGLE_SKIP_DEPLOYMENT') !== 'true') {
+            return self::$gcloudWrapper->deploy();
+        }
     }
 
     /**
