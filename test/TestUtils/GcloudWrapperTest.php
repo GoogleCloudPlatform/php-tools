@@ -76,8 +76,6 @@ class GcloudWrapperTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->mockGcloudWrapper->delete();
-
-        $this->assertEquals(false, $this->mockGcloudWrapper->getBaseUrl());
     }
 
     public function testDeployAndDeleteWithCustomArgs()
@@ -110,8 +108,6 @@ class GcloudWrapperTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->mockGcloudWrapper->delete('myservice', 4);
-
-        $this->assertEquals(false, $this->mockGcloudWrapper->getBaseUrl());
     }
 
     public function testRunAndStopWithDefault()
