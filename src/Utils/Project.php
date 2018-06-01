@@ -107,7 +107,7 @@ class Project
             $output, $ret);
         $this->info = array_merge($this->info, $output);
         if ($ret !== 0) {
-            $this->info[] = 'Failed to run composer update in ' . $this->dir
+            $this->errors[] = 'Failed to run composer update in ' . $this->dir
                 . '. Please run it by yourself before running WordPress.';
         }
     }
