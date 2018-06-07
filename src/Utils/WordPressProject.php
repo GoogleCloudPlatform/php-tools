@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2016 Google Inc.
+ * Copyright 2018 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ class WordPressProject
             throw new Exception('Operation canceled.');
         }
 
-        // create a project object
+        // Create a project object
         $this->output->writeln("Creating a project in <info>$dir</info>");
         $this->project = new Project($dir);
         $this->report();
