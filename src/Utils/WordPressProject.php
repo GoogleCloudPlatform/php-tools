@@ -20,6 +20,8 @@ namespace Google\Cloud\Utils;
 use Exception;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Helper\QuestionHelper;
 
@@ -29,7 +31,7 @@ class WordPressProject
     const DEFAULT_DB_REGION = 'us-central1';
 
     const LATEST_WP = 'https://wordpress.org/latest.tar.gz';
-    const LATEST_BATCHACE = 'https://downloads.wordpress.org/plugin/batcache.1.4.zip';
+    const LATEST_BATCACHE = 'https://downloads.wordpress.org/plugin/batcache.1.4.zip';
     const LATEST_MEMCACHED = 'https://downloads.wordpress.org/plugin/memcached.3.0.1.zip';
     const LATEST_GAE_WP = 'https://downloads.wordpress.org/plugin/google-app-engine.1.6.zip';
     const LATEST_GCS_PLUGIN =  'https://downloads.wordpress.org/plugin/gcs.0.1.2.zip';
@@ -37,12 +39,13 @@ class WordPressProject
     private $input;
     private $output;
     private $helper;
+    private $project;
 
-    public function __construct(InputInterface $input, OutputInterface $output)
+    public function __construct(InputInterface $input, OutputInterface $output, QuestionHelper $helper = null)
     {
         $this->input = $input;
         $this->output = $output;
-        $this->helper = new QuestionHelper();
+        $this->helper = $helper ?: new QuestionHelper();
     }
 
     public function initializeProject()
@@ -67,27 +70,27 @@ class WordPressProject
         }
 
         // create a project object
-        $project = new Project($dir);
-        $this->report();
         $this->output->writeln("Creating a project in <info>$dir</info>");
+        $this->project = new Project($dir);
+        $this->report();
 
-        $this->project = $project;
-        return $project->getDir();
+        return $this->project->getDir();
     }
 
     /**
      * Set up WordPress for Cloud SQL Generation 2
      */
-    public function initializeDatabase(Project $project)
+    public function initializeDatabase()
     {
         // Get the database region
         $region = $this->input->getOption('db_region');
-        if (!in_array($region, $project->getAvailableDbRegions())) {
+        $availableDbRegions = $this->project->getAvailableDbRegions();
+        if (!in_array($region, $availableDbRegions)) {
             $q = new ChoiceQuestion(
                 'Please select the region of your Cloud SQL instance '
-                . "(defaults to $defaultDbRegion)",
-                $project->getAvailableDbRegions(),
-                $defaultDbRegion
+                . sprintf('(defaults to %s)', self::DEFAULT_DB_REGION),
+                $availableDbRegions,
+                array_search(self::DEFAULT_DB_REGION, $availableDbRegions)
             );
             $q->setErrorMessage('DB region %s is invalid.');
             $region = $this->ask($q);
@@ -97,17 +100,17 @@ class WordPressProject
         // Get the other DB parameters
         $params = $this->askParameters([
             'project_id' => '',
-            'db_instance' => 'wp',
-            'db_name' => 'wp',
-            'db_user' => 'wp',
+            'db_instance' => '',
+            'db_name' => '',
+            'db_user' => '',
             'db_password' => '',
         ]);
 
         // Set the database connection string
         $params['db_connection'] = sprintf(
             '%s:%s:%s',
-            $region,
             $params['project_id'],
+            $region,
             $params['db_instance']
         );
 
@@ -131,60 +134,60 @@ class WordPressProject
         return $params;
     }
 
-    public function downloadWordpress(Project $project)
+    public function downloadWordpress()
     {
         $this->output->writeln('Downloading the WordPress archive...');
-        $project->downloadArchive(
-            'the WordPress archive', $input->getOption('wordpress_url'));
+        $this->project->downloadArchive(
+            'the WordPress archive', $this->input->getOption('wordpress_url'));
         $this->report();
     }
 
-    public function downloadBatcachePlugin(Project $project)
+    public function downloadBatcachePlugin()
     {
         $this->output->writeln('Downloading the Batcache plugin...');
-        $project->downloadArchive(
-            'Batcache plugin', $latestBatcache,
+        $this->project->downloadArchive(
+            'Batcache plugin', self::LATEST_BATCACHE,
             '/wordpress/wp-content/plugins'
         );
         $this->report();
         $this->output->writeln('Copying drop-ins...');
-        $dir = $project->getDir();
+        $dir = $this->project->getDir();
         copy(
             $dir . '/wordpress/wp-content/plugins/batcache/advanced-cache.php',
             $dir . '/wordpress/wp-content/advanced-cache.php'
         );
     }
 
-    public function downloadMemcachedPlugin(Project $project)
+    public function downloadMemcachedPlugin()
     {
         $this->output->writeln('Downloading the Memcached plugin...');
-        $project->downloadArchive(
-            'Memcached plugin', $latestMemcached,
+        $this->project->downloadArchive(
+            'Memcached plugin', self::LATEST_MEMCACHED,
             '/wordpress/wp-content/plugins'
         );
         $this->report();
         $this->output->writeln('Copying drop-ins...');
-        $dir = $project->getDir();
+        $dir = $this->project->getDir();
         copy(
             $dir . '/wordpress/wp-content/plugins/memcached/object-cache.php',
             $dir . '/wordpress/wp-content/object-cache.php'
         );
     }
 
-    public function downloadAppEnginePlugin(Project $project)
+    public function downloadAppEnginePlugin()
     {
         $this->output->writeln('Downloading the appengine-wordpress plugin...');
-        $project->downloadArchive(
-            'App Engine WordPress plugin', $latestGaeWp,
+        $this->project->downloadArchive(
+            'App Engine WordPress plugin', self::LATEST_GAE_WP,
             '/wordpress/wp-content/plugins'
         );
         $this->report();
     }
 
-    public function downloadGcsPlugin(Project $project)
+    public function downloadGcsPlugin()
     {
         $this->output->writeln('Downloading the GCS plugin...');
-        $project->downloadArchive(
+        $this->project->downloadArchive(
             'GCS plugin', self::LATEST_GCS_PLUGIN,
             '/wordpress/wp-content/plugins'
         );
@@ -207,9 +210,11 @@ class WordPressProject
 
     public function copyFiles($path, $files, $params = [])
     {
-        // uppercase all the keys
+        // uppercase all the keys and prefix with "YOUR_"
         $params = array_combine(
-            array_map('strtoupper', array_keys($params)),
+            array_map(function($key) {
+                return 'YOUR_' . strtoupper($key);
+            }, array_keys($params)),
             array_values($params)
         );
 
@@ -223,7 +228,20 @@ class WordPressProject
         $this->report();
     }
 
-    private function askParameters(array $configKeys) {
+    private function report()
+    {
+        if ($this->project) {
+            foreach ($this->project->getInfo() as $value) {
+                $this->output->writeln("<info>" . $value . "</info>");
+            }
+            if ($this->project->getErrors()) {
+                throw new Exception(implode("\n", $this->project->getErrors()));
+            }
+        }
+    }
+
+    private function askParameters(array $configKeys)
+    {
         $params = [];
         foreach ($configKeys as $key => $default) {
             $value = $this->input->getOption($key);
@@ -232,11 +250,11 @@ class WordPressProject
             }
             while (empty($value)) {
                 if (empty($default)) {
-                    $default = '(required)';
+                    $defaultText = '(required)';
                 } else {
-                    $default = '(defaults to \'' . $default . '\')';
+                    $defaultText = '(defaults to \'' . $default . '\')';
                 }
-                $q = new Question("Please enter $key $default: ", $default);
+                $q = new Question("Please enter $key $defaultText: ", $default);
                 if (strpos($key, 'password') !== false) {
                     $q->setHidden(true);
                     $q->setHiddenFallback(false);
@@ -254,17 +272,5 @@ class WordPressProject
     private function ask(Question $q)
     {
         return $this->helper->ask($this->input, $this->output, $q);
-    }
-
-    private function report()
-    {
-        if ($this->project) {
-            foreach ($project->getInfo() as $value) {
-                $this->output->writeln("<info>" . $value . "</info>");
-            }
-            if ($project->getErrors()) {
-                throw new Exception(implode("\n", $project->getErrors()));
-            }
-        }
     }
 }
