@@ -32,9 +32,9 @@ class WordPressProjectTest extends \PHPUnit_Framework_TestCase
 {
     public function testInitializeDatabase()
     {
-        $input = $this->getMock(InputInterface::class);
-        $output = $this->getMock(OutputInterface::class);
-        $helper = $this->getMock(QuestionHelper::class);
+        $input = $this->createMock(InputInterface::class);
+        $output = $this->createMock(OutputInterface::class);
+        $helper = $this->createMock(QuestionHelper::class);
         $i = 0;
         $input
             ->expects($this->exactly(7))
@@ -77,8 +77,8 @@ class WordPressProjectTest extends \PHPUnit_Framework_TestCase
 
     public function testDownloadWordPress()
     {
-        $input = $this->getMock(InputInterface::class);
-        $output = $this->getMock(OutputInterface::class);
+        $input = $this->createMock(InputInterface::class);
+        $output = $this->createMock(OutputInterface::class);
         $input
             ->expects($this->exactly(2))
             ->method('getOption')
