@@ -212,7 +212,7 @@ class WordPressProject
     {
         // uppercase all the keys and prefix with "YOUR_"
         $params = array_combine(
-            array_map(function($key) {
+            array_map(function ($key) {
                 return 'YOUR_' . strtoupper($key);
             }, array_keys($params)),
             array_values($params)

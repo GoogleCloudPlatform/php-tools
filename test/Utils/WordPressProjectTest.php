@@ -39,7 +39,7 @@ class WordPressProjectTest extends \PHPUnit_Framework_TestCase
         $input
             ->expects($this->exactly(7))
             ->method('getOption')
-            ->will($this->returnCallback(function($optionName) {
+            ->will($this->returnCallback(function ($optionName) {
                 if ($optionName == 'dir') {
                     return sys_get_temp_dir() . '/wp-project' . rand();
                 }
@@ -55,7 +55,7 @@ class WordPressProjectTest extends \PHPUnit_Framework_TestCase
         $helper
             ->expects($this->any())
             ->method('ask')
-            ->will($this->returnCallback(function($optionName) use (&$i) {
+            ->will($this->returnCallback(function ($optionName) use (&$i) {
                 return 'value_' . $i++;
             }));
 
@@ -86,7 +86,7 @@ class WordPressProjectTest extends \PHPUnit_Framework_TestCase
                 $this->equalTo('dir'),
                 $this->equalTo('wordpress_url')
             ))
-            ->will($this->returnCallback(function($optionName) {
+            ->will($this->returnCallback(function ($optionName) {
                 if ($optionName == 'dir') {
                     return sys_get_temp_dir() . '/wp-project' . rand();
                 }
