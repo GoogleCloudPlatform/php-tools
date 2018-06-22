@@ -46,7 +46,8 @@ class EventuallyConsistentTestTraitTest extends \PHPUnit_Framework_TestCase
         };
         try {
             $this->runEventuallyConsistentTest($func, $retries);
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
         $this->assertEquals($retries, $i);
     }
 
@@ -70,7 +71,8 @@ class EventuallyConsistentTestTraitTest extends \PHPUnit_Framework_TestCase
         $this->eventuallyConsistentRetryCount = $retries;
         try {
             $this->runEventuallyConsistentTest($func);
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
         $this->assertEquals($retries, $i);
     }
 
@@ -84,7 +86,8 @@ class EventuallyConsistentTestTraitTest extends \PHPUnit_Framework_TestCase
         };
         try {
             $this->runEventuallyConsistentTest($func, $retries, true);
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
         $this->assertEquals($retries, $i);
     }
 
@@ -99,7 +102,8 @@ class EventuallyConsistentTestTraitTest extends \PHPUnit_Framework_TestCase
         $this->catchAllExceptions = true;
         try {
             $this->runEventuallyConsistentTest($func, $retries);
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
         $this->assertEquals($i, $retries);
     }
 
@@ -113,7 +117,8 @@ class EventuallyConsistentTestTraitTest extends \PHPUnit_Framework_TestCase
         };
         try {
             $this->runEventuallyConsistentTest($func, $retries);
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
         $this->assertEquals(1, $i);
     }
 }
