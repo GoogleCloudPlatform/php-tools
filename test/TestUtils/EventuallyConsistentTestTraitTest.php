@@ -40,61 +40,85 @@ class EventuallyConsistentTestTraitTest extends \PHPUnit_Framework_TestCase
     {
         $retries = 4;
         $i = 0;
-        $func = function () use (&$i, $retries) {
-            if (++$i == $retries) {
-                // return on the final retry
-                return;
-            }
+        $func = function () use (&$i) {
+            $i++;
             $this->assertTrue(false);
         };
-        $this->runEventuallyConsistentTest($func, $retries);
-        $this->assertEquals($i, $retries);
+        try {
+            $this->runEventuallyConsistentTest($func, $retries);
+        } catch (\Exception $e) {
+        }
+        $this->assertEquals($retries, $i);
+    }
+
+    public function testEventuallyConsistentTestReturnsValue()
+    {
+        $func = function () {
+            return 'foo';
+        };
+        $retVal = $this->runEventuallyConsistentTest($func);
+        $this->assertEquals('foo', $retVal);
+    }
+
+    public function testRetryCountInstanceVarTest()
+    {
+        $retries = 10;
+        $i = 0;
+        $func = function () use (&$i) {
+            $i++;
+            $this->assertTrue(false);
+        };
+        $this->eventuallyConsistentRetryCount = $retries;
+        try {
+            $this->runEventuallyConsistentTest($func);
+        } catch (\Exception $e) {
+        }
+        $this->assertEquals($retries, $i);
     }
 
     public function testCatchAllExceptionsTest()
     {
         $retries = 4;
         $i = 0;
-        $func = function () use (&$i, $retries) {
-            if (++$i == $retries) {
-                // return on the final retry
-                return;
-            }
+        $func = function () use (&$i) {
+            $i++;
             throw new \Exception('Something goes wrong');
         };
-        $this->runEventuallyConsistentTest($func, $retries, true);
-        $this->assertEquals($i, $retries);
+        try {
+            $this->runEventuallyConsistentTest($func, $retries, true);
+        } catch (\Exception $e) {
+        }
+        $this->assertEquals($retries, $i);
     }
 
     public function testCatchAllExceptionsWithInstanceVarTest()
     {
         $retries = 4;
         $i = 0;
-        $func = function () use (&$i, $retries) {
-            if (++$i == $retries) {
-                // return on the final retry
-                return;
-            }
+        $func = function () use (&$i) {
+            $i++;
             throw new \Exception('Something goes wrong');
         };
         $this->catchAllExceptions = true;
-        $this->runEventuallyConsistentTest($func, $retries);
+        try {
+            $this->runEventuallyConsistentTest($func, $retries);
+        } catch (\Exception $e) {
+        }
         $this->assertEquals($i, $retries);
     }
-    /**
-     * @expectedException \Exception
-     */
+
     public function testNoCatchAllExceptionsTest()
     {
         $retries = 4;
         $i = 0;
-        $func = function () use (&$i, $retries) {
-            if (++$i == $retries) {
-                // return on the final retry
-                return;
-            }
+        $func = function () use (&$i) {
+            $i++;
             throw new \Exception('Something goes wrong');
         };
-        $this->runEventuallyConsistentTest($func, $retries);
+        try {
+            $this->runEventuallyConsistentTest($func, $retries);
+        } catch (\Exception $e) {
+        }
+        $this->assertEquals(1, $i);
     }
 }

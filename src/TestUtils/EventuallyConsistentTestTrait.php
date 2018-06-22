@@ -43,37 +43,44 @@ trait EventuallyConsistentTestTrait
 
     /**
      * @param callable $func The callable that runs tests
-     * @param int $retries The number of retry
+     * @param int $maxAttempts The number of attempts to make total
      * @param bool $catchAllExceptions Indicates whether or not catch all the
      *             exceptions other than the test failure.
      */
     private function runEventuallyConsistentTest(
         callable $func,
-        $retries = null,
+        $maxAttempts = null,
         $catchAllExceptions = null
     ) {
-        if (is_null($retries)) {
-            $retries = $this->eventuallyConsistentRetryCount;
+        if (is_null($maxAttempts)) {
+            $maxAttempts = $this->eventuallyConsistentRetryCount;
         }
         if (is_null($catchAllExceptions)) {
             $catchAllExceptions = $this->catchAllExceptions;
         }
         $attempts = 0;
-        while ($attempts <= $retries) {
+        while ($attempts < $maxAttempts) {
             try {
-                $func();
-                return;
+                return $func();
             } catch (
                 \PHPUnit\Framework\ExpectationFailedException $testException) {
-                sleep(pow(2, ++$attempts));
             } catch (\Exception $testException) {
-                if ($catchAllExceptions) {
-                    sleep(pow(2, ++$attempts));
-                } else {
+                if (!$catchAllExceptions) {
                     throw $testException;
                 }
             }
+            // Increment the number of attempts, and if we are going to attempt
+            // again, run the sleep function.
+            $attempts++;
+            if ($attempts < $maxAttempts) {
+                $this->retrySleepFunc($attempts);
+            }
         }
         throw $testException;
+    }
+
+    private function retrySleepFunc($attempts)
+    {
+        sleep(pow(2, $attempts));
     }
 }
