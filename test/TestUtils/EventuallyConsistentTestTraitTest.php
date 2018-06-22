@@ -50,6 +50,15 @@ class EventuallyConsistentTestTraitTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($retries, $i);
     }
 
+    public function testEventuallyConsistentTestReturnsValue()
+    {
+        $func = function () {
+            return 'foo';
+        };
+        $retVal = $this->runEventuallyConsistentTest($func);
+        $this->assertEquals('foo', $retVal);
+    }
+
     public function testRetryCountInstanceVarTest()
     {
         $retries = 10;
