@@ -26,4 +26,3 @@ $application->add(new Command('test'))
     });
 
 return $application;
-

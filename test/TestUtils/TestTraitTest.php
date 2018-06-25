@@ -23,7 +23,7 @@ use Google\Cloud\TestUtils\TestTrait;
  * Class TestTraitTest
  * @package Google\Cloud\TestUtils\Test
  *
- * A class for testing ExponentialBackoffTrait.
+ * A class for testing TestTrait.
  */
 class TestTraitTest extends \PHPUnit_Framework_TestCase
 {

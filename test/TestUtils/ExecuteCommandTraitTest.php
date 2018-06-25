@@ -23,7 +23,7 @@ use Google\Cloud\TestUtils\ExecuteCommandTrait;
  * Class ExecuteCommandTraitTest
  * @package Google\Cloud\TestUtils\Test
  *
- * A class for testing ExponentialBackoffTrait.
+ * A class for testing ExecuteCommandTrait.
  */
 class ExecuteCommandTraitTest extends \PHPUnit_Framework_TestCase
 {
