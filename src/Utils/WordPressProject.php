@@ -52,11 +52,11 @@ class WordPressProject extends Project
     {
         if (empty($dir)) {
             $dir = $this->promptForProjectDir();
+        } else {
+            $dir = $this->validateProjectDir($dir);
         }
-        // Create a project object
-        $this->output->writeln("Creating a project in <info>$dir</info>");
 
-        parent::__construct($dir);
+        $this->dir = $dir;
         $this->report();
 
         return $this->getDir();
@@ -82,7 +82,7 @@ class WordPressProject extends Project
         if (!$this->ask($q)) {
             throw new Exception('Operation canceled.');
         }
-        return $dir;
+        return $this->validateProjectDir($dir);
     }
 
     /**

@@ -19,7 +19,7 @@ namespace Google\Cloud\Utils;
 
 class Project
 {
-    private $dir;
+    protected $dir;
     private $errors = array();
     private $info = array();
     private static $availableDbRegions = [
@@ -40,6 +40,11 @@ class Project
 
     public function __construct($dir)
     {
+        $this->dir = $this->validateProjectDir($dir);
+    }
+
+    protected function validateProjectDir($dir)
+    {
         if ($this->isRelativePath($dir)) {
             $dir = getcwd() . DIRECTORY_SEPARATOR . $dir;
         }
@@ -54,7 +59,7 @@ class Project
         } else {
             $this->info[] = 'A directory ' . $dir . ' was created.';
         }
-        $this->dir = realpath($dir);
+        return realpath($dir);
     }
 
     public function downloadArchive($name, $url, $dir='')
@@ -140,7 +145,7 @@ class Project
 
     protected function getRelativeDir($dir)
     {
-        return $dir && $dir[0] == DIRECTORY_SEPARATOR
+        return $dir && $dir[0] === DIRECTORY_SEPARATOR
             ? $dir
             : $this->dir . DIRECTORY_SEPARATOR . $dir;
     }
