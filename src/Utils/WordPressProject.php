@@ -237,7 +237,7 @@ class WordPressProject extends Project
             array_values($params)
         );
 
-        $this->copyFiles($path, $files, $params);
+        parent::copyFiles($path, $files, $params);
         $this->report();
     }
 
