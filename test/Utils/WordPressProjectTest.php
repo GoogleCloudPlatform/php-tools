@@ -97,5 +97,36 @@ class WordPressProjectTest extends \PHPUnit_Framework_TestCase
         $dir = $project->initializeProject();
         $project->downloadWordpress();
         $this->assertFileExists($dir . '/wordpress/wp-login.php');
+
+        // test downloading a plugin
+        $project->downloadGcsPlugin();
+        $this->assertFileExists($dir . '/wordpress/wp-content/plugins/gcs/readme.txt');
+    }
+
+    public function testDownloadWordPressToDifferentDirectory()
+    {
+        $input = $this->createMock(InputInterface::class);
+        $output = $this->createMock(OutputInterface::class);
+        $dir = sys_get_temp_dir() . '/wp-project' . rand();
+        $input
+            ->expects($this->once())
+            ->method('getOption')
+            ->with($this->logicalOr(
+                $this->equalTo('dir'),
+                $this->equalTo('wordpress_url')
+            ))
+            ->will($this->returnCallback(function ($optionName) {
+                return WordPressProject::LATEST_WP;
+            }));
+
+        $project = new WordPressProject($input, $output);
+        $project->downloadWordpress($dir);
+        $project->initializeProject($dir);
+
+        $this->assertFileExists($dir . '/wp-login.php');
+
+        // test downloading a plugin
+        $project->downloadGcsPlugin();
+        $this->assertFileExists($dir . '/wp-content/plugins/gcs/readme.txt');
     }
 }

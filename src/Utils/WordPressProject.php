@@ -25,7 +25,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Helper\QuestionHelper;
 
-class WordPressProject
+class WordPressProject extends Project
 {
     const DEFAULT_DIR = 'my-wordpress-project';
     const DEFAULT_DB_REGION = 'us-central1';
@@ -39,7 +39,7 @@ class WordPressProject
     private $input;
     private $output;
     private $helper;
-    private $project;
+    private $wordPressDir;
 
     public function __construct(InputInterface $input, OutputInterface $output, QuestionHelper $helper = null)
     {
@@ -48,7 +48,21 @@ class WordPressProject
         $this->helper = $helper ?: new QuestionHelper();
     }
 
-    public function initializeProject()
+    public function initializeProject($dir = '')
+    {
+        if (empty($dir)) {
+            $dir = $this->promptForProjectDir();
+        } else {
+            $dir = $this->validateProjectDir($dir);
+        }
+
+        $this->dir = $dir;
+        $this->report();
+
+        return $this->getDir();
+    }
+
+    public function promptForProjectDir()
     {
         $dir = $this->input->getOption('dir');
         if ($dir === self::DEFAULT_DIR) {
@@ -68,13 +82,7 @@ class WordPressProject
         if (!$this->ask($q)) {
             throw new Exception('Operation canceled.');
         }
-
-        // Create a project object
-        $this->output->writeln("Creating a project in <info>$dir</info>");
-        $this->project = new Project($dir);
-        $this->report();
-
-        return $this->project->getDir();
+        return $this->validateProjectDir($dir);
     }
 
     /**
@@ -84,7 +92,7 @@ class WordPressProject
     {
         // Get the database region
         $region = $this->input->getOption('db_region');
-        $availableDbRegions = $this->project->getAvailableDbRegions();
+        $availableDbRegions = $this->getAvailableDbRegions();
         if (!in_array($region, $availableDbRegions)) {
             $q = new ChoiceQuestion(
                 'Please select the region of your Cloud SQL instance '
@@ -134,52 +142,62 @@ class WordPressProject
         return $params;
     }
 
-    public function downloadWordpress()
+    public function downloadWordpress($dir = 'wordpress')
     {
+        $tmpDir = sys_get_temp_dir();
+
         $this->output->writeln('Downloading the WordPress archive...');
-        $this->project->downloadArchive(
-            'the WordPress archive', $this->input->getOption('wordpress_url'));
+        $this->downloadArchive(
+            'the WordPress archive',
+            $this->input->getOption('wordpress_url'),
+            $tmpDir
+        );
+
+        // set the wordpress dir
+        $this->wordPressDir = $this->getRelativeDir($dir);
+        rename($tmpDir . DIRECTORY_SEPARATOR . 'wordpress', $this->wordPressDir);
         $this->report();
     }
 
     public function downloadBatcachePlugin()
     {
         $this->output->writeln('Downloading the Batcache plugin...');
-        $this->project->downloadArchive(
+        $dir = $this->getWordpressDir();
+        $this->downloadArchive(
             'Batcache plugin', self::LATEST_BATCACHE,
-            '/wordpress/wp-content/plugins'
+            $dir . '/wp-content/plugins'
         );
         $this->report();
         $this->output->writeln('Copying drop-ins...');
-        $dir = $this->project->getDir();
         copy(
-            $dir . '/wordpress/wp-content/plugins/batcache/advanced-cache.php',
-            $dir . '/wordpress/wp-content/advanced-cache.php'
+            $dir . '/wp-content/plugins/batcache/advanced-cache.php',
+            $dir . '/wp-content/advanced-cache.php'
         );
     }
 
     public function downloadMemcachedPlugin()
     {
         $this->output->writeln('Downloading the Memcached plugin...');
-        $this->project->downloadArchive(
+        $dir = $this->getWordpressDir();
+        $this->downloadArchive(
             'Memcached plugin', self::LATEST_MEMCACHED,
-            '/wordpress/wp-content/plugins'
+            $dir . '/wp-content/plugins'
         );
         $this->report();
         $this->output->writeln('Copying drop-ins...');
-        $dir = $this->project->getDir();
         copy(
-            $dir . '/wordpress/wp-content/plugins/memcached/object-cache.php',
-            $dir . '/wordpress/wp-content/object-cache.php'
+            $dir . '/wp-content/plugins/memcached/object-cache.php',
+            $dir . '/wp-content/object-cache.php'
         );
     }
 
     public function downloadAppEnginePlugin()
     {
         $this->output->writeln('Downloading the appengine-wordpress plugin...');
-        $this->project->downloadArchive(
+        $dir = $this->getWordpressDir();
+        $this->downloadArchive(
             'App Engine WordPress plugin', self::LATEST_GAE_WP,
-            '/wordpress/wp-content/plugins'
+            $dir . '/wp-content/plugins'
         );
         $this->report();
     }
@@ -187,9 +205,10 @@ class WordPressProject
     public function downloadGcsPlugin()
     {
         $this->output->writeln('Downloading the GCS plugin...');
-        $this->project->downloadArchive(
+        $dir = $this->getWordpressDir();
+        $this->downloadArchive(
             'GCS plugin', self::LATEST_GCS_PLUGIN,
-            '/wordpress/wp-content/plugins'
+            $dir . '/wp-content/plugins'
         );
         $this->report();
     }
@@ -218,25 +237,23 @@ class WordPressProject
             array_values($params)
         );
 
-        $this->project->copyFiles($path, $files, $params);
+        parent::copyFiles($path, $files, $params);
         $this->report();
     }
 
     public function runComposer()
     {
-        $this->project->runComposer();
+        parent::runComposer();
         $this->report();
     }
 
     private function report()
     {
-        if ($this->project) {
-            foreach ($this->project->getInfo() as $value) {
-                $this->output->writeln("<info>" . $value . "</info>");
-            }
-            if ($this->project->getErrors()) {
-                throw new Exception(implode("\n", $this->project->getErrors()));
-            }
+        foreach ($this->getInfo() as $value) {
+            $this->output->writeln("<info>" . $value . "</info>");
+        }
+        if ($this->getErrors()) {
+            throw new Exception(implode("\n", $this->getErrors()));
         }
     }
 
@@ -267,6 +284,11 @@ class WordPressProject
             $params[$key] = $value;
         }
         return $params;
+    }
+
+    private function getWordPressDir()
+    {
+        return $this->wordPressDir;
     }
 
     private function ask(Question $q)

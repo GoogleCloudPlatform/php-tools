@@ -19,7 +19,7 @@ namespace Google\Cloud\Utils;
 
 class Project
 {
-    private $dir;
+    protected $dir;
     private $errors = array();
     private $info = array();
     private static $availableDbRegions = [
@@ -40,6 +40,11 @@ class Project
 
     public function __construct($dir)
     {
+        $this->dir = $this->validateProjectDir($dir);
+    }
+
+    protected function validateProjectDir($dir)
+    {
         if ($this->isRelativePath($dir)) {
             $dir = getcwd() . DIRECTORY_SEPARATOR . $dir;
         }
@@ -54,7 +59,7 @@ class Project
         } else {
             $this->info[] = 'A directory ' . $dir . ' was created.';
         }
-        $this->dir = realpath($dir);
+        return realpath($dir);
     }
 
     public function downloadArchive($name, $url, $dir='')
@@ -62,6 +67,7 @@ class Project
         $tmpdir = sys_get_temp_dir();
         $file = $tmpdir . DIRECTORY_SEPARATOR . basename($url);
         file_put_contents($file, file_get_contents($url));
+        $dir = $this->getRelativeDir($dir);
 
         if (substr($url, -3, 3) === 'zip') {
             $zip = new \ZipArchive;
@@ -69,7 +75,7 @@ class Project
                 $this->errors[] = 'Failed to open a zip file: ' . $file;
                 return;
             }
-            if ($zip->extractTo($this->dir . $dir) === false) {
+            if ($zip->extractTo($dir) === false) {
                 $this->errors[] = 'Failed to extract a zip file: ' . $file;
                 $zip->close();
                 return;
@@ -77,7 +83,7 @@ class Project
             $zip->close();
         } else {
             $phar = new \PharData($file, 0, null);
-            $phar->extractTo($this->dir . $dir, null, true);
+            $phar->extractTo($dir, null, true);
         }
         unlink($file);
         $this->info[] = 'Downloaded ' . $name . '.';
@@ -135,6 +141,13 @@ class Project
     public static function getAvailableDbRegions()
     {
         return self::$availableDbRegions;
+    }
+
+    protected function getRelativeDir($dir)
+    {
+        return $dir && $dir[0] === DIRECTORY_SEPARATOR
+            ? $dir
+            : $this->dir . DIRECTORY_SEPARATOR . $dir;
     }
 
     private function isRelativePath($path)
