@@ -57,6 +57,9 @@ class WordPressProject extends Project
         }
 
         $this->dir = $dir;
+        if (empty($this->wordPressDir)) {
+            $this->wordPressDir = $dir;
+        }
         $this->report();
 
         return $this->getDir();
@@ -110,7 +113,7 @@ class WordPressProject extends Project
             'project_id' => '',
             'db_instance' => '',
             'db_name' => '',
-            'db_user' => '',
+            'db_user' => 'root',
             'db_password' => '',
         ]);
 
@@ -134,7 +137,7 @@ class WordPressProject extends Project
             ];
         } else {
             $params += $this->askParameters([
-                'local_db_user' => 'wp',
+                'local_db_user' => 'root',
                 'local_db_password' => '',
             ]);
         }
