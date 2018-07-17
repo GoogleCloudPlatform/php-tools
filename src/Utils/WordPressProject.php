@@ -243,7 +243,7 @@ class WordPressProject extends Project
 
     public function runComposer()
     {
-        $this->runComposer();
+        parent::runComposer();
         $this->report();
     }
 
