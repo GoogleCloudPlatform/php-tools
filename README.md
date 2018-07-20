@@ -81,15 +81,29 @@ The example test cases are available in
 There are multiple environment variables to control the behavior of
 our test traits.
 
-- `RUN_DEVSERVER_TESTS`:
-  Set to `true` if you want to run tests with DevAppserverTestTrait
-- `PHP_CGI_PATH`:
-  Path to `php-cgi` for running dev_appserver
+#### All Traits
+
+- `GOOGLE_PROJECT_ID`:
+  The project id for deploying the application.
+- `GOOGLE_VERSION_ID`:
+  The version id for deploying the application.
+
+#### AppEngineDeploymentTrait
+
+- `GOOGLE_DEPLOYMENT_DELAY`:
+  Number of seconds to wait after the deployment has been triggered before continuing to execute tests.
+- `GOOGLE_KEEP_DEPLOYMENT`:
+  Set to `true` to keep deployed app in place after test completion.
+- `GOOGLE_SKIP_DEPLOYMENT`:
+  Set to `true` if you want to skip deployment.
+- `RUN_DEPLOYMENT_TESTS`:
+  Set to `true` if you want to run deploy tests.
+
+#### DevAppserverTestTrait
+
 - `LOCAL_TEST_TARGETS`:
   You can specify multiple yaml files if your test need multiple services.
-- `RUN_DEPLOYMENT_TESTS`:
-  Set to `true` if you want to run tests with AppEngineDeploymentTrait
-- `GOOGLE_PROJECT_ID`:
-  The project id for deploying the application
-- `GOOGLE_VERSION_ID`:
-  The version id for deploying the application
+- `PHP_CGI_PATH`:
+  Path to `php-cgi` for running dev_appserver.
+- `RUN_DEVSERVER_TESTS`:
+  Set to `true` if you want to run tests.
