@@ -170,7 +170,7 @@ class GcloudWrapper
         $targets = 'app.yaml',
         $phpCgiPath = '/usr/bin/php-cgi'
     ) {
-        $cmd = 'exec dev_appserver.py --port ' . $this->port
+        $cmd = 'dev_appserver.py --port ' . $this->port
             . ' --skip_sdk_update_check true'
             . ' --php_executable_path ' . $phpCgiPath
             . ' ' . $targets;
@@ -236,7 +236,7 @@ class GcloudWrapper
             $this->errorLog('The app is not running.');
             return false;
         }
-        return 'http://localhost:' . $this->port;
+        return 'http://127.0.0.1:' . $this->port;
     }
 
     /**

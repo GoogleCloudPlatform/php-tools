@@ -121,7 +121,7 @@ class GcloudWrapperTest extends \PHPUnit_Framework_TestCase
         $this->mockGcloudWrapper->method('createProcess')
             ->willReturn($this->mockProcess);
 
-        $runCmd = 'exec dev_appserver.py --port 8080 '
+        $runCmd = 'dev_appserver.py --port 8080 '
             . '--skip_sdk_update_check true '
             . '--php_executable_path /usr/bin/php-cgi '
             . 'app.yaml';
@@ -136,7 +136,7 @@ class GcloudWrapperTest extends \PHPUnit_Framework_TestCase
         $this->mockGcloudWrapper->run();
 
         $this->assertEquals(
-            'http://localhost:8080',
+            'http://127.0.0.1:8080',
             $this->mockGcloudWrapper->getLocalBaseUrl()
         );
 
@@ -159,7 +159,7 @@ class GcloudWrapperTest extends \PHPUnit_Framework_TestCase
         $this->mockGcloudWrapper->method('createProcess')
             ->willReturn($this->mockProcess);
 
-        $runCmd = 'exec dev_appserver.py --port 8080 '
+        $runCmd = 'dev_appserver.py --port 8080 '
             . '--skip_sdk_update_check true '
             . '--php_executable_path /usr/local/bin/php-cgi '
             . 'app.yaml backend.yaml';
@@ -177,7 +177,7 @@ class GcloudWrapperTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals(
-            'http://localhost:8080',
+            'http://127.0.0.1:8080',
             $this->mockGcloudWrapper->getLocalBaseUrl()
         );
 
@@ -200,7 +200,7 @@ class GcloudWrapperTest extends \PHPUnit_Framework_TestCase
         $this->mockGcloudWrapper->method('createProcess')
             ->willReturn($this->mockProcess);
 
-        $runCmd = 'exec dev_appserver.py --port 8000 '
+        $runCmd = 'dev_appserver.py --port 8000 '
             . '--skip_sdk_update_check true '
             . '--php_executable_path /usr/bin/php-cgi '
             . 'app.yaml';
@@ -215,7 +215,7 @@ class GcloudWrapperTest extends \PHPUnit_Framework_TestCase
         $this->mockGcloudWrapper->run();
 
         $this->assertEquals(
-            'http://localhost:8000',
+            'http://127.0.0.1:8000',
             $this->mockGcloudWrapper->getLocalBaseUrl()
         );
 
