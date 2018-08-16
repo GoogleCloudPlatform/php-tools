@@ -37,4 +37,18 @@ class FileUtilTest extends \PHPUnit_Framework_TestCase
             $this->assertFileExists($newDir . '/appengine-standard/' . $file);
         }
     }
+
+    public function testCloneIntoDirectoryWithExistingFile()
+    {
+        $tmpDir = sys_get_temp_dir() . '/test-' . FileUtil::randomName(8);
+        mkdir($tmpDir);
+        $testText = 'This is the existing app.php';
+        file_put_contents($tmpDir . '/app.php', $testText);
+        FileUtil::copyDir(
+            __DIR__ . '/../fixtures/appengine-standard',
+            $tmpDir
+        );
+
+        $this->assertNotEquals($testText, file_get_contents($tmpDir . '/app.php'));
+    }
 }
