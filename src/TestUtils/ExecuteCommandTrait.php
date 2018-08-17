@@ -18,6 +18,7 @@
 namespace Google\Cloud\TestUtils;
 
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Process\Process;
 
 trait ExecuteCommandTrait
 {
