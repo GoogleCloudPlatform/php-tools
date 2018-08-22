@@ -34,7 +34,7 @@ class WordPressProject extends Project
     const LATEST_BATCACHE = 'https://downloads.wordpress.org/plugin/batcache.1.4.zip';
     const LATEST_MEMCACHED = 'https://downloads.wordpress.org/plugin/memcached.3.0.1.zip';
     const LATEST_GAE_WP = 'https://downloads.wordpress.org/plugin/google-app-engine.1.6.zip';
-    const LATEST_GCS_PLUGIN =  'https://downloads.wordpress.org/plugin/gcs.0.1.2.zip';
+    const LATEST_GCS_PLUGIN =  'https://downloads.wordpress.org/plugin/gcs.0.1.3.zip';
 
     private $input;
     private $output;
