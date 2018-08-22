@@ -70,9 +70,7 @@ trait AppEngineDeploymentTrait
 
     private static function doDeploy()
     {
-        if (getenv('GOOGLE_SKIP_DEPLOYMENT') !== 'true') {
-            return self::$gcloudWrapper->deploy();
-        }
+        return self::$gcloudWrapper->deploy();
     }
 
     /**
@@ -99,14 +97,16 @@ trait AppEngineDeploymentTrait
             self::getProjectId(),
             self::getVersionId()
         );
-        static::beforeDeploy();
-        if (static::doDeploy() === false) {
-            self::fail('Deployment failed.');
+        if (getenv('GOOGLE_SKIP_DEPLOYMENT') !== 'true') {
+            static::beforeDeploy();
+            if (static::doDeploy() === false) {
+                self::fail('Deployment failed.');
+            }
+            if ((int) $delay = getenv('GOOGLE_DEPLOYMENT_DELAY')) {
+                sleep($delay);
+            }
+            static::afterDeploy();
         }
-        if ((int) $delay = getenv('GOOGLE_DEPLOYMENT_DELAY')) {
-            sleep($delay);
-        }
-        static::afterDeploy();
     }
 
     /**
