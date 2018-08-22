@@ -27,7 +27,7 @@ trait ExecuteCommandTrait
 
     use ExponentialBackoffTrait;
 
-    private function runCommand($commandName, $args=[])
+    private static function runCommand($commandName, $args=[])
     {
         if (!isset(self::$commandFile) || !file_exists(self::$commandFile)) {
             throw new \LogicException('$commandFile is not set or is missing.');
