@@ -145,9 +145,9 @@ class Project
 
     protected function getRelativeDir($dir)
     {
-        return $dir && $dir[0] === DIRECTORY_SEPARATOR
-            ? $dir
-            : $this->dir . DIRECTORY_SEPARATOR . $dir;
+        return $this->isRelativePath($dir)
+            ? $this->dir . DIRECTORY_SEPARATOR . $dir
+            : $dir;
     }
 
     private function isRelativePath($path)
