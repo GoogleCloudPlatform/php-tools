@@ -24,6 +24,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Filesystem\Filesystem;
 
 class WordPressProject extends Project
 {
@@ -45,6 +46,7 @@ class WordPressProject extends Project
     {
         $this->input = $input;
         $this->output = $output;
+        $this->filesystem = new Filesystem();
         $this->helper = $helper ?: new QuestionHelper();
     }
 
@@ -158,7 +160,11 @@ class WordPressProject extends Project
 
         // set the wordpress dir
         $this->wordPressDir = $this->getRelativeDir($dir);
-        rename($tmpDir . DIRECTORY_SEPARATOR . 'wordpress', $this->wordPressDir);
+        $this->filesystem->rename(
+            $tmpDir . DIRECTORY_SEPARATOR . 'wordpress',
+            $this->wordPressDir,
+            true
+        );
         $this->report();
     }
 
@@ -172,7 +178,7 @@ class WordPressProject extends Project
         );
         $this->report();
         $this->output->writeln('Copying drop-ins...');
-        copy(
+        $this->filesystem->copy(
             $dir . '/wp-content/plugins/batcache/advanced-cache.php',
             $dir . '/wp-content/advanced-cache.php'
         );
@@ -188,7 +194,7 @@ class WordPressProject extends Project
         );
         $this->report();
         $this->output->writeln('Copying drop-ins...');
-        copy(
+        $this->filesystem->copy(
             $dir . '/wp-content/plugins/memcached/object-cache.php',
             $dir . '/wp-content/object-cache.php'
         );
