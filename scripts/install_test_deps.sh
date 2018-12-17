@@ -71,6 +71,6 @@ if [ "${RUN_DEPLOYMENT_TESTS}" = "true" ] \
     configure_gcloud
 fi
 
-if [ "${RUN_CS_FIXER}" = "true" ]; then
+if [ "${RUN_CS_FIXER}" = "true" ] || [ "${RUN_CS_CHECK}" = "true" ]; then
     install_php_cs_fixer
 fi
