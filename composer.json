@@ -1,19 +1,19 @@
 {
-    "name": "google/cloud-tools",
+    "name": "pratikid/php-tools",
     "description": "PHP tools for Google Cloud Platform",
     "keywords": ["test", "appengine", "gcp"],
-    "homepage": "https://github.com/GoogleCloudPlatform/php-tools",
+    "homepage": "https://github.com/pratikid/php-tools",
     "type": "library",
     "license": "Apache-2.0",
     "authors": [
         {
-            "name": "Takashi Matsuo",
-            "email": "tmatsuo@google.com",
-            "homepage": "https://wp.gaeflex.ninja/"
+            "name": "Pratik Khanolkar",
+            "email": "pratikid@gmail.com",
+            "homepage": "https://www.google.com/"
         }
     ],
     "require": {
-        "php": ">=5.5",
+        "php": ">=7.1",
         "guzzlehttp/guzzle": "~5.3|~6.0",
         "symfony/browser-kit": "~2|~3",
         "symfony/console": "~4",
