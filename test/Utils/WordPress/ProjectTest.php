@@ -15,20 +15,19 @@
  * limitations under the License.
  */
 
-namespace Google\Cloud\Utils\Test;
+namespace Google\Cloud\Utils\WordPress;
 
-use Google\Cloud\Utils\WordPressProject;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\QuestionHelper;
 
 /**
- * Class WordPressProjectTest
+ * Class WordPress\ProjectTest
  * @package Google\Cloud\Utils\Test
  *
- * A class for testing WordPressProject class.
+ * A class for testing WordPress\Project class.
  */
-class WordPressProjectTest extends \PHPUnit_Framework_TestCase
+class ProjectTest extends \PHPUnit_Framework_TestCase
 {
     public function testInitializeDatabase()
     {
@@ -59,7 +58,7 @@ class WordPressProjectTest extends \PHPUnit_Framework_TestCase
                 return 'value_' . $i++;
             }));
 
-        $project = new WordPressProject($input, $output, $helper);
+        $project = new Project($input, $output, $helper);
         $project->initializeProject();
         $params = $project->initializeDatabase();
 
@@ -90,10 +89,10 @@ class WordPressProjectTest extends \PHPUnit_Framework_TestCase
                 if ($optionName == 'dir') {
                     return sys_get_temp_dir() . '/wp-project' . rand();
                 }
-                return WordPressProject::LATEST_WP;
+                return Project::LATEST_WP;
             }));
 
-        $project = new WordPressProject($input, $output);
+        $project = new Project($input, $output);
         $dir = $project->initializeProject();
         $project->downloadWordpress();
         $this->assertFileExists($dir . '/wordpress/wp-login.php');
@@ -116,10 +115,10 @@ class WordPressProjectTest extends \PHPUnit_Framework_TestCase
                 $this->equalTo('wordpress_url')
             ))
             ->will($this->returnCallback(function ($optionName) {
-                return WordPressProject::LATEST_WP;
+                return Project::LATEST_WP;
             }));
 
-        $project = new WordPressProject($input, $output);
+        $project = new Project($input, $output);
         $project->downloadWordpress($dir);
         $project->initializeProject($dir);
 

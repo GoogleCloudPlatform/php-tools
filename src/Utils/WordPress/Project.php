@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 
-namespace Google\Cloud\Utils;
+namespace Google\Cloud\Utils\WordPress;
 
 use Exception;
+use Google\Cloud\Utils\Project as BaseProject;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
@@ -26,7 +27,7 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Filesystem\Filesystem;
 
-class WordPressProject extends Project
+class Project extends BaseProject
 {
     const DEFAULT_DIR = 'my-wordpress-project';
     const DEFAULT_DB_REGION = 'us-central1';
