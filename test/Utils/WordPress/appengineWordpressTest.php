@@ -23,7 +23,7 @@ class wordpressTest extends \PHPUnit_Framework_TestCase
 {
     use ExecuteCommandTrait;
 
-    private static $commandFile = __DIR__ . '/../../../src/utils/WordPress/appengine-wordpress';
+    private static $commandFile = __DIR__ . '/../../../src/Utils/WordPress/appengine-wordpress';
 
     public function testCreate()
     {

@@ -25,7 +25,7 @@ class DeployTest extends \PHPUnit_Framework_TestCase
     use ExecuteCommandTrait;
     use AppEngineDeploymentTrait;
 
-    private static $commandFile = __DIR__ . '/../../../src/utils/WordPress/appengine-wordpress';
+    private static $commandFile = __DIR__ . '/../../../src/Utils/WordPress/appengine-wordpress';
 
     public static function beforeDeploy()
     {
