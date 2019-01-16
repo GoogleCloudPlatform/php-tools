@@ -19,11 +19,11 @@ namespace Google\Cloud\Utils\WordPress;
 
 use Google\Cloud\TestUtils\ExecuteCommandTrait;
 
-class wordpressTest extends \PHPUnit_Framework_TestCase
+class wpGaeTest extends \PHPUnit_Framework_TestCase
 {
     use ExecuteCommandTrait;
 
-    private static $commandFile = __DIR__ . '/../../../src/Utils/WordPress/appengine-wordpress';
+    private static $commandFile = __DIR__ . '/../../../src/Utils/WordPress/wp-gae';
 
     public function testCreate()
     {

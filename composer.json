@@ -23,7 +23,7 @@
     },
     "bin": [
         "src/Utils/Flex/flex_exec",
-        "src/Utils/WordPress/appengine-wordpress"
+        "src/Utils/WordPress/wp-gae"
     ],
     "autoload": {
         "psr-4": {
