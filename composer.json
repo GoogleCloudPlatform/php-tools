@@ -23,7 +23,7 @@
     },
     "bin": [
         "src/Utils/Flex/flex_exec",
-        "scripts/install_test_deps.sh"
+        "src/Utils/WordPress/wp-gae"
     ],
     "autoload": {
         "psr-4": {
