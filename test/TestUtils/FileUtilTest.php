@@ -38,6 +38,26 @@ class FileUtilTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testCloneDirectoryIntoTempWithProgress()
+    {
+        $output = new \Symfony\Component\Console\Output\BufferedOutput;
+        $progress = new \Symfony\Component\Console\Helper\ProgressBar($output);
+
+        $newDir = FileUtil::cloneDirectoryIntoTmp(__DIR__ . '/../fixtures', $progress);
+
+        $this->assertEquals("
+    1 [->--------------------------]
+    2 [-->-------------------------]
+    3 [--->------------------------]
+    4 [---->-----------------------]
+    5 [----->----------------------]
+    6 [------>---------------------]
+    7 [------->--------------------]
+    8 [-------->-------------------]
+    9 [--------->------------------]
+   10 [---------->-----------------]", $output->fetch());
+    }
+
     public function testCloneIntoDirectoryWithExistingFile()
     {
         $tmpDir = sys_get_temp_dir() . '/test-' . FileUtil::randomName(8);
