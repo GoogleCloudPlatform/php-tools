@@ -1,3 +1,4 @@
+# App Engine cron configuration
 cron:
 - description: "wordpress cron tasks"
   url: /wp-cron.php
