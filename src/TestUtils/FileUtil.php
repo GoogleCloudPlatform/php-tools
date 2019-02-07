@@ -17,6 +17,8 @@
 
 namespace Google\Cloud\TestUtils;
 
+use Symfony\Component\Console\Helper\ProgressBar;
+
 class FileUtil
 {
     public static function randomName($length)
@@ -28,14 +30,14 @@ class FileUtil
         return join('', $array);
     }
 
-    public static function cloneDirectoryIntoTmp($projectDir = '.')
+    public static function cloneDirectoryIntoTmp($projectDir = '.', ProgressBar $progress = null)
     {
         $tmpDir = sys_get_temp_dir() . '/test-' . self::randomName(8);
-        self::copyDir($projectDir, $tmpDir);
+        self::copyDir($projectDir, $tmpDir, $progress);
         return $tmpDir;
     }
 
-    public static function copyDir($src, $dst)
+    public static function copyDir($src, $dst, ProgressBar $progress = null)
     {
         @mkdir($dst);
         $dir = opendir($src);
@@ -44,9 +46,12 @@ class FileUtil
                 continue;
             }
             if (is_dir($src . '/' . $file)) {
-                self::copyDir($src . '/' . $file, $dst . '/' . $file);
+                self::copyDir($src . '/' . $file, $dst . '/' . $file, $progress);
             } else {
                 copy($src . '/' . $file, $dst . '/' . $file);
+                if ($progress) {
+                    $progress->advance();
+                }
             }
         }
         closedir($dir);
