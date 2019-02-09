@@ -42,4 +42,13 @@ trait TestTrait
         }
         return $varValue;
     }
+
+    private static function randomName($length)
+    {
+        $array = array();
+        for ($i = 0; $i < $length; ++$i) {
+            array_push($array, chr(random_int(ord('a'), ord('z'))));
+        }
+        return join('', $array);
+    }
 }
