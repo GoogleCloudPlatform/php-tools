@@ -118,7 +118,7 @@ class TestTraitTest extends \PHPUnit_Framework_TestCase
 
 class FakeBackoff
 {
-    function execute($fn)
+    public function execute($fn)
     {
         return "FakeBackoff";
     }
