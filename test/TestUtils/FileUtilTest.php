@@ -55,7 +55,8 @@ class FileUtilTest extends \PHPUnit_Framework_TestCase
     7 [------->--------------------]
     8 [-------->-------------------]
     9 [--------->------------------]
-   10 [---------->-----------------]", $output->fetch());
+   10 [---------->-----------------]
+   11 [----------->----------------]", $output->fetch());
     }
 
     public function testCloneIntoDirectoryWithExistingFile()
