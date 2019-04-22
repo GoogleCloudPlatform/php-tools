@@ -17,6 +17,8 @@
 
 namespace Google\Cloud\TestUtils;
 
+use ReflectionClass;
+
 trait TestTrait
 {
     private static $projectId;
@@ -41,5 +43,31 @@ trait TestTrait
             );
         }
         return $varValue;
+    }
+
+    private static function runSnippet($sampleName, $params = [])
+    {
+        // Determine the snippet filename
+        $sampleFile = $sampleName;
+        if ('/' !== $sampleName[0]) {
+            // Default to 'src/' in sample directory
+            $reflector = new ReflectionClass(get_class());
+            $testDir = dirname($reflector->getFileName());
+            $sampleFile = sprintf('%s/../src/%s.php', $testDir, $sampleName);
+        }
+
+        $testFunc = function () use ($sampleFile, $params) {
+            return shell_exec(sprintf(
+                'php %s %s',
+                $sampleFile,
+                implode(' ', array_map('escapeshellarg', $params))
+            ));
+        };
+
+        if (isset(self::$backoff)) {
+            return self::$backoff->execute($testFunc);
+        }
+
+        return $testFunc();
     }
 }

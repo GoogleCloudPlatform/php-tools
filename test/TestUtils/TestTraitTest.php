@@ -29,6 +29,8 @@ class TestTraitTest extends \PHPUnit_Framework_TestCase
 {
     use TestTrait;
 
+    private static $backoff;
+
     public static function checkProjectEnvVarBeforeClass()
     {
         // disable checkProjectEnvVarBeforeClass
@@ -79,5 +81,45 @@ class TestTraitTest extends \PHPUnit_Framework_TestCase
         } catch (\PHPUnit_Framework_SkippedTestError $e) {
             $this->fail('should not have skipped!');
         }
+    }
+
+    public function testRunSnippet()
+    {
+        $snippet1Cmd = sprintf('php %s/../src/snippet1.php', __DIR__);
+        $output1 = shell_exec($snippet1Cmd);
+        $output2 = $this->runSnippet('snippet1');
+        $this->assertEquals($output1, $output2);
+
+        $output1 = shell_exec($snippet1Cmd . ' foo bar baz');
+        $output2 = $this->runSnippet('snippet1', ['foo', 'bar', 'baz']);
+        $this->assertEquals($output1, $output2);
+
+        // Test escaping shell args
+        $output1 = shell_exec($snippet1Cmd . ' foo bar \'\'');
+        $output2 = $this->runSnippet('snippet1', ['foo', 'bar', '']);
+        $this->assertEquals($output1, $output2);
+
+        $snippet2File = __DIR__ . '/../fixtures/snippet2.php';
+        $snippet2Cmd = sprintf('php ' . $snippet2File);
+        $output1 = shell_exec($snippet2Cmd);
+        $output2 = $this->runSnippet($snippet2File);
+        $this->assertEquals($output1, $output2);
+
+        $output1 = shell_exec($snippet2Cmd . ' foo bar baz');
+        $output2 = $this->runSnippet($snippet2File, ['foo', 'bar', 'baz']);
+        $this->assertEquals($output1, $output2);
+
+        self::$backoff = new FakeBackoff();
+
+        $output = $this->runSnippet('foo');
+        $this->assertEquals('FakeBackoff', $output);
+    }
+}
+
+class FakeBackoff
+{
+    public function execute($fn)
+    {
+        return "FakeBackoff";
     }
 }
