@@ -94,6 +94,11 @@ class TestTraitTest extends \PHPUnit_Framework_TestCase
         $output2 = $this->runSnippet('snippet1', ['foo', 'bar', 'baz']);
         $this->assertEquals($output1, $output2);
 
+        // Test escaping shell args
+        $output1 = shell_exec($snippet1Cmd . ' foo bar \'\'');
+        $output2 = $this->runSnippet('snippet1', ['foo', 'bar', '']);
+        $this->assertEquals($output1, $output2);
+
         $snippet2File = __DIR__ . '/../fixtures/snippet2.php';
         $snippet2Cmd = sprintf('php ' . $snippet2File);
         $output1 = shell_exec($snippet2Cmd);
