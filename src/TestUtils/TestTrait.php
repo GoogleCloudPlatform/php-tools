@@ -57,17 +57,21 @@ trait TestTrait
         }
 
         $testFunc = function () use ($sampleFile, $params) {
-            return shell_exec(sprintf(
-                'php %s %s',
-                $sampleFile,
-                implode(' ', array_map('escapeshellarg', $params))
-            ));
+            $argv = array_merge([$sampleFile], $params);
+            $argc = count($argv);
+            try {
+                ob_start();
+                require $sampleFile;
+                return ob_get_clean();
+            } catch (\Exception $e) {
+                ob_get_clean();
+                throw $e;
+            }
         };
 
         if (isset(self::$backoff)) {
             return self::$backoff->execute($testFunc);
         }
-
         return $testFunc();
     }
 }
