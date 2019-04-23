@@ -18,6 +18,7 @@
 namespace Google\Cloud\TestUtils\test;
 
 use Google\Cloud\TestUtils\TestTrait;
+use Google\Cloud\TestUtils\ExponentialBackoffTrait;
 
 /**
  * Class TestTraitTest
@@ -28,8 +29,7 @@ use Google\Cloud\TestUtils\TestTrait;
 class TestTraitTest extends \PHPUnit_Framework_TestCase
 {
     use TestTrait;
-
-    private static $backoff;
+    use ExponentialBackoffTrait;
 
     public static function checkProjectEnvVarBeforeClass()
     {
@@ -108,18 +108,41 @@ class TestTraitTest extends \PHPUnit_Framework_TestCase
         $output1 = shell_exec($snippet2Cmd . ' foo bar baz');
         $output2 = $this->runSnippet($snippet2File, ['foo', 'bar', 'baz']);
         $this->assertEquals($output1, $output2);
-
-        self::$backoff = new FakeBackoff();
-
-        $output = $this->runSnippet('foo');
-        $this->assertEquals('FakeBackoff', $output);
     }
-}
 
-class FakeBackoff
-{
-    public function execute($fn)
+    public function testRunSnippetWithBackoff()
     {
-        return "FakeBackoff";
+        $this->useBackoff($retries = 5, function () use (&$timesCalled) {
+            $timesCalled++;
+            return true;
+        });
+
+        self::setDelayFunction(function ($delay) {
+            // do nothing!
+        });
+
+        try {
+            $output = $this->runSnippet('snippet3');
+            $this->fail('Should have thrown exception');
+        } catch (\Exception $e) {
+            $this->assertEquals('This is expected', $e->getMessage());
+        }
+
+        $this->assertEquals($retries + 1, $timesCalled);
+    }
+
+    /**
+     * @expectedException Exception
+     * @expectedExceptionMessage This is expected
+     */
+    public function testRunSnippetWithException()
+    {
+        $this->runSnippet('snippet3');
+    }
+
+    public function setUp()
+    {
+        // Clear backoffs before running each test
+        self::$backoff = null;
     }
 }
