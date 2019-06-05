@@ -34,7 +34,6 @@ env:
     - PATH=${HOME}/google-cloud-sdk/bin:${PATH}
     - PHP_CGI_PATH=/home/travis/.phpenv/shims/php-cgi
     - TEST_BUILD_DIR=$TRAVIS_BUILD_DIR
-    - TEST_SCRIPT="composer install && vendor/bin/phpunit"
 
 before_install:
   - php scripts/dump_credentials.php
@@ -43,8 +42,8 @@ before_install:
 
 script:
   - if [ "${RUN_CS_FIXER}" = "true" ]; then ./php-cs-fixer fix --dry-run --diff .; fi;
-  - $TEST_SCRIPT
-  - pushd test/fixtures/appengine-standard && $TEST_SCRIPT && popd
+  - composer install && vendor/bin/phpunit
+  - pushd test/fixtures/appengine-standard && composer install && vendor/bin/phpunit && popd
 
 after_success:
   - composer require "satooshi/php-coveralls:^1.0"
