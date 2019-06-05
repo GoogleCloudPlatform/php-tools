@@ -124,8 +124,9 @@ class GcloudWrapper
             $options = array_filter([
                 'targets' => @func_get_arg(0),
                 'promote' => @func_get_arg(1),
+            ]) + array_filter([
                 'retries' => @func_get_arg(2),
-            ]);
+            ], 'is_numeric');
         }
         $options = array_merge([
             'targets' => 'app.yaml',
