@@ -117,11 +117,22 @@ class GcloudWrapper
      * @param int $retries optional Number of retries upon failure.
      * @return bool true if deployment suceeds, false upon failure.
      */
-    public function deploy(
-        $targets = 'app.yaml',
-        $promote = false,
-        $retries = self::DEFAULT_RETRIES
-    ) {
+    public function deploy($options = []) {
+        // Handle old function signature
+        if (!is_array($options)) {
+            $options = array_filter([
+                'targets' => @func_get_arg(0),
+                'promote' => @func_get_arg(1),
+                'retries' => @func_get_arg(2),
+            ]);
+        }
+        $options = array_merge([
+            'targets' => 'app.yaml',
+            'promote' => false,
+            'retries' => self::DEFAULT_RETRIES,
+            'beta' => false,
+        ], $options);
+
         if ($this->deployed) {
             $this->errorLog('The app has been already deployed.');
             return false;
@@ -131,7 +142,8 @@ class GcloudWrapper
             $this->errorLog('Can not chdir to ' . $this->dir);
             return false;
         }
-        $cmd = "gcloud -q " . self::GCLOUD_APP . " deploy "
+        $beta = $options['beta'] ? 'beta ' : '';
+        $cmd = "gcloud -q " . $beta . self::GCLOUD_APP . " deploy "
             . "--project " . $this->project . " "
             . "--version " . $this->version . " ";
         if ($promote) {
