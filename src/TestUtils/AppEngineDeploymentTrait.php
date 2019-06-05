@@ -52,13 +52,11 @@ trait AppEngineDeploymentTrait
             self::requireEnv('GOOGLE_PROJECT_ID'),
             self::requireEnv('GOOGLE_VERSION_ID')
         );
-        $this->baseDeployApp();
+        self::baseDeployApp();
     }
 
     /**
-     * Delete the application.
-     *
-     * @afterClass
+     * Delete a deployed App Engine app.
      */
     private static function doDelete()
     {
@@ -66,13 +64,10 @@ trait AppEngineDeploymentTrait
     }
 
     /**
-     * Set up the client.
-     *
-     * @before
+     * Return the URI of the deployed App Engine app.
      */
     private function getBaseUri()
     {
         return self::$gcloudWrapper->getBaseUrl();
-        $this->client = new Client(['base_uri' => $url]);
     }
 }
