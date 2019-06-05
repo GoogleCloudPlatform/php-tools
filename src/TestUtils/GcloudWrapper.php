@@ -116,7 +116,7 @@ class GcloudWrapper
      *      $targets string The yaml files for deployments.
      *      $promote bool True if you want to promote the new app.
      *      $retries int Number of retries upon failure.
-     *      $version string Run gcloud using "alpha" or "beta" version of gcloud commands
+     *      $release_version string Run using "alpha" or "beta" version of gcloud deploy
      * @return bool true if deployment suceeds, false upon failure.
      */
     public function deploy($options = [])
@@ -134,10 +134,10 @@ class GcloudWrapper
             'targets' => 'app.yaml',
             'promote' => false,
             'retries' => self::DEFAULT_RETRIES,
-            'version' => null,
+            'release_version' => null,
         ], $options);
-        if (!in_array($options['version'], ['', 'alpha', 'beta'])) {
-            $this->errorLog('Version option must be "alpha" or "beta"');
+        if (!in_array($options['release_version'], [null, 'alpha', 'beta'])) {
+            $this->errorLog('release_version must be "alpha" or "beta"');
             return false;
         }
         if ($this->deployed) {
@@ -150,7 +150,7 @@ class GcloudWrapper
             return false;
         }
         $cmd = sprintf('gcloud -q %s%s deploy --project %s --version %s %s %s',
-            $options['version'] ? $options['version'] . ' ' : '',
+            $options['release_version'] ? $options['release_version'] . ' ' : '',
             self::GCLOUD_APP,
             $this->project,
             $this->version,
