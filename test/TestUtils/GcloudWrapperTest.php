@@ -136,7 +136,7 @@ class GcloudWrapperTest extends \PHPUnit_Framework_TestCase
             'targets' => 'app.yaml backend.yaml',
             'promote' => true,
             'retries' => 4,
-            'beta'    => true,
+            'version' => 'beta',
         ]);
 
         $this->assertEquals(
