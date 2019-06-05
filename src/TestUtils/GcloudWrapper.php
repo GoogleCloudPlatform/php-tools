@@ -113,10 +113,10 @@ class GcloudWrapper
      * Deploy the app to the Google Cloud Platform.
      *
      * @param array $options list of options
-     *      $targets string optional The yaml files for deployments.
-     *      $promote bool optional true if you want to promote the new app.
-     *      $retries int optional Number of retries upon failure.
-     *      $version string optional Run gcloud using "alpha" or "beta" version of gcloud commands
+     *      $targets string The yaml files for deployments.
+     *      $promote bool True if you want to promote the new app.
+     *      $retries int Number of retries upon failure.
+     *      $version string Run gcloud using "alpha" or "beta" version of gcloud commands
      * @return bool true if deployment suceeds, false upon failure.
      */
     public function deploy($options = [])
