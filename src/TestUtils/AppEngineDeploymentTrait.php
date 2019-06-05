@@ -17,8 +17,6 @@
 
 namespace Google\Cloud\TestUtils;
 
-use GuzzleHttp\Client;
-
 /**
  * Trait AppEngineDeploymentTrait
  * @package Google\Cloud\TestUtils
