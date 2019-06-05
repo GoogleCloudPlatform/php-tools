@@ -5,7 +5,8 @@
     "require-dev": {
         "guzzlehttp/guzzle": "~6.0",
         "symfony/browser-kit": "~3",
-        "symfony/process": "~3"
+        "symfony/process": "~3",
+        "phpunit/phpunit": "^5"
     },
     "autoload": {
         "psr-4": { "Google\\Cloud\\Test\\": "tests/e2e" }
