@@ -117,7 +117,8 @@ class GcloudWrapper
      * @param int $retries optional Number of retries upon failure.
      * @return bool true if deployment suceeds, false upon failure.
      */
-    public function deploy($options = []) {
+    public function deploy($options = [])
+    {
         // Handle old function signature
         if (!is_array($options)) {
             $options = array_filter([
@@ -146,13 +147,13 @@ class GcloudWrapper
         $cmd = "gcloud -q " . $beta . self::GCLOUD_APP . " deploy "
             . "--project " . $this->project . " "
             . "--version " . $this->version . " ";
-        if ($promote) {
+        if ($options['promote']) {
             $cmd .= "--promote ";
         } else {
             $cmd .= "--no-promote ";
         }
-        $cmd .= $targets;
-        $ret = $this->execWithRetry($cmd, $retries);
+        $cmd .= $options['targets'];
+        $ret = $this->execWithRetry($cmd, $options['retries']);
         chdir($orgDir);
         if ($ret) {
             $this->deployed = true;

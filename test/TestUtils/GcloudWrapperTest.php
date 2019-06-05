@@ -110,6 +110,43 @@ class GcloudWrapperTest extends \PHPUnit_Framework_TestCase
         $this->mockGcloudWrapper->delete('myservice', 4);
     }
 
+    public function testDeployWithArgsArray()
+    {
+        $this->mockGcloudWrapper = $this->getMockBuilder(
+            '\Google\Cloud\TestUtils\GcloudWrapper'
+        )
+            ->setMethods(array('execWithRetry'))
+            ->setConstructorArgs(array('project', 'version'))
+            ->getMock();
+        $this->mockGcloudWrapper->method('execWithRetry')->willReturn(true);
+        $deployCmd = 'gcloud -q beta app deploy '
+            . '--project project --version version '
+            . '--promote app.yaml backend.yaml';
+        $deleteCmd = 'gcloud -q app versions delete '
+            . '--service myservice version '
+            . '--project project';
+        $this->mockGcloudWrapper->expects($this->exactly(2))
+            ->method('execWithRetry')
+            ->withConsecutive(
+                array($this->equalTo($deployCmd), $this->equalTo(4)),
+                array($this->equalTo($deleteCmd), $this->equalTo(4))
+            );
+
+        $this->mockGcloudWrapper->deploy([
+            'targets' => 'app.yaml backend.yaml',
+            'promote' => true,
+            'retries' => 4,
+            'beta'    => true,
+        ]);
+
+        $this->assertEquals(
+            'https://version-dot-project.appspot.com',
+            $this->mockGcloudWrapper->getBaseUrl()
+        );
+
+        $this->mockGcloudWrapper->delete('myservice', 4);
+    }
+
     public function testRunAndStopWithDefault()
     {
         $this->mockGcloudWrapper = $this->getMockBuilder(
