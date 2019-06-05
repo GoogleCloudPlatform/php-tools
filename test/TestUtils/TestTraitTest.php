@@ -18,6 +18,7 @@
 namespace Google\Cloud\TestUtils\test;
 
 use Google\Cloud\TestUtils\TestTrait;
+use Google\Cloud\TestUtils\ExponentialBackoffTrait;
 
 /**
  * Class TestTraitTest
@@ -28,6 +29,7 @@ use Google\Cloud\TestUtils\TestTrait;
 class TestTraitTest extends \PHPUnit_Framework_TestCase
 {
     use TestTrait;
+    use ExponentialBackoffTrait;
 
     public static function checkProjectEnvVarBeforeClass()
     {
@@ -79,5 +81,68 @@ class TestTraitTest extends \PHPUnit_Framework_TestCase
         } catch (\PHPUnit_Framework_SkippedTestError $e) {
             $this->fail('should not have skipped!');
         }
+    }
+
+    public function testRunSnippet()
+    {
+        $snippet1Cmd = sprintf('php %s/../src/snippet1.php', __DIR__);
+        $output1 = shell_exec($snippet1Cmd);
+        $output2 = $this->runSnippet('snippet1');
+        $this->assertEquals($output1, $output2);
+
+        $output1 = shell_exec($snippet1Cmd . ' foo bar baz');
+        $output2 = $this->runSnippet('snippet1', ['foo', 'bar', 'baz']);
+        $this->assertEquals($output1, $output2);
+
+        // Test escaping shell args
+        $output1 = shell_exec($snippet1Cmd . ' foo bar \'\'');
+        $output2 = $this->runSnippet('snippet1', ['foo', 'bar', '']);
+        $this->assertEquals($output1, $output2);
+
+        $snippet2File = __DIR__ . '/../fixtures/snippet2.php';
+        $snippet2Cmd = sprintf('php ' . $snippet2File);
+        $output1 = shell_exec($snippet2Cmd);
+        $output2 = $this->runSnippet($snippet2File);
+        $this->assertEquals($output1, $output2);
+
+        $output1 = shell_exec($snippet2Cmd . ' foo bar baz');
+        $output2 = $this->runSnippet($snippet2File, ['foo', 'bar', 'baz']);
+        $this->assertEquals($output1, $output2);
+    }
+
+    public function testRunSnippetWithBackoff()
+    {
+        $this->useBackoff($retries = 5, function () use (&$timesCalled) {
+            $timesCalled++;
+            return true;
+        });
+
+        self::setDelayFunction(function ($delay) {
+            // do nothing!
+        });
+
+        try {
+            $output = $this->runSnippet('snippet3');
+            $this->fail('Should have thrown exception');
+        } catch (\Exception $e) {
+            $this->assertEquals('This is expected', $e->getMessage());
+        }
+
+        $this->assertEquals($retries + 1, $timesCalled);
+    }
+
+    /**
+     * @expectedException Exception
+     * @expectedExceptionMessage This is expected
+     */
+    public function testRunSnippetWithException()
+    {
+        $this->runSnippet('snippet3');
+    }
+
+    public function setUp()
+    {
+        // Clear backoffs before running each test
+        self::$backoff = null;
     }
 }
