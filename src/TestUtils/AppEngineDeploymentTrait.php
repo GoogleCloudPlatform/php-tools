@@ -52,7 +52,7 @@ trait AppEngineDeploymentTrait
             self::requireEnv('GOOGLE_PROJECT_ID'),
             self::requireEnv('GOOGLE_VERSION_ID')
         );
-        $this->baseDeployApp();
+        self::baseDeployApp();
     }
 
     /**
