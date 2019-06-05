@@ -30,7 +30,7 @@ class LocalTest extends \PHPUnit_Framework_TestCase
     {
         // Just copy app.yaml, making sure this function is called before the
         // deployment.
-        copy('app.yaml.dist', 'app.yaml');
+        copy('app-php55.yaml.dist', 'app.yaml');
     }
 
     /**
