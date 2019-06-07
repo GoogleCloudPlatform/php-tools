@@ -34,6 +34,7 @@
     "require-dev": {
         "google/cloud-core": "^1.20",
         "google/gax": "^0.35.0",
-        "paragonie/random_compat": ">=2"
+        "paragonie/random_compat": ">=2",
+        "phpunit/phpunit": "^5"
     }
 }

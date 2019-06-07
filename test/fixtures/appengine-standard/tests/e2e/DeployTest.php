@@ -30,7 +30,7 @@ class DeployTest extends \PHPUnit_Framework_TestCase
     {
         // Copy app.yaml, making sure this function is called before the
         // deployment.
-        copy('app.yaml.dist', 'app.yaml');
+        copy('app-php72.yaml.dist', 'app.yaml');
         // Call setter for $dir
         self::$gcloudWrapper->setDir(realpath(__DIR__ . '/../..'));
     }
