@@ -17,15 +17,8 @@
 
 namespace Google\Cloud\TestUtils;
 
-if (!class_exists('\PHPUnit\Framework\ExpectationFailedException', true)) {
-    class_alias(
-        '\PHPUnit_Framework_ExpectationFailedException',
-        '\PHPUnit\Framework\ExpectationFailedException'
-    );
-}
-
 use Google\ApiCore\ApiException;
-use Google\Cloud\Core\ExponentialBackoff;
+use Google\Cloud\Utils\ExponentialBackoff;
 use Google\Rpc\Code;
 use PHPUnit\Framework\ExpectationFailedException;
 
@@ -52,12 +45,24 @@ trait ExponentialBackoffTrait
         });
     }
 
+    private function useDeadlineExceededBackoff($retries = null)
+    {
+        self::useBackoff($retries, function ($exception) {
+            return $exception instanceof ApiException
+                && $exception->getCode() == Code::DEADLINE_EXCEEDED;
+        });
+    }
+
     private function useBackoff($retries = null, callable $retryFunction = null)
     {
-        self::$backoff = new ExponentialBackoff(
+        $backoff = new ExponentialBackoff(
             $retries ?: $this->expontentialBackoffRetryCount,
             $retryFunction
         );
+
+        self::$backoff
+            ? self::$backoff->chain($backoff)
+            : self::$backoff = $backoff;
     }
 
     private function setDelayFunction(callable $delayFunction)
