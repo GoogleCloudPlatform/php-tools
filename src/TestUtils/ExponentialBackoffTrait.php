@@ -61,7 +61,7 @@ trait ExponentialBackoffTrait
         );
 
         self::$backoff
-            ? self::$backoff->chain($backoff)
+            ? self::$backoff->combine($backoff)
             : self::$backoff = $backoff;
     }
 

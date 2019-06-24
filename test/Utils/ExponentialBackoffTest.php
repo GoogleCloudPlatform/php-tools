@@ -108,7 +108,7 @@ class ExponentialBackoffTest extends TestCase
         $this->assertEquals(1, $actualAttempts);
     }
 
-    public function testBackoffChaining()
+    public function testCombiningBackoffs()
     {
         $retryCount1 = 0;
         $retryCount2 = 0;
@@ -124,7 +124,7 @@ class ExponentialBackoffTest extends TestCase
             return $exception instanceof \OutOfRangeException;
         });
 
-        $backoff->chain($backoff2);
+        $backoff->combine($backoff2);
         $backoff->execute(function () use (&$executionCount) {
             $executionCount++;
             if ($executionCount == 1) {

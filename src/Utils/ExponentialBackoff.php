@@ -19,6 +19,7 @@ namespace Google\Cloud\Utils;
 
 /**
  * Exponential backoff implementation.
+ * @internal
  */
 class ExponentialBackoff
 {
@@ -106,7 +107,7 @@ class ExponentialBackoff
      * @param ExponentialBackoff $backoff
      * @return null
      */
-    public function chain(ExponentialBackoff $backoff)
+    public function combine(ExponentialBackoff $backoff)
     {
         $this->backoff = $backoff;
     }
