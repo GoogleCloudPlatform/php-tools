@@ -45,6 +45,13 @@ trait TestTrait
         return $varValue;
     }
 
+    private static function requireGrpc()
+    {
+        if (!extension_loaded('grpc')) {
+            self::markTestSkipped('Must have the grpc extension installed to run this test.');
+        }
+    }
+
     private static function runSnippet($sampleName, $params = [])
     {
         // Determine the snippet filename
