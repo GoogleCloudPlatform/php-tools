@@ -37,7 +37,7 @@ env:
 
 before_install:
   - php scripts/dump_credentials.php
-  - travis_retry scripts/install_test_deps.sh
+  - if [[ $TRAVIS_PHP_VERSION = 7.3* ]]; then scripts/install_test_deps.sh --gcloud --cs-fixer; fi
   - sudo apt-get update && sudo apt-get install python-ipaddr
 
 script:
