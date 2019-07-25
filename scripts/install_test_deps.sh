@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -ex
+set -e
 
 install_gcloud()
 {
@@ -65,12 +65,18 @@ install_php_cs_fixer()
     fi
 }
 
-if [ "${RUN_DEPLOYMENT_TESTS}" = "true" ] \
-    || [ "${RUN_DEVSERVER_TESTS}" = "true" ]; then
-    install_gcloud
-    configure_gcloud
-fi
-
-if [ "${RUN_CS_FIXER}" = "true" ] || [ "${RUN_CS_CHECK}" = "true" ]; then
-    install_php_cs_fixer
-fi
+while test $# -gt 0
+do
+    case "$1" in
+        --gcloud)
+            install_gcloud
+            configure_gcloud
+            ;;
+        --cs-fixer)
+            install_php_cs_fixer
+            ;;
+        --*) echo "bad option $1"
+            ;;
+    esac
+    shift
+done

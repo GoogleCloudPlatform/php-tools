@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 /**
  * Dumps the contents of the environment variable GOOGLE_CREDENTIALS_BASE64 to
