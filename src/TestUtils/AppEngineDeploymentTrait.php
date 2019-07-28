@@ -46,7 +46,7 @@ trait AppEngineDeploymentTrait
     {
         self::$gcloudWrapper = new GcloudWrapper(
             self::requireEnv('GOOGLE_PROJECT_ID'),
-            self::requireEnv('GOOGLE_VERSION_ID')
+            getenv('GOOGLE_VERSION_ID') ?: null
         );
         self::baseDeployApp();
     }
