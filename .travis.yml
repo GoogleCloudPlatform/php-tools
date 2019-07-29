@@ -33,17 +33,23 @@ env:
     - GOOGLE_VERSION_ID=$TRAVIS_JOB_ID
     - PATH=${HOME}/google-cloud-sdk/bin:${PATH}
     - PHP_CGI_PATH=/home/travis/.phpenv/shims/php-cgi
-    - TEST_BUILD_DIR=$TRAVIS_BUILD_DIR
 
 before_install:
   - scripts/dump_credentials.php
-  - if [[ $TRAVIS_PHP_VERSION = 7.3* ]]; then scripts/install_test_deps.sh --gcloud --cs-fixer; fi
   - sudo apt-get update && sudo apt-get install python-ipaddr
+  - if [[ $TRAVIS_PHP_VERSION = 7.3* ]]; then scripts/install_test_deps.sh --gcloud --cs-fixer; fi
 
 script:
   - if [ "${RUN_CS_FIXER}" = "true" ]; then ./php-cs-fixer fix --dry-run --diff .; fi;
-  - composer install && vendor/bin/phpunit
-  - pushd test/fixtures/appengine-standard && composer install && vendor/bin/phpunit && popd
+  - |
+  set -e
+  find . -name 'phpunit.xml.dist' -exec dirname {} \; | while read DIR
+  do
+    pushd $DIR
+    composer install
+    phpunit
+    popd
+  done
 
 after_success:
   - composer require "satooshi/php-coveralls:^1.0"
