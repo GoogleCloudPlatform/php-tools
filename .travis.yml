@@ -20,28 +20,26 @@ language: php
 
 matrix:
   include:
-    - php: 5.6
-    - php: 7.0
-    - php: 7.1
-    - php: 7.2
-    - php: 7.3
-      env: RUN_DEPLOYMENT_TESTS=true RUN_DEVSERVER_TESTS=true RUN_CS_FIXER=true
+  - php: 7.1
+  - php: 7.2
+  - php: 7.3
+    env: RUN_DEPLOYMENT_TESTS=true RUN_DEVSERVER_TESTS=true RUN_CS_FIXER=true
 
 env:
   global:
-    - GOOGLE_APPLICATION_CREDENTIALS=$TRAVIS_BUILD_DIR/credentials.json
-    - GOOGLE_VERSION_ID=$TRAVIS_JOB_ID
-    - PATH=${HOME}/google-cloud-sdk/bin:${PATH}
-    - PHP_CGI_PATH=/home/travis/.phpenv/shims/php-cgi
+  - GOOGLE_APPLICATION_CREDENTIALS=$TRAVIS_BUILD_DIR/credentials.json
+  - GOOGLE_VERSION_ID=$TRAVIS_JOB_ID
+  - PATH=${HOME}/google-cloud-sdk/bin:${PATH}
+  - PHP_CGI_PATH=/home/travis/.phpenv/shims/php-cgi
 
 before_install:
-  - scripts/dump_credentials.php
-  - sudo apt-get update && sudo apt-get install python-ipaddr
-  - if [[ $TRAVIS_PHP_VERSION = 7.3* ]]; then scripts/install_test_deps.sh --gcloud --cs-fixer; fi
+- scripts/dump_credentials.php
+- sudo apt-get update && sudo apt-get install python-ipaddr
+- if [[ $TRAVIS_PHP_VERSION = 7.3* ]]; then scripts/install_test_deps.sh --gcloud --cs-fixer; fi
 
 script:
-  - if [ "${RUN_CS_FIXER}" = "true" ]; then ./php-cs-fixer fix --dry-run --diff .; fi;
-  - |
+- if [ "${RUN_CS_FIXER}" = "true" ]; then ./php-cs-fixer fix --dry-run --diff .; fi;
+- |
   set -e
   find . -name 'phpunit.xml.dist' -exec dirname {} \; | while read DIR
   do
@@ -52,5 +50,5 @@ script:
   done
 
 after_success:
-  - composer require "satooshi/php-coveralls:^1.0"
-  - travis_retry php vendor/bin/coveralls -v
+- composer require "satooshi/php-coveralls:^1.0"
+- travis_retry php vendor/bin/coveralls -v
