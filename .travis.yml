@@ -39,15 +39,8 @@ before_install:
 
 script:
 - if [ "${RUN_CS_FIXER}" = "true" ]; then ./php-cs-fixer fix --dry-run --diff .; fi;
-- |
-  set -e
-  find . -name 'phpunit.xml.dist' -exec dirname {} \; | while read DIR
-  do
-    pushd $DIR
-    composer install
-    phpunit
-    popd
-  done
+- composer install && vendor/bin/phpunit
+- pushd test/fixtures/appengine-standard && composer install && vendor/bin/phpunit && popd
 
 after_success:
 - composer require "satooshi/php-coveralls:^1.0"
