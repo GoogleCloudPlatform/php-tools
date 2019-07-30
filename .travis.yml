@@ -39,8 +39,8 @@ before_install:
 
 script:
 - if [ "${RUN_CS_FIXER}" = "true" ]; then ./php-cs-fixer fix --dry-run --diff .; fi;
-- composer install && vendor/bin/phpunit
-- pushd test/fixtures/appengine-standard && composer install && vendor/bin/phpunit && popd
+- composer install && vendor/bin/phpunit -v
+- pushd test/fixtures/appengine-standard && composer install && vendor/bin/phpunit -v && popd
 
 after_success:
 - composer require "satooshi/php-coveralls:^1.0"
