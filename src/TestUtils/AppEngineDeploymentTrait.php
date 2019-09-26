@@ -17,8 +17,6 @@
 
 namespace Google\Cloud\TestUtils;
 
-use GuzzleHttp\Client;
-
 /**
  * Trait AppEngineDeploymentTrait
  * @package Google\Cloud\TestUtils
@@ -27,46 +25,13 @@ use GuzzleHttp\Client;
  */
 trait AppEngineDeploymentTrait
 {
+    use TestTrait;
+    use DeploymentTrait {
+        DeploymentTrait::deployApp as baseDeployApp;
+    }
+
     /** @var \Google\Cloud\TestUtils\GcloudWrapper */
     private static $gcloudWrapper;
-    /** @var \GuzzleHttp\Client */
-    private $client;
-
-    /**
-     * Return the project id for the test.
-     *
-     * @return string
-     */
-    private static function getProjectId()
-    {
-        $projectId = getenv('GOOGLE_PROJECT_ID');
-        if ($projectId === false) {
-            self::fail('Please set GOOGLE_PROJECT_ID env var.');
-        }
-        return $projectId;
-    }
-
-    /**
-     * Return the version id for the test.
-     *
-     * @return string
-     */
-    private static function getVersionId()
-    {
-        $versionId = getenv('GOOGLE_VERSION_ID');
-        if ($versionId === false) {
-            self::fail('Please set GOOGLE_VERSION_ID env var.');
-        }
-        return $versionId;
-    }
-
-    /**
-     * Called before deploying the app. The concrete test class can override
-     * this.
-     */
-    private static function beforeDeploy()
-    {
-    }
 
     private static function doDeploy()
     {
@@ -74,64 +39,33 @@ trait AppEngineDeploymentTrait
     }
 
     /**
-     * Called after deploying the app. The concrete test class can override
-     * this.
-     */
-    private static function afterDeploy()
-    {
-    }
-
-    /**
      * Deploy the application.
+     * Override DeploymentTrait::deployApp to ensure $gcloudWrapper exists.
      *
      * @beforeClass
      */
     public static function deployApp()
     {
-        if (getenv('RUN_DEPLOYMENT_TESTS') !== 'true') {
-            self::markTestSkipped(
-                'To run this test, set RUN_DEPLOYMENT_TESTS env to true.'
-            );
-        }
         self::$gcloudWrapper = new GcloudWrapper(
-            self::getProjectId(),
-            self::getVersionId()
+            self::requireEnv('GOOGLE_PROJECT_ID'),
+            self::requireEnv('GOOGLE_VERSION_ID')
         );
-        if (getenv('GOOGLE_SKIP_DEPLOYMENT') !== 'true') {
-            static::beforeDeploy();
-            if (static::doDeploy() === false) {
-                self::fail('Deployment failed.');
-            }
-            if ((int) $delay = getenv('GOOGLE_DEPLOYMENT_DELAY')) {
-                sleep($delay);
-            }
-            static::afterDeploy();
-        }
+        self::baseDeployApp();
     }
 
     /**
-     * Delete the application.
-     *
-     * @afterClass
+     * Delete a deployed App Engine app.
      */
-    public static function deleteApp()
+    private static function doDelete()
     {
-        if (
-            getenv('GOOGLE_KEEP_DEPLOYMENT') !== 'true'
-            && getenv('GOOGLE_SKIP_DEPLOYMENT') !== 'true'
-        ) {
-            self::$gcloudWrapper->delete();
-        }
+        self::$gcloudWrapper->delete();
     }
 
     /**
-     * Set up the client.
-     *
-     * @before
+     * Return the URI of the deployed App Engine app.
      */
-    public function setUpClient()
+    private function getBaseUri()
     {
-        $url = self::$gcloudWrapper->getBaseUrl();
-        $this->client = new Client(['base_uri' => $url]);
+        return self::$gcloudWrapper->getBaseUrl();
     }
 }
