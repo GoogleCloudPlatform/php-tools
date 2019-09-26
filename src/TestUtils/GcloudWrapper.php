@@ -112,16 +112,34 @@ class GcloudWrapper
     /**
      * Deploy the app to the Google Cloud Platform.
      *
-     * @param string $targets optional The yaml files for deployments.
-     * @param bool $promote optional true if you want to promote the new app.
-     * @param int $retries optional Number of retries upon failure.
+     * @param array $options list of options
+     *      $targets string The yaml files for deployments.
+     *      $promote bool True if you want to promote the new app.
+     *      $retries int Number of retries upon failure.
+     *      $release_version string Run using "alpha" or "beta" version of gcloud deploy
      * @return bool true if deployment suceeds, false upon failure.
      */
-    public function deploy(
-        $targets = 'app.yaml',
-        $promote = false,
-        $retries = self::DEFAULT_RETRIES
-    ) {
+    public function deploy($options = [])
+    {
+        // Handle old function signature
+        if (!is_array($options)) {
+            $options = array_filter([
+                'targets' => @func_get_arg(0),
+                'promote' => @func_get_arg(1),
+            ]) + array_filter([
+                'retries' => @func_get_arg(2),
+            ], 'is_numeric');
+        }
+        $options = array_merge([
+            'targets' => 'app.yaml',
+            'promote' => false,
+            'retries' => self::DEFAULT_RETRIES,
+            'release_version' => null,
+        ], $options);
+        if (!in_array($options['release_version'], [null, 'alpha', 'beta'])) {
+            $this->errorLog('release_version must be "alpha" or "beta"');
+            return false;
+        }
         if ($this->deployed) {
             $this->errorLog('The app has been already deployed.');
             return false;
@@ -131,16 +149,15 @@ class GcloudWrapper
             $this->errorLog('Can not chdir to ' . $this->dir);
             return false;
         }
-        $cmd = "gcloud -q " . self::GCLOUD_APP . " deploy "
-            . "--project " . $this->project . " "
-            . "--version " . $this->version . " ";
-        if ($promote) {
-            $cmd .= "--promote ";
-        } else {
-            $cmd .= "--no-promote ";
-        }
-        $cmd .= $targets;
-        $ret = $this->execWithRetry($cmd, $retries);
+        $cmd = sprintf('gcloud -q %s%s deploy --project %s --version %s %s %s',
+            $options['release_version'] ? $options['release_version'] . ' ' : '',
+            self::GCLOUD_APP,
+            $this->project,
+            $this->version,
+            $options['promote'] ? '--promote' : '--no-promote',
+            $options['targets']
+        );
+        $ret = $this->execWithRetry($cmd, $options['retries']);
         chdir($orgDir);
         if ($ret) {
             $this->deployed = true;

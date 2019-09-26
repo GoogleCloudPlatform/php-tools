@@ -128,7 +128,7 @@ class TestTraitTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('This is expected', $e->getMessage());
         }
 
-        $this->assertEquals($retries + 1, $timesCalled);
+        $this->assertEquals($retries, $timesCalled);
     }
 
     /**
