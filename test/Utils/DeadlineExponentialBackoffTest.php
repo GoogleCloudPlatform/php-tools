@@ -52,7 +52,7 @@ class DeadlineExponentialBackoffTest extends TestCase
      */
     public function testNoRetryFunc()
     {
-        $neverRetryFunc = function() {
+        $neverRetryFunc = function () {
             return false;
         };
         $actualAttempts = 0;
