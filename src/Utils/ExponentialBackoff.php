@@ -120,7 +120,8 @@ class ExponentialBackoff
      */
     protected function shouldRetry(\Exception $exception)
     {
-        if ($this->retryAttempt < $this->retries) {
+        // Always retry when retries is -1
+        if (-1 === $this->retries || $this->retryAttempt < $this->retries) {
             if (!$this->retryFunction) {
                 $this->retryAttempt++;
                 return true;
