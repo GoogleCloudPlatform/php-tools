@@ -17,20 +17,20 @@
 
 namespace Google\Cloud\TestUtils\test;
 
-use Google\Cloud\TestUtils\GcloudWrapper;
+use Google\Cloud\TestUtils\GcloudAppEngineWrapper;
 
 /**
- * Class GcloudWrapperTest
+ * Class GcloudAppEngineWrapperTest
  * @package Google\Cloud\TestUtils\Test
  *
- * A class for testing GcloudWrapper class.
+ * A class for testing GcloudAppEngine class.
  */
-class GcloudWrapperTest extends \PHPUnit_Framework_TestCase
+class GcloudAppEngineWrapperTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \Symfony\Component\Process\Process */
     private $mockProcess;
 
-    /** @var  \Google\Cloud\TestUtils\GcloudWrapper */
+    /** @var  \Google\Cloud\TestUtils\GcloudAppEngineWrapper */
     private $mockGcloudWrapper;
 
     public function setUp()
@@ -49,7 +49,7 @@ class GcloudWrapperTest extends \PHPUnit_Framework_TestCase
     public function testDeployAndDeleteWithDefault()
     {
         $this->mockGcloudWrapper = $this->getMockBuilder(
-            '\Google\Cloud\TestUtils\GcloudWrapper'
+            '\Google\Cloud\TestUtils\GcloudAppEngineWrapper'
         )
             ->setMethods(array('execWithRetry'))
             ->setConstructorArgs(array('project', 'version'))
@@ -81,7 +81,7 @@ class GcloudWrapperTest extends \PHPUnit_Framework_TestCase
     public function testDeployAndDeleteWithCustomArgs()
     {
         $this->mockGcloudWrapper = $this->getMockBuilder(
-            '\Google\Cloud\TestUtils\GcloudWrapper'
+            '\Google\Cloud\TestUtils\GcloudAppEngineWrapper'
         )
             ->setMethods(array('execWithRetry'))
             ->setConstructorArgs(array('project', 'version'))
@@ -113,7 +113,7 @@ class GcloudWrapperTest extends \PHPUnit_Framework_TestCase
     public function testDeployWithArgsArray()
     {
         $this->mockGcloudWrapper = $this->getMockBuilder(
-            '\Google\Cloud\TestUtils\GcloudWrapper'
+            '\Google\Cloud\TestUtils\GcloudAppEngineWrapper'
         )
             ->setMethods(array('execWithRetry'))
             ->setConstructorArgs(array('project', 'version'))
@@ -150,7 +150,7 @@ class GcloudWrapperTest extends \PHPUnit_Framework_TestCase
     public function testRunAndStopWithDefault()
     {
         $this->mockGcloudWrapper = $this->getMockBuilder(
-            '\Google\Cloud\TestUtils\GcloudWrapper'
+            '\Google\Cloud\TestUtils\GcloudAppEngineWrapper'
         )
             ->setMethods(array('createProcess'))
             ->setConstructorArgs(array('project', 'version'))
@@ -188,7 +188,7 @@ class GcloudWrapperTest extends \PHPUnit_Framework_TestCase
     public function testRunAndStopWithCustomArgs()
     {
         $this->mockGcloudWrapper = $this->getMockBuilder(
-            '\Google\Cloud\TestUtils\GcloudWrapper'
+            '\Google\Cloud\TestUtils\GcloudAppEngineWrapper'
         )
             ->setMethods(array('createProcess'))
             ->setConstructorArgs(array('project', 'version'))
@@ -229,7 +229,7 @@ class GcloudWrapperTest extends \PHPUnit_Framework_TestCase
     public function testRunAndStopWithCustomPort()
     {
         $this->mockGcloudWrapper = $this->getMockBuilder(
-            '\Google\Cloud\TestUtils\GcloudWrapper'
+            '\Google\Cloud\TestUtils\GcloudAppEngineWrapper'
         )
             ->setMethods(array('createProcess'))
             ->setConstructorArgs(array('project', 'version', null, 8000))
