@@ -20,29 +20,27 @@ namespace Google\Cloud\TestUtils;
 use Symfony\Component\Process\Process;
 
 /**
- * Class GcloudWrapper
+ * Trait GcloudWrapperTrait
  * @package Google\Cloud\TestUtils
  *
- * A class representing App Engine application.
+ * Traits for classes wrapping gcloud
  */
-abstract class GcloudWrapperBase
+trait GcloudWrapperTrait
 {
     /** @var string */
-    protected $project;
+    private $project;
 
     /** @var bool */
-    protected $deployed;
+    private $deployed;
 
     /** @var bool */
-    protected $isRunning;
+    private $isRunning;
 
     /** @var \Symfony\Component\Process\Process */
-    protected $process;
+    private $process;
 
     /** @var string */
-    protected $dir;
-
-    const DEFAULT_RETRIES = 3;
+    private $dir;
 
     /**
      * Constructor of GcloudWrapper.
@@ -50,7 +48,7 @@ abstract class GcloudWrapperBase
      * @param string $project
      * @param string|null $dir optional
      */
-    public function __construct(
+    private function setDefaultVars(
         $project,
         $dir = null
     ) {
@@ -63,12 +61,12 @@ abstract class GcloudWrapperBase
         $this->dir = $dir;
     }
 
-    protected function errorLog($message)
+    private function errorLog($message)
     {
         fwrite(STDERR, $message . "\n");
     }
 
-    protected function execWithRetry($cmd, $retries = self::DEFAULT_RETRIES, &$output = null)
+    private function execWithRetry($cmd, $retries = 3, &$output = null)
     {
         for ($i = 0; $i <= $retries; $i++) {
             exec($cmd, $output, $ret);
@@ -98,7 +96,7 @@ abstract class GcloudWrapperBase
      * @param string $cmd
      * @return \Symfony\Component\Process\Process
      */
-    protected function createProcess($cmd)
+    private function createProcess($cmd)
     {
         return new Process($cmd);
     }
@@ -113,13 +111,4 @@ abstract class GcloudWrapperBase
         }
         $this->isRunning = false;
     }
-
-    /**
-     * Return the base URL of the deployed app.
-     *
-     * @param string $service optional
-     * @return mixed returns the base URL of the deployed app, or false when
-     *     the app is not deployed.
-     */
-    abstract public function getBaseUrl($service = 'default');
 }

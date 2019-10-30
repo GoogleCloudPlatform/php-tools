@@ -25,8 +25,10 @@ use Symfony\Component\Process\Process;
  *
  * A class representing App Engine application.
  */
-class GcloudCloudRunWrapper extends GcloudWrapperBase
+class GcloudCloudRunWrapper
 {
+    use GcloudWrapperTrait;
+
     /** @var string */
     private $image;
 
@@ -70,7 +72,7 @@ class GcloudCloudRunWrapper extends GcloudWrapperBase
         $this->service = $options['service'];
         $this->region = $options['region'];
 
-        parent::__construct($project, $options['dir']);
+        $this->setDefaultVars($project, $options['dir']);
     }
 
     /**
@@ -85,7 +87,7 @@ class GcloudCloudRunWrapper extends GcloudWrapperBase
     {
         // Set default optioins
         $options = array_merge([
-            'retries' => self::DEFAULT_RETRIES,
+            'retries' => 3,
         ], $options);
 
         $orgDir = getcwd();
@@ -111,7 +113,7 @@ class GcloudCloudRunWrapper extends GcloudWrapperBase
     {
         // Set default optioins
         $options = array_merge([
-            'retries' => self::DEFAULT_RETRIES,
+            'retries' => 3,
         ], $options);
         if ($this->deployed) {
             $this->errorLog('The app has been already deployed.');
@@ -149,7 +151,7 @@ class GcloudCloudRunWrapper extends GcloudWrapperBase
     {
         // Set default optioins
         $options = array_merge([
-            'retries' => self::DEFAULT_RETRIES,
+            'retries' => 3,
         ], $options);
         $cmd = sprintf('gcloud beta %s services delete %s --region %s --platform %s --project %s',
             self::GCLOUD_RUN,
@@ -158,10 +160,9 @@ class GcloudCloudRunWrapper extends GcloudWrapperBase
             $this->platform,
             $this->project
         );
-        $ret = $this->execWithRetry($cmd, $options['retries'], $output);
+        $ret = $this->execWithRetry($cmd, $options['retries']);
         if ($ret) {
             $this->deployed = false;
-            $this->url = $output[0];
         }
         return $ret;
     }
@@ -173,17 +174,17 @@ class GcloudCloudRunWrapper extends GcloudWrapperBase
      *      $retries int Number of retries upon failure.
      * @return bool true if the app is succesfully deleted, otherwise false
      */
-    public function deleteImage($image)
+    public function deleteImage($image, array $options = [])
     {
         // Set default optioins
         $options = array_merge([
-            'retries' => self::DEFAULT_RETRIES,
+            'retries' => 3,
         ], $options);
         $cmd = sprintf('gcloud container images delete %s --project %s',
             $this->project,
             $image
         );
-        return $this->execWithRetry($cmd, $options['retries'], $output);
+        return $this->execWithRetry($cmd, $options['retries']);
     }
 
     /**
@@ -198,6 +199,18 @@ class GcloudCloudRunWrapper extends GcloudWrapperBase
         if (!$this->deployed) {
             $this->errorLog('The app has not been deployed.');
         }
-        return $this->url;
+        if ($this->url) {
+            return $this->url;
+        }
+        $cmd = sprintf('gcloud beta %s services describe %s --region %s --platform %s --project %s',
+            self::GCLOUD_RUN,
+            $this->service,
+            $this->region,
+            $this->platform,
+            $this->project
+        );
+        $cmd .= '| grep -m1 -oh "https:\/\/.*\.run\.app$"';
+        $this->execWithRetry($cmd, 0, $output);
+        return $this->url = $output[0];
     }
 }

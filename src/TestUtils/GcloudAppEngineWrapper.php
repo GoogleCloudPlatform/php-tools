@@ -25,8 +25,10 @@ use Symfony\Component\Process\Process;
  *
  * A class representing App Engine application.
  */
-class GcloudAppEngineWrapper extends GcloudWrapperBase
+class GcloudAppEngineWrapper
 {
+    use GcloudWrapperTrait;
+
     /** @var string */
     private $version;
 
@@ -55,7 +57,7 @@ class GcloudAppEngineWrapper extends GcloudWrapperBase
         }
         $this->version = $version;
         $this->port = $port;
-        parent::__construct($project, $dir);
+        $this->setDefaultVars($project, $dir);
     }
 
     /**
@@ -82,7 +84,7 @@ class GcloudAppEngineWrapper extends GcloudWrapperBase
         $options = array_merge([
             'targets' => 'app.yaml',
             'promote' => false,
-            'retries' => self::DEFAULT_RETRIES,
+            'retries' => 3,
             'release_version' => null,
         ], $options);
         if (!in_array($options['release_version'], [null, 'alpha', 'beta'])) {
@@ -167,7 +169,7 @@ class GcloudAppEngineWrapper extends GcloudWrapperBase
      */
     public function delete(
         $service = 'default',
-        $retries = self::DEFAULT_RETRIES
+        $retries = 3
     ) {
         $cmd = "gcloud -q " . self::GCLOUD_APP . " versions delete "
             . "--service " . $service . " "
