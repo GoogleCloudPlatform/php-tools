@@ -55,7 +55,7 @@ class GcloudCloudRunWrapper extends GcloudWrapperBase
      * @param string|null $dir optional
      * @param int $port optional
      */
-    public function __construct($project, $options = [])
+    public function __construct($project, array $options = [])
     {
         $this->project = $project;
 
@@ -81,7 +81,7 @@ class GcloudCloudRunWrapper extends GcloudWrapperBase
      *      $retries int Number of retries upon failure.
      * @return bool true if deployment suceeds, false upon failure.
      */
-    public function build($image, $options = [])
+    public function build($image, array $options = [])
     {
         // Set default optioins
         $options = array_merge([
@@ -107,7 +107,7 @@ class GcloudCloudRunWrapper extends GcloudWrapperBase
      *      $retries int Number of retries upon failure.
      * @return bool true if deployment suceeds, false upon failure.
      */
-    public function deploy($image, $options = [])
+    public function deploy($image, array $options = [])
     {
         // Set default optioins
         $options = array_merge([
