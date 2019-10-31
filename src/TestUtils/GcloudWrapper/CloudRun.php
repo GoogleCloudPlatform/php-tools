@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace Google\Cloud\TestUtils;
+namespace Google\Cloud\TestUtils\GcloudWrapper;
 
 use Symfony\Component\Process\Process;
 
@@ -25,7 +25,7 @@ use Symfony\Component\Process\Process;
  *
  * A class representing App Engine application.
  */
-class GcloudCloudRunWrapper
+class CloudRun
 {
     use GcloudWrapperTrait;
 

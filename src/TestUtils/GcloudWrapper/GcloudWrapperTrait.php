@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace Google\Cloud\TestUtils;
+namespace Google\Cloud\TestUtils\GcloudWrapper;
 
 use Symfony\Component\Process\Process;
 

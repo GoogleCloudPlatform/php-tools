@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace Google\Cloud\TestUtils;
+namespace Google\Cloud\TestUtils\GcloudWrapper;
 
 use Symfony\Component\Process\Process;
 
@@ -25,7 +25,7 @@ use Symfony\Component\Process\Process;
  *
  * A class representing App Engine application.
  */
-class GcloudAppEngineWrapper
+class AppEngine
 {
     use GcloudWrapperTrait;
 
@@ -226,4 +226,4 @@ class GcloudAppEngineWrapper
     }
 }
 
-class_alias(GcloudAppEngineWrapper::class, GcloudWrapper::class);
+class_alias(AppEngine::class, \Google\Cloud\TestUtils\GcloudWrapper::class);

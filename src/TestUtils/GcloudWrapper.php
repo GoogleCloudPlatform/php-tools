@@ -15,4 +15,4 @@
  * limitations under the License.
  */
 
-class_exists(GcloudAppEngineWrapper::class);
+class_exists(Google\Cloud\TestUtils\GcloudWrapper\AppEngine::class);
