@@ -17,17 +17,17 @@
 
 namespace Google\Cloud\TestUtils\test;
 
-use Google\Cloud\TestUtils\GcloudCloudRunWrapper;
+use Google\Cloud\TestUtils\GcloudWrapper\CloudRun;
 
 /**
- * Class GcloudCloudRunWrapperTest
+ * Class GcloudWrapper\AppEngineTest
  * @package Google\Cloud\TestUtils\Test
  *
  * A class for testing GcloudAppEngine class.
  */
-class GcloudCloudRunWrapperTest extends \PHPUnit_Framework_TestCase
+class CloudRunTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var  \Google\Cloud\TestUtils\GcloudCloudRunWrapper */
+    /** @var  \Google\Cloud\TestUtils\GcloudWrapper\CloudRun */
     private $mockGcloudWrapper;
 
     private static $image = 'gcr.io/my-project/image';
@@ -35,7 +35,7 @@ class GcloudCloudRunWrapperTest extends \PHPUnit_Framework_TestCase
     public function testDeployAndDeleteWithDefault()
     {
         $this->mockGcloudWrapper = $this->getMockBuilder(
-            '\Google\Cloud\TestUtils\GcloudCloudRunWrapper'
+            '\Google\Cloud\TestUtils\GcloudWrapper\CloudRun'
         )
             ->setMethods(['execWithRetry'])
             ->setConstructorArgs(['project'])
@@ -62,7 +62,7 @@ class GcloudCloudRunWrapperTest extends \PHPUnit_Framework_TestCase
     public function testDeployAndDeleteWithCustomArgs()
     {
         $this->mockGcloudWrapper = $this->getMockBuilder(
-            '\Google\Cloud\TestUtils\GcloudCloudRunWrapper'
+            '\Google\Cloud\TestUtils\GcloudWrapper\CloudRun'
         )
             ->setMethods(['execWithRetry'])
             ->setConstructorArgs(['project', [
