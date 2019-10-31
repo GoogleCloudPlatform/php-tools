@@ -181,8 +181,8 @@ class CloudRun
             'retries' => 3,
         ], $options);
         $cmd = sprintf('gcloud container images delete %s --project %s',
-            $this->project,
-            $image
+            $image,
+            $this->project
         );
         return $this->execWithRetry($cmd, $options['retries']);
     }
