@@ -17,8 +17,6 @@
 
 namespace Google\Cloud\TestUtils\GcloudWrapper;
 
-use Symfony\Component\Process\Process;
-
 /**
  * Class GcloudWrapper
  * @package Google\Cloud\TestUtils

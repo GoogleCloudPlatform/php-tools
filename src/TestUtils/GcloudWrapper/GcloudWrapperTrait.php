@@ -66,7 +66,7 @@ trait GcloudWrapperTrait
         fwrite(STDERR, $message . "\n");
     }
 
-    private function execWithRetry($cmd, $retries = 3, &$output = null)
+    protected function execWithRetry($cmd, $retries = 3, &$output = null)
     {
         for ($i = 0; $i <= $retries; $i++) {
             exec($cmd, $output, $ret);
@@ -96,7 +96,7 @@ trait GcloudWrapperTrait
      * @param string $cmd
      * @return \Symfony\Component\Process\Process
      */
-    private function createProcess($cmd)
+    protected function createProcess($cmd)
     {
         return new Process($cmd);
     }

@@ -27,66 +27,57 @@ use Google\Cloud\TestUtils\GcloudWrapper\CloudRun;
  */
 class CloudRunTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var  \Google\Cloud\TestUtils\GcloudWrapper\CloudRun */
-    private $mockGcloudWrapper;
-
     private static $image = 'gcr.io/my-project/image';
 
     public function testDeployAndDeleteWithDefault()
     {
-        $this->mockGcloudWrapper = $this->getMockBuilder(
-            '\Google\Cloud\TestUtils\GcloudWrapper\CloudRun'
-        )
+        $mockGcloudWrapper = $this->getMockBuilder(CloudRun::class)
             ->setMethods(['execWithRetry'])
             ->setConstructorArgs(['project'])
             ->getMock();
-        $this->mockGcloudWrapper->method('execWithRetry')->willReturn(true);
         $deployCmd = 'gcloud beta run deploy default --image ' . self::$image
             . ' --region us-central1 --platform managed'
             . ' --project project';
         $deleteCmd = 'gcloud beta run services delete default'
             . ' --region us-central1 --platform managed'
             . ' --project project';
-        $this->mockGcloudWrapper->expects($this->exactly(2))
+        $mockGcloudWrapper->expects($this->exactly(2))
             ->method('execWithRetry')
             ->withConsecutive(
                 [$this->equalTo($deployCmd), $this->equalTo(3)],
                 [$this->equalTo($deleteCmd), $this->equalTo(3)]
-            );
+            )
+            ->will($this->returnValue(false));
 
-        $this->mockGcloudWrapper->deploy(self::$image);
+        $mockGcloudWrapper->deploy(self::$image);
 
-        $this->mockGcloudWrapper->delete();
+        $mockGcloudWrapper->delete();
     }
 
     public function testDeployAndDeleteWithCustomArgs()
     {
-        $this->mockGcloudWrapper = $this->getMockBuilder(
-            '\Google\Cloud\TestUtils\GcloudWrapper\CloudRun'
-        )
+        $mockGcloudWrapper = $this->getMockBuilder(CloudRun::class)
             ->setMethods(['execWithRetry'])
             ->setConstructorArgs(['project', [
                 'platform' => 'gke',
-                'region' => 'us-central2',
+                'region' => '',
                 'service' => 'foo',
             ]])
             ->getMock();
-        $this->mockGcloudWrapper->method('execWithRetry')->willReturn(true);
+        $mockGcloudWrapper->method('execWithRetry')->willReturn(true);
         $deployCmd = 'gcloud beta run deploy foo --image ' . self::$image
-            . ' --region us-central2 --platform gke'
-            . ' --project project';
+            . ' --platform gke --project project';
         $deleteCmd = 'gcloud beta run services delete foo'
-            . ' --region us-central2 --platform gke'
-            . ' --project project';
-        $this->mockGcloudWrapper->expects($this->exactly(2))
+            . ' --platform gke --project project';
+        $mockGcloudWrapper->expects($this->exactly(2))
             ->method('execWithRetry')
             ->withConsecutive(
                 [$this->equalTo($deployCmd), $this->equalTo(4)],
                 [$this->equalTo($deleteCmd), $this->equalTo(4)]
             );
 
-        $this->mockGcloudWrapper->deploy(self::$image, ['retries' => 4]);
+        $mockGcloudWrapper->deploy(self::$image, ['retries' => 4]);
 
-        $this->mockGcloudWrapper->delete(['retries' => 4]);
+        $mockGcloudWrapper->delete(['retries' => 4]);
     }
 }

@@ -17,8 +17,6 @@
 
 namespace Google\Cloud\TestUtils\GcloudWrapper;
 
-use Symfony\Component\Process\Process;
-
 /**
  * Class GcloudWrapper
  * @package Google\Cloud\TestUtils
@@ -124,11 +122,11 @@ class CloudRun
             $this->errorLog('Can not chdir to ' . $this->dir);
             return false;
         }
-        $cmd = sprintf('gcloud beta %s deploy %s --image %s --region %s --platform %s --project %s',
+        $cmd = sprintf('gcloud beta %s deploy %s --image %s%s --platform %s --project %s',
             self::GCLOUD_RUN,
             $this->service,
             $image,
-            $this->region,
+            $this->region ? sprintf(' --region %s', $this->region) : '',
             $this->platform,
             $this->project
         );
@@ -153,10 +151,10 @@ class CloudRun
         $options = array_merge([
             'retries' => 3,
         ], $options);
-        $cmd = sprintf('gcloud beta %s services delete %s --region %s --platform %s --project %s',
+        $cmd = sprintf('gcloud beta %s services delete %s%s --platform %s --project %s',
             self::GCLOUD_RUN,
             $this->service,
-            $this->region,
+            $this->region ? sprintf(' --region %s', $this->region) : '',
             $this->platform,
             $this->project
         );
@@ -202,10 +200,10 @@ class CloudRun
         if ($this->url) {
             return $this->url;
         }
-        $cmd = sprintf('gcloud beta %s services describe %s --region %s --platform %s --project %s',
+        $cmd = sprintf('gcloud beta %s services describe %s%s --platform %s --project %s',
             self::GCLOUD_RUN,
             $this->service,
-            $this->region,
+            $this->region ? sprintf(' --region %s', $this->region) : '',
             $this->platform,
             $this->project
         );
