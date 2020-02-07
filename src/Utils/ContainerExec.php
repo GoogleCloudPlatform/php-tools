@@ -93,7 +93,6 @@ class ContainerExec
         file_put_contents("$this->workdir/cloudbuild.yaml", $cloudBuildYaml);
         list($result, $cmdOutput) = $this->gcloud->exec(
             [
-                'container',
                 'builds',
                 'submit',
                 "--config=$this->workdir/cloudbuild.yaml",
