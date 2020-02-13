@@ -92,7 +92,6 @@ class ContainerExecTest extends \PHPUnit_Framework_TestCase
         $image = 'gcr.io/my-project/my-image';
         $this->gcloud->exec(
             [
-                'container',
                 'builds',
                 'submit',
                 "--config=$this->workdir/cloudbuild.yaml",

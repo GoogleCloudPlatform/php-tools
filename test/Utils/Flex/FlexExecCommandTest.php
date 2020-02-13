@@ -101,7 +101,6 @@ class FlexExecCommandTest extends \PHPUnit_Framework_TestCase
             );
         $this->gcloud->exec(
             [
-                'container',
                 'builds',
                 'submit',
                 "--config=$this->workdir/cloudbuild.yaml",
