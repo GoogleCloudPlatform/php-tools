@@ -45,10 +45,7 @@ class FileUtilTest extends \PHPUnit_Framework_TestCase
 
         $newDir = FileUtil::cloneDirectoryIntoTmp(__DIR__ . '/../fixtures/clonedir', $progress);
 
-        $this->assertEquals("
-    1 [->--------------------------]
-    2 [-->-------------------------]
-    3 [--->------------------------]", $output->fetch());
+        $this->assertContains('1 [', $output->fetch());
     }
 
     public function testCloneIntoDirectoryWithExistingFile()
