@@ -105,7 +105,7 @@ trait ExecuteCommandTrait
     {
         $process = new Process($cmd);
         if (self::$workingDirectory) {
-            $process->setWorkingDirectory();
+            $process->setWorkingDirectory(self::$workingDirectory);
         }
 
         if (false !== $timeout) {
