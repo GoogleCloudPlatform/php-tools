@@ -104,7 +104,10 @@ trait ExecuteCommandTrait
     private static function createProcess($cmd, $timeout = false)
     {
         $process = new Process($cmd);
-        $process->setWorkingDirectory(self::$workingDirectory);
+        if (self::$workingDirectory) {
+            $process->setWorkingDirectory();
+        }
+
         if (false !== $timeout) {
             $process->setTimeout($timeout);
         }
