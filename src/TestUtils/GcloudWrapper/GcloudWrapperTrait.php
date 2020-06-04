@@ -36,7 +36,7 @@ trait GcloudWrapperTrait
     /** @var bool */
     private $isRunning;
 
-    /** @var \Symfony\Component\Process\Process */
+    /** @var Process */
     private $process;
 
     /** @var string */
@@ -94,11 +94,11 @@ trait GcloudWrapperTrait
      * Create \Symfony\Component\Process\Process with a given string.
      *
      * @param string $cmd
-     * @return \Symfony\Component\Process\Process
+     * @return Process
      */
     protected function createProcess($cmd)
     {
-        return new Process($cmd);
+        return new Process(explode(' ', $cmd));
     }
 
     /**

@@ -33,7 +33,7 @@ class FileUtilTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFileExists($newDir);
         $this->assertFileExists($newDir . '/appengine-standard');
-        foreach (['app.php', 'phpunit.xml', 'tests/bootstrap.php'] as $file) {
+        foreach (['app.php', 'phpunit.xml'] as $file) {
             $this->assertFileExists($newDir . '/appengine-standard/' . $file);
         }
     }

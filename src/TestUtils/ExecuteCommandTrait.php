@@ -103,6 +103,9 @@ trait ExecuteCommandTrait
      */
     private static function createProcess($cmd, $timeout = false)
     {
+        if (!is_array($cmd)) {
+            $cmd = explode(' ', $cmd);
+        }
         $process = new Process($cmd);
         if (self::$workingDirectory) {
             $process->setWorkingDirectory(self::$workingDirectory);
