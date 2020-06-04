@@ -175,6 +175,7 @@ class FlexExecCommand extends Command
             . implode(' ', $commands)
             . '` succeeded</info>'
         );
+        return 0;
     }
 
     /**
