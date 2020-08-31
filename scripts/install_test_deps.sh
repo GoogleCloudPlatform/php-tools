@@ -48,7 +48,6 @@ configure_gcloud()
             "${GOOGLE_APPLICATION_CREDENTIALS}"
     fi
     gcloud -q components install app-engine-python
-    gcloud -q components install app-engine-php
     gcloud -q components update
     if [ -n "${GCLOUD_VERBOSITY}" ]; then
         gcloud -q config set verbosity ${GCLOUD_VERBOSITY}
