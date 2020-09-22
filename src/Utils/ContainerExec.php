@@ -62,8 +62,13 @@ class ContainerExec
             throw new \InvalidArgumentException("$workdir is not a directory");
         }
         $this->gcloud = ($gcloud == null) ? new Gcloud() : $gcloud;
-        $loader = new \Twig_Loader_Filesystem(__DIR__ . '/templates');
-        $this->twig = new \Twig_Environment($loader);
+        if (class_exists(\Twig_Loader_Filesystem::class)) {
+            $loader = new \Twig_Loader_Filesystem(__DIR__ . '/templates');
+            $this->twig = new \Twig_Environment($loader);
+        } else {
+            $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/templates');
+            $this->twig = new \Twig\Environment($loader);
+        }
         $this->image = $image;
         $this->commands = $commands;
         $this->cloudSqlInstances = $cloudSqlInstances;
