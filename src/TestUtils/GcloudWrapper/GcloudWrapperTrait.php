@@ -20,10 +20,7 @@ namespace Google\Cloud\TestUtils\GcloudWrapper;
 use Symfony\Component\Process\Process;
 
 /**
- * Trait GcloudWrapperTrait
- * @package Google\Cloud\TestUtils
- *
- * Traits for classes wrapping gcloud
+ * Trait GcloudWrapperTrait.
  */
 trait GcloudWrapperTrait
 {
@@ -43,10 +40,10 @@ trait GcloudWrapperTrait
     private $dir;
 
     /**
-     * Constructor of GcloudWrapper.
+     * Set trait properties to default values.
      *
-     * @param string $project
-     * @param string|null $dir optional
+     * @param string      $project
+     * @param string|null $dir     optional
      */
     private function setDefaultVars(
         $project,
@@ -63,19 +60,20 @@ trait GcloudWrapperTrait
 
     private function errorLog($message)
     {
-        fwrite(STDERR, $message . "\n");
+        fwrite(STDERR, $message."\n");
     }
 
     protected function execWithRetry($cmd, $retries = 3, &$output = null)
     {
-        for ($i = 0; $i <= $retries; $i++) {
+        for ($i = 0; $i <= $retries; ++$i) {
             exec($cmd, $output, $ret);
             if ($ret === 0) {
                 return true;
             } elseif ($i <= $retries) {
-                $this->errorLog('Retrying the command: ' . $cmd);
+                $this->errorLog('Retrying the command: '.$cmd);
             }
         }
+
         return false;
     }
 
@@ -94,6 +92,7 @@ trait GcloudWrapperTrait
      * Create \Symfony\Component\Process\Process with a given string.
      *
      * @param string $cmd
+     *
      * @return Process
      */
     protected function createProcess($cmd)
@@ -102,7 +101,7 @@ trait GcloudWrapperTrait
     }
 
     /**
-     * Stop the dev_appserver.
+     * Stop the process.
      */
     public function stop()
     {
