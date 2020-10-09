@@ -95,12 +95,13 @@ class AppEngine
         }
         $orgDir = getcwd();
         if (chdir($this->dir) === false) {
-            $this->errorLog('Can not chdir to '.$this->dir);
+            $this->errorLog('Can not chdir to ' . $this->dir);
 
             return false;
         }
-        $cmd = sprintf('gcloud -q %s%s deploy --project %s --version %s %s %s',
-            $options['release_version'] ? $options['release_version'].' ' : '',
+        $cmd = sprintf(
+            'gcloud -q %s%s deploy --project %s --version %s %s %s',
+            $options['release_version'] ? $options['release_version'] . ' ' : '',
             self::GCLOUD_COMPONENT,
             $this->project,
             $this->version,
@@ -128,13 +129,13 @@ class AppEngine
         $targets = 'app.yaml',
         $phpCgiPath = '/usr/bin/php-cgi'
     ) {
-        $cmd = 'dev_appserver.py --port '.$this->port
-            .' --skip_sdk_update_check true'
-            .' --php_executable_path '.$phpCgiPath
-            .' '.$targets;
+        $cmd = 'dev_appserver.py --port ' . $this->port
+            . ' --skip_sdk_update_check true'
+            . ' --php_executable_path ' . $phpCgiPath
+            . ' ' . $targets;
         $orgDir = getcwd();
         if (chdir($this->dir) === false) {
-            $this->errorLog('Can not chdir to '.$this->dir);
+            $this->errorLog('Can not chdir to ' . $this->dir);
 
             return false;
         }
@@ -176,9 +177,9 @@ class AppEngine
         $service = 'default',
         $retries = 3
     ) {
-        $cmd = 'gcloud -q '.self::GCLOUD_COMPONENT.' versions delete '
-            .'--service '.$service.' '
-            .$this->version.' --project '.$this->project;
+        $cmd = 'gcloud -q ' . self::GCLOUD_COMPONENT . ' versions delete '
+            . '--service ' . $service . ' '
+            . $this->version . ' --project ' . $this->project;
         $ret = $this->execWithRetry($cmd, $retries);
         if ($ret) {
             $this->deployed = false;
@@ -201,7 +202,7 @@ class AppEngine
             return false;
         }
 
-        return 'http://127.0.0.1:'.$this->port;
+        return 'http://127.0.0.1:' . $this->port;
     }
 
     /**

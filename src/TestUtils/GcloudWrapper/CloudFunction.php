@@ -114,12 +114,13 @@ class CloudFunction
         }
         $orgDir = getcwd();
         if (chdir($this->dir) === false) {
-            $this->errorLog('Can not chdir to '.$this->dir);
+            $this->errorLog('Can not chdir to ' . $this->dir);
 
             return false;
         }
-        $cmd = sprintf('gcloud -q %s%s deploy %s --entry-point %s --runtime %s --project %s --region %s %s --no-allow-unauthenticated',
-            $options['release_version'] ? $options['release_version'].' ' : '',
+        $cmd = sprintf(
+            'gcloud -q %s%s deploy %s --entry-point %s --runtime %s --project %s --region %s %s --no-allow-unauthenticated',
+            $options['release_version'] ? $options['release_version'] . ' ' : '',
             self::GCLOUD_COMPONENT,
             $this->functionName,
             $this->entryPoint,
@@ -145,10 +146,10 @@ class CloudFunction
     public function run($phpBin = 'php')
     {
         $type = $this->isCloudEventFunction() ? 'FUNCTION_SIGNATURE_TYPE=cloudevent' : '';
-        $cmd = $type.'FUNCTION_TARGET='.$this->functionName.' '.$phpBin.' -S localhost:'.$this->port.' vendor/bin/router.php';
+        $cmd = $type . 'FUNCTION_TARGET=' . $this->functionName . ' ' . $phpBin . ' -S localhost:' . $this->port . ' vendor/bin/router.php';
         $orgDir = getcwd();
         if (chdir($this->dir) === false) {
-            $this->errorLog('Can not chdir to '.$this->dir);
+            $this->errorLog('Can not chdir to ' . $this->dir);
 
             return false;
         }
@@ -193,8 +194,8 @@ class CloudFunction
             return false;
         }
 
-        $cmd = 'gcloud -q '.self::GCLOUD_COMPONENT.' delete '
-            .$this->functionName.' --project '.$this->project.' --region '.$this->region;
+        $cmd = 'gcloud -q ' . self::GCLOUD_COMPONENT . ' delete '
+            . $this->functionName . ' --project ' . $this->project . ' --region ' . $this->region;
         $ret = $this->execWithRetry($cmd, $retries);
         if ($ret) {
             $this->deployed = false;
@@ -217,7 +218,7 @@ class CloudFunction
             return false;
         }
 
-        return 'http://localhost:'.$this->port;
+        return 'http://localhost:' . $this->port;
     }
 
     /**
@@ -229,7 +230,7 @@ class CloudFunction
     public function getBaseUrl($retries = 3)
     {
         if (!$this->deployed) {
-            echo '$this->deployed is empty by the time getBaseUrl is called.'.PHP_EOL;
+            echo '$this->deployed is empty by the time getBaseUrl is called.' . PHP_EOL;
             $this->errorLog('The function has not been deployed.');
 
             return false;
@@ -242,8 +243,8 @@ class CloudFunction
         }
 
         if (empty($this->url)) {
-            $cmd = 'gcloud -q '.self::GCLOUD_COMPONENT.' describe '.$this->functionName
-            .' --format \'value(httpsTrigger.url)\' --project '.$this->project.' --region '.$this->region;
+            $cmd = 'gcloud -q ' . self::GCLOUD_COMPONENT . ' describe ' . $this->functionName
+            . ' --format \'value(httpsTrigger.url)\' --project ' . $this->project . ' --region ' . $this->region;
             $this->url = $this->execWithRetry($cmd, $retries, $url);
             $this->url = $url[0];
         }

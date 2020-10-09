@@ -60,7 +60,7 @@ trait GcloudWrapperTrait
 
     private function errorLog($message)
     {
-        fwrite(STDERR, $message."\n");
+        fwrite(STDERR, $message . "\n");
     }
 
     protected function execWithRetry($cmd, $retries = 3, &$output = null)
@@ -70,7 +70,7 @@ trait GcloudWrapperTrait
             if ($ret === 0) {
                 return true;
             } elseif ($i <= $retries) {
-                $this->errorLog('Retrying the command: '.$cmd);
+                $this->errorLog('Retrying the command: ' . $cmd);
             }
         }
 

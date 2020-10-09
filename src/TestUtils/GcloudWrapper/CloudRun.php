@@ -85,7 +85,7 @@ class CloudRun
 
         $orgDir = getcwd();
         if (chdir($this->dir) === false) {
-            $this->errorLog('Can not chdir to '.$this->dir);
+            $this->errorLog('Can not chdir to ' . $this->dir);
 
             return false;
         }
@@ -118,11 +118,12 @@ class CloudRun
         }
         $orgDir = getcwd();
         if (chdir($this->dir) === false) {
-            $this->errorLog('Can not chdir to '.$this->dir);
+            $this->errorLog('Can not chdir to ' . $this->dir);
 
             return false;
         }
-        $cmd = sprintf('gcloud beta %s deploy %s --image %s%s --platform %s --project %s',
+        $cmd = sprintf(
+            'gcloud beta %s deploy %s --image %s%s --platform %s --project %s',
             self::GCLOUD_COMPONENT,
             $this->service,
             $image,
@@ -153,7 +154,8 @@ class CloudRun
         $options = array_merge([
             'retries' => 3,
         ], $options);
-        $cmd = sprintf('gcloud beta %s services delete %s%s --platform %s --project %s',
+        $cmd = sprintf(
+            'gcloud beta %s services delete %s%s --platform %s --project %s',
             self::GCLOUD_COMPONENT,
             $this->service,
             $this->region ? sprintf(' --region %s', $this->region) : '',
@@ -182,7 +184,8 @@ class CloudRun
         $options = array_merge([
             'retries' => 3,
         ], $options);
-        $cmd = sprintf('gcloud container images delete %s --project %s',
+        $cmd = sprintf(
+            'gcloud container images delete %s --project %s',
             $image,
             $this->project
         );
@@ -208,7 +211,8 @@ class CloudRun
         if ($this->url) {
             return $this->url;
         }
-        $cmd = sprintf('gcloud beta %s services describe %s%s --platform %s --project %s',
+        $cmd = sprintf(
+            'gcloud beta %s services describe %s%s --platform %s --project %s',
             self::GCLOUD_COMPONENT,
             $this->service,
             $this->region ? sprintf(' --region %s', $this->region) : '',

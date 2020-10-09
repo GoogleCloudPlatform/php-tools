@@ -40,7 +40,7 @@ trait CloudFunctionDeploymentTrait
     {
         $projectId = self::requireEnv('GOOGLE_PROJECT_ID');
         $versionId = self::requireEnv('GOOGLE_VERSION_ID');
-        self::$fn = new CloudFunction($projectId, self::$name, ['functionName' => self::$name.'-'.$versionId]);
+        self::$fn = new CloudFunction($projectId, self::$name, ['functionName' => self::$name . '-' . $versionId]);
     }
 
     /**
