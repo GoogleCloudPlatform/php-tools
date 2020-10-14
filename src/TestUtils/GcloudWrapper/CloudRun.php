@@ -18,7 +18,7 @@
 namespace Google\Cloud\TestUtils\GcloudWrapper;
 
 /**
- * Class GcloudWrapper.
+ * Class CloudRun.
  */
 class CloudRun
 {
