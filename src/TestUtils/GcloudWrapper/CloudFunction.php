@@ -145,15 +145,17 @@ class CloudFunction
      */
     public function run($phpBin = 'php')
     {
-        $type = $this->isCloudEventFunction() ? 'FUNCTION_SIGNATURE_TYPE=cloudevent' : '';
-        $cmd = $type . 'FUNCTION_TARGET=' . $this->functionName . ' ' . $phpBin . ' -S localhost:' . $this->port . ' vendor/bin/router.php';
+        $cmd = $phpBin . ' -S localhost:' . $this->port . ' vendor/bin/router.php';
         $orgDir = getcwd();
         if (chdir($this->dir) === false) {
             $this->errorLog('Can not chdir to ' . $this->dir);
 
             return false;
         }
-        $this->process = $this->createProcess($cmd);
+        $this->process = $this->createProcess($cmd, [
+            'FUNCTION_TARGET' => $this->functionName,
+            'FUNCTION_SIGNATURE_TYPE' => $this->isCloudEventFunction() ? 'cloudevent' : 'http',
+        ]);
         $this->process->start();
         chdir($orgDir);
         sleep(3);

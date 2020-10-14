@@ -95,9 +95,9 @@ trait GcloudWrapperTrait
      *
      * @return Process
      */
-    protected function createProcess($cmd)
+    protected function createProcess($cmd, array $env = [])
     {
-        return new Process(explode(' ', $cmd));
+        return new Process(explode(' ', $cmd), null, $env);
     }
 
     /**
