@@ -21,9 +21,11 @@ use Google\Cloud\TestUtils\GcloudWrapper\CloudFunction;
 use GuzzleHttp\Client;
 
 /**
- * Trait CloudFunctionSystemTestTrait.
+ * Trait CloudFunctionLocalTestTrait.
+ *
+ * Uses the function framework to run the function as a local service for system tests.
  */
-trait CloudFunctionSystemTestTrait
+trait CloudFunctionLocalTestTrait
 {
     use TestTrait;
 
