@@ -18,10 +18,7 @@
 namespace Google\Cloud\TestUtils\GcloudWrapper;
 
 /**
- * Class GcloudWrapper
- * @package Google\Cloud\TestUtils
- *
- * A class representing App Engine application.
+ * Class AppEngine.
  */
 class AppEngine
 {
@@ -33,16 +30,16 @@ class AppEngine
     /** @var string */
     private $port;
 
-    const GCLOUD_APP = 'app';
+    const GCLOUD_COMPONENT = 'app';
     const DEFAULT_PORT = 8080;
 
     /**
-     * Constructor of GcloudWrapper.
+     * Constructor of AppEngine.
      *
-     * @param string $project
-     * @param string $version
-     * @param string|null $dir optional
-     * @param int $port optional
+     * @param string      $project
+     * @param string      $version
+     * @param string|null $dir     optional
+     * @param int         $port    optional
      */
     public function __construct(
         $project,
@@ -62,11 +59,12 @@ class AppEngine
      * Deploy the app to the Google Cloud Platform using App Engine.
      *
      * @param array $options list of options
-     *      $targets string The yaml files for deployments.
-     *      $promote bool True if you want to promote the new app.
-     *      $retries int Number of retries upon failure.
-     *      $release_version string Run using "alpha" or "beta" version of gcloud deploy
-     * @return bool true if deployment suceeds, false upon failure.
+     *                       $targets string The yaml files for deployments.
+     *                       $promote bool True if you want to promote the new app.
+     *                       $retries int Number of retries upon failure.
+     *                       $release_version string Run using "alpha" or "beta" version of gcloud deploy
+     *
+     * @return bool true if deployment suceeds, false upon failure
      */
     public function deploy($options = [])
     {
@@ -87,20 +85,24 @@ class AppEngine
         ], $options);
         if (!in_array($options['release_version'], [null, 'alpha', 'beta'])) {
             $this->errorLog('release_version must be "alpha" or "beta"');
+
             return false;
         }
         if ($this->deployed) {
             $this->errorLog('The app has been already deployed.');
+
             return false;
         }
         $orgDir = getcwd();
         if (chdir($this->dir) === false) {
             $this->errorLog('Can not chdir to ' . $this->dir);
+
             return false;
         }
-        $cmd = sprintf('gcloud -q %s%s deploy --project %s --version %s %s %s',
+        $cmd = sprintf(
+            'gcloud -q %s%s deploy --project %s --version %s %s %s',
             $options['release_version'] ? $options['release_version'] . ' ' : '',
-            self::GCLOUD_APP,
+            self::GCLOUD_COMPONENT,
             $this->project,
             $this->version,
             $options['promote'] ? '--promote' : '--no-promote',
@@ -111,15 +113,17 @@ class AppEngine
         if ($ret) {
             $this->deployed = true;
         }
+
         return $ret;
     }
 
     /**
      * Run the app with dev_appserver.
      *
-     * @param string $targets optional The yaml files for local run.
-     * @param string $phpCgiPath optional The path to php-cgi.
-     * @return bool true if the app is running, otherwise false.
+     * @param string $targets    optional The yaml files for local run
+     * @param string $phpCgiPath optional The path to php-cgi
+     *
+     * @return bool true if the app is running, otherwise false
      */
     public function run(
         $targets = 'app.yaml',
@@ -132,6 +136,7 @@ class AppEngine
         $orgDir = getcwd();
         if (chdir($this->dir) === false) {
             $this->errorLog('Can not chdir to ' . $this->dir);
+
             return false;
         }
         $this->process = $this->createProcess($cmd);
@@ -141,9 +146,11 @@ class AppEngine
         if (!$this->process->isRunning()) {
             $this->errorLog('dev_appserver failed to run.');
             $this->errorLog($this->process->getErrorOutput());
+
             return false;
         }
         $this->isRunning = true;
+
         return true;
     }
 
@@ -162,20 +169,22 @@ class AppEngine
      * Delete the deployed app.
      *
      * @param string $service
-     * @param int $retries optional The number of retries upon failure.
+     * @param int    $retries optional The number of retries upon failure
+     *
      * @return bool true if the app is succesfully deleted, otherwise false
      */
     public function delete(
         $service = 'default',
         $retries = 3
     ) {
-        $cmd = "gcloud -q " . self::GCLOUD_APP . " versions delete "
-            . "--service " . $service . " "
-            . $this->version . " --project " . $this->project;
+        $cmd = 'gcloud -q ' . self::GCLOUD_COMPONENT . ' versions delete '
+            . '--service ' . $service . ' '
+            . $this->version . ' --project ' . $this->project;
         $ret = $this->execWithRetry($cmd, $retries);
         if ($ret) {
             $this->deployed = false;
         }
+
         return $ret;
     }
 
@@ -183,14 +192,16 @@ class AppEngine
      * Return the base URL of the local dev_appserver.
      *
      * @return mixed returns the base URL of the running app, or false when
-     *     the app is not running
+     *               the app is not running
      */
     public function getLocalBaseUrl()
     {
         if (!$this->isRunning) {
             $this->errorLog('The app is not running.');
+
             return false;
         }
+
         return 'http://127.0.0.1:' . $this->port;
     }
 
@@ -198,8 +209,9 @@ class AppEngine
      * Return the base URL of the deployed app.
      *
      * @param string $service optional
+     *
      * @return mixed returns the base URL of the deployed app, or false when
-     *     the app is not deployed.
+     *               the app is not deployed
      */
     public function getBaseUrl($service = 'default')
     {
@@ -220,6 +232,7 @@ class AppEngine
                 $this->project
             );
         }
+
         return $url;
     }
 }
