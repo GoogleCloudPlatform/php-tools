@@ -127,7 +127,7 @@ class CloudFunction
             $this->runtime,
             $this->project,
             $this->region,
-            $this->trigger,
+            $this->trigger
         );
         $ret = $this->execWithRetry($cmd, $options['retries']);
         chdir($orgDir);
