@@ -28,13 +28,7 @@ class CloudFunction
     private $functionName;
 
     /** @var string */
-    private $entryPoint;
-
-    /** @var string */
     private $region;
-
-    /** @var string */
-    private $runtime;
 
     /** @var string */
     private $trigger;
@@ -44,6 +38,9 @@ class CloudFunction
 
     /** @var string */
     private $port;
+
+    /** @var array */
+    private $deployFlags;
 
     const GCLOUD_COMPONENT = 'functions';
     const DEFAULT_REGION = 'us-central1';
@@ -61,14 +58,18 @@ class CloudFunction
         $entryPoint,
         array $options = []
     ) {
+        $deployFlags = array_merge_recursive([
+            '--runtime' => self::DEFAULT_RUNTIME,
+            '--entry-point' => $entryPoint,
+        ], $options['deployFlags']);
         $options = array_merge([
             'functionName' => $entryPoint,
             'region' => self::DEFAULT_REGION,
-            'runtime' => self::DEFAULT_RUNTIME,
-            'trigger' => self::DEFAULT_TRIGGER,
             'port' => self::DEFAULT_PORT,
+            'trigger' => self::DEFAULT_TRIGGER,
             'dir' => null,
         ], $options);
+        $options['deployFlags'] = $deployFlags;
 
         $this->project = $project;
         $this->entryPoint = $entryPoint;
@@ -118,17 +119,21 @@ class CloudFunction
 
             return false;
         }
+
         $cmd = sprintf(
-            'gcloud -q %s%s deploy %s --entry-point %s --runtime %s --project %s --region %s %s --no-allow-unauthenticated',
+            'gcloud -q %s%s deploy %s --project %s --region %s %s --no-allow-unauthenticated%s',
             $options['release_version'] ? $options['release_version'] . ' ' : '',
             self::GCLOUD_COMPONENT,
             $this->functionName,
-            $this->entryPoint,
-            $this->runtime,
             $this->project,
             $this->region,
-            $this->trigger
+            $this->trigger,
+            array_reduce(array_keys($this->deployFlags), function ($carry, $item) {
+                return $carry . ' ' . $item . '=' . $this->deployFlags[$item];
+            })
         );
+        echo 'Deploy Command: ' . $cmd . PHP_EOL;
+
         $ret = $this->execWithRetry($cmd, $options['retries']);
         chdir($orgDir);
         if ($ret) {
@@ -231,7 +236,7 @@ class CloudFunction
      */
     public function getBaseUrl($retries = 3)
     {
-        if (!$this->deployed) {
+        if (!$this->deployed && getenv('GOOGLE_SKIP_DEPLOYMENT') !== 'true') {
             echo '$this->deployed is empty by the time getBaseUrl is called.' . PHP_EOL;
             $this->errorLog('The function has not been deployed.');
 

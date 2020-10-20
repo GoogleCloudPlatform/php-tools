@@ -33,14 +33,36 @@ trait CloudFunctionDeploymentTrait
     /** @var \Google\Cloud\TestUtils\GcloudWrapper\CloudFunction */
     private static $fn;
 
+    /** @var string */
+    private static $projectId;
+
+    /** @var string */
+    private static $versionId;
+
     /**
      * Prepare the Cloud Function.
+     *
+     * @beforeClass
      */
-    public static function setUpDeploymentVars()
+    public static function setUpFunction()
     {
-        $projectId = self::requireEnv('GOOGLE_PROJECT_ID');
-        $versionId = self::requireEnv('GOOGLE_VERSION_ID');
-        self::$fn = new CloudFunction($projectId, self::$name, ['functionName' => self::$name . '-' . $versionId]);
+        // Avoid repeating work if this has already been called by DeploymentTrait::deployApp().
+        if (is_null(self::$fn)) {
+            self::$projectId = self::requireEnv('GOOGLE_PROJECT_ID');
+            self::$versionId = self::requireEnv('GOOGLE_VERSION_ID');
+            self::$fn = new CloudFunction(self::$projectId, self::$name, [
+                'functionName' => self::$name . '-' . self::$versionId,
+                'deployFlags' => self::deployFlags([])
+            ]);
+        }
+    }
+
+    /**
+     * Define initialization properties for the CloudFunction.
+     */
+    protected static function deployFlags(array $flags = [])
+    {
+        return $flags;
     }
 
     /**
@@ -48,13 +70,8 @@ trait CloudFunctionDeploymentTrait
      */
     private static function beforeDeploy()
     {
-        // Ensure setUpDeploymentVars has been called
-        if (is_null(self::$fn)) {
-            self::setUpDeploymentVars();
-        }
-
-        // Suppress gcloud prompts during deployment.
-        putenv('CLOUDSDK_CORE_DISABLE_PROMPTS=1');
+        // Ensure function is set up before depoyment is attempted.
+        self::setUpFunction();
     }
 
     /**
