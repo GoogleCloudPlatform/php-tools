@@ -61,7 +61,7 @@ class CloudFunction
         $deployFlags = array_merge_recursive([
             '--runtime' => self::DEFAULT_RUNTIME,
             '--entry-point' => $entryPoint,
-        ], $options['deployFlags']);
+        ], $options['deployFlags'] ?? []);
         $options = array_merge([
             'functionName' => $entryPoint,
             'region' => self::DEFAULT_REGION,
