@@ -40,12 +40,16 @@ configure_gcloud()
             || /bin/true
     fi
     # Configure gcloud
-    gcloud config set project ${GOOGLE_PROJECT_ID}
     gcloud config set app/promote_by_default false
     gcloud config set disable_prompts true
     if [ -f ${GOOGLE_APPLICATION_CREDENTIALS} ]; then
         gcloud auth activate-service-account --key-file \
             "${GOOGLE_APPLICATION_CREDENTIALS}"
+    fi
+    if [ -n "${GOOGLE_CLOUD_PROJECT}" ]; then
+        gcloud config set project ${GOOGLE_CLOUD_PROJECT}
+    elif [ -n "${GOOGLE_PROJECT_ID}" ]; then
+        gcloud config set project ${GOOGLE_PROJECT_ID}
     fi
     gcloud -q components install app-engine-python
     gcloud -q components update
