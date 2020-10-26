@@ -31,14 +31,14 @@ trait TestTrait
 
     private static function checkProjectEnvVars()
     {
-        self::$projectId = self::requireEnv([
+        self::$projectId = self::requireOneOfEnv([
             'GOOGLE_CLOUD_PROJECT',
             'GOOGLE_PROJECT_ID',
         ]);
         self::requireEnv('GOOGLE_APPLICATION_CREDENTIALS');
     }
 
-    private static function requireEnv($varNames)
+    private static function requireOneOfEnv($varNames)
     {
         foreach ((array) $varNames as $varName) {
             if ($varValue = getenv($varName)) {
@@ -51,6 +51,17 @@ trait TestTrait
                 implode(' or ', (array) $varName)
             )
         );
+    }
+
+    private static function requireEnv($varName)
+    {
+        if (!$varValue = getenv($varName)) {
+            self::markTestSkipped(
+                sprintf('Set the %s environment variable', $varName)
+            );
+        }
+
+        return $varValue;
     }
 
     private static function requireGrpc()
