@@ -55,7 +55,10 @@ trait CloudFunctionLocalTestTrait
     public function setUpClient()
     {
         $baseUrl = self::$fn->getLocalBaseUrl();
-        $this->client = new Client(['base_uri' => $baseUrl]);
+        $this->client = new Client([
+            'base_uri' => $baseUrl,
+            'http_errors' => false
+        ]);
     }
 
     /**
