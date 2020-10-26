@@ -113,6 +113,7 @@ trait CloudFunctionDeploymentTrait
             'handler' => $stack,
             'auth' => 'google_auth',
             'base_uri' => $targetAudience,
+            'http_errors' => false,
         ]);
     }
 
