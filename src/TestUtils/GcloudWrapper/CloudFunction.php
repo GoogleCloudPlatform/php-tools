@@ -98,12 +98,7 @@ class CloudFunction
             // If we've already deployed, assume the function is ready for use.
             return true;
         }
-        // Handle old function signature
-        if (!is_array($options)) {
-            $options = array_filter([
-                'retries' => @func_get_arg(1),
-            ], 'is_numeric');
-        }
+
         $options = array_merge([
             'retries' => 3,
             'release_version' => null,
@@ -144,49 +139,6 @@ class CloudFunction
     }
 
     /**
-     * Run the function with the php development server.
-     *
-     * @return bool true if the app is running, otherwise false
-     */
-    public function run($phpBin = 'php')
-    {
-        $cmd = $phpBin . ' -S localhost:' . $this->port . ' vendor/bin/router.php';
-        $orgDir = getcwd();
-        if (chdir($this->dir) === false) {
-            $this->errorLog('Can not chdir to ' . $this->dir);
-
-            return false;
-        }
-        $this->process = $this->createProcess($cmd, [
-            'FUNCTION_TARGET' => $this->functionName,
-            'FUNCTION_SIGNATURE_TYPE' => $this->isCloudEventFunction() ? 'cloudevent' : 'http',
-        ]);
-        $this->process->start();
-        chdir($orgDir);
-        sleep(3);
-        if (!$this->process->isRunning()) {
-            $this->errorLog('php server failed to run.');
-            $this->errorLog($this->process->getErrorOutput());
-
-            return false;
-        }
-        $this->isRunning = true;
-
-        return true;
-    }
-
-    /**
-     * Stop the php development server.
-     */
-    public function stop()
-    {
-        if ($this->process->isRunning()) {
-            $this->process->stop();
-        }
-        $this->isRunning = false;
-    }
-
-    /**
      * Delete the deployed function.
      *
      * @param int $retries optional The number of retries upon failure
@@ -209,23 +161,6 @@ class CloudFunction
         }
 
         return $ret;
-    }
-
-    /**
-     * Return the base URL of the local dev_appserver.
-     *
-     * @return mixed returns the base URL of the running app, or false when
-     *               the app is not running
-     */
-    public function getLocalBaseUrl()
-    {
-        if (!$this->isRunning) {
-            $this->errorLog('The function is not running.');
-
-            return false;
-        }
-
-        return 'http://localhost:' . $this->port;
     }
 
     /**
@@ -264,5 +199,62 @@ class CloudFunction
     {
         // Default trigger is an http trigger. If that's not in use, assume an event trigger.
         return  $this->trigger != self::DEFAULT_TRIGGER;
+    }
+
+    /**
+     * Run the function with the php development server.
+     *
+     * @return bool true if the app is running, otherwise false
+     */
+    public function run($phpBin = 'php')
+    {
+        $cmd = $phpBin . ' -S localhost:' . $this->port . ' vendor/bin/router.php';
+        $orgDir = getcwd();
+        if (chdir($this->dir) === false) {
+            $this->errorLog('Can not chdir to ' . $this->dir);
+
+            return false;
+        }
+        $this->process = $this->createProcess($cmd, [
+            'FUNCTION_TARGET' => $this->functionName,
+            'FUNCTION_SIGNATURE_TYPE' => $this->isCloudEventFunction() ? 'cloudevent' : 'http',
+        ]);
+        $this->process->start();
+        chdir($orgDir);
+        sleep(1);
+        if (!$this->process->isRunning()) {
+            $this->errorLog('php server failed to run');
+            $this->errorLog($this->process->getErrorOutput());
+
+            return false;
+        }
+        $this->isRunning = true;
+
+        return true;
+    }
+
+    /**
+     * Get the PHP server process.
+     */
+    public function getProcess()
+    {
+        return $this->process;
+    }
+
+    /**
+     * Return the base URL of the local dev_appserver.
+     *
+     * @return mixed returns the base URL of the running app, or false when
+     *               the app is not running
+     */
+    public function getLocalBaseUrl()
+    {
+        if (!$this->isRunning) {
+            $this->errorLog('The function is not running.');
+
+            return false;
+        }
+
+        return 'http://localhost:' . $this->port;
     }
 }
