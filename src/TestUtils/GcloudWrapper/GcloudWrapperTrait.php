@@ -18,6 +18,7 @@
 namespace Google\Cloud\TestUtils\GcloudWrapper;
 
 use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 
 /**
  * Trait GcloudWrapperTrait.
@@ -78,6 +79,36 @@ trait GcloudWrapperTrait
     }
 
     /**
+     * Retry the provided process and return the output.
+     *
+     * @param Symfony\Component\Process\Process $cmd
+     * @param int $retries is the number of retry attempts to make.
+     *
+     * @return string
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
+     */
+    protected function runWithRetry(Process $cmd, $retries = 3)
+    {
+        $this->errorLog('Running: ' . str_replace("'", "", $cmd->getCommandLine()));
+        for ($i = 0; $i <= $retries; ++$i) {
+            // TODO: Use ExponentialBackoffTrait for more sophisticated handling.
+            // Simple geometric backoff, .25 seconds * iteration.
+            usleep(250000 * $i);
+
+            $cmd->run();
+            if ($cmd->isSuccessful()) {
+                return $cmd->getOutput();
+            } elseif ($i < $retries) {
+                $this->errorLog('Retry Attempt #' . ($i+1));
+                $cmd->clearOutput();
+                $cmd->clearErrorOutput();
+            }
+        }
+
+        throw new ProcessFailedException($cmd);
+    }
+
+    /**
      * A setter for $dir, it's handy for using different directory for the
      * test.
      *
@@ -95,9 +126,9 @@ trait GcloudWrapperTrait
      *
      * @return Process
      */
-    protected function createProcess($cmd, array $env = [])
+    protected function createProcess($cmd, $dir = null, array $env = [])
     {
-        return new Process(explode(' ', $cmd), null, $env);
+        return new Process(explode(' ', $cmd), $dir, $env);
     }
 
     /**

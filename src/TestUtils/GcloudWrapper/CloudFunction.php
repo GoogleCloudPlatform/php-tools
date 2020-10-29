@@ -17,6 +17,10 @@
 
 namespace Google\Cloud\TestUtils\GcloudWrapper;
 
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+
 /**
  * Class CloudFunction.
  */
@@ -25,72 +29,78 @@ class CloudFunction
     use GcloudWrapperTrait;
 
     /** @var string */
-    private $functionName;
+    private $projectId;
 
     /** @var string */
     private $region;
 
     /** @var string */
-    private $trigger;
+    private $entryPoint;
+
+    /** @var string */
+    private $functionName;
 
     /** @var string */
     private $url;
 
     /** @var string */
-    private $port;
-
-    /** @var array */
-    private $deployFlags;
+    private $localUri;
 
     const GCLOUD_COMPONENT = 'functions';
     const DEFAULT_REGION = 'us-central1';
     const DEFAULT_RUNTIME = 'php74';
     const DEFAULT_TRIGGER = '--trigger-http';
     const DEFAULT_PORT = '8080';
+    const DEFAULT_TIMEOUT_SECONDS = 300; // 5 minutes
 
     /**
      * Constructor of CloudFunction.
      *
      * @param string $project
+     * @param string $entryPoint
+     * @param string $region
+     * @param string $dir
      */
     public function __construct(
-        $project,
-        $entryPoint,
-        array $options = []
+        string $projectId,
+        string $entryPoint,
+        string $region = self::DEFAULT_REGION,
+        string $dir = null
     ) {
-        $deployFlags = array_merge_recursive([
-            '--runtime' => self::DEFAULT_RUNTIME,
-            '--entry-point' => $entryPoint,
-        ], $options['deployFlags']);
-        $options = array_merge([
-            'functionName' => $entryPoint,
-            'region' => self::DEFAULT_REGION,
-            'port' => self::DEFAULT_PORT,
-            'trigger' => self::DEFAULT_TRIGGER,
-            'dir' => null,
-        ], $options);
-        $options['deployFlags'] = $deployFlags;
-
-        $this->project = $project;
+        $this->projectId = $projectId;
         $this->entryPoint = $entryPoint;
+        $this->functionName = $this->getFunctionName();
+        $this->region = $region;
+        $this->setDefaultVars($projectId, $dir);
+    }
 
-        foreach ($options as $name => $value) {
-            $this->$name = $value;
+    /**
+     * Retrieve the function name.
+     */
+    public function getFunctionName()
+    {
+        if (empty($this->functionName)) {
+            $id = getenv('GOOGLE_VERSION_ID') ?? uniqid();
+            $this->functionName = $this->entryPoint . '-' . $id;
         }
-
-        $this->setDefaultVars($project, $options['dir']);
+        return $this->functionName;
     }
 
     /**
      * Deploy the app to the Google Cloud Platform using App Engine.
      *
-     * @param array $options list of options
-     *                       $retries int Number of retries upon failure.
-     *                       $release_version string Run using "alpha" or "beta" version of gcloud deploy
+     * To set custom deploy flags, call deploy like so:
+     *
+     *     CloudFunction::deploy(['--update-env-vars' => 'FOO_VAR=BAR'])
+     *
+     * @param array $flags optional flags to inject into the deploy command
+     * @param string $trigger defines the full trigger flag for the function.
+     * @param int $retries
+     * @param string|null $channel gcloud release version.
      *
      * @return bool true if deployment suceeds, false upon failure
      */
-    public function deploy($options = [])
+    public function deploy(array $flags = [], string $trigger = self::DEFAULT_TRIGGER, int $retries = 3, string $channel = null)
     {
         if ($this->deployed) {
             $this->errorLog('The function has already been deployed.');
@@ -99,43 +109,36 @@ class CloudFunction
             return true;
         }
 
-        $options = array_merge([
-            'retries' => 3,
-            'release_version' => null,
-        ], $options);
-        if (!in_array($options['release_version'], [null, 'alpha', 'beta'])) {
-            $this->errorLog('release_version must be "alpha" or "beta"');
+        // Prepare deploy command.
+        $flags = array_merge([
+            '--runtime' => self::DEFAULT_RUNTIME,
+        ], $flags);
 
-            return false;
+        $flattenedFlags = [];
+        foreach ($flags as $name => $value) {
+            $flattenedFlags[] = empty($value) ? $name : "$name=$value";
         }
-        $orgDir = getcwd();
-        if (chdir($this->dir) === false) {
-            $this->errorLog('Can not chdir to ' . $this->dir);
-
-            return false;
-        }
-
-        $cmd = sprintf(
-            'gcloud -q %s%s deploy %s --project %s --region %s %s --no-allow-unauthenticated%s',
-            $options['release_version'] ? $options['release_version'] . ' ' : '',
-            self::GCLOUD_COMPONENT,
+        $args = array_merge([
+            'deploy',
             $this->functionName,
-            $this->project,
-            $this->region,
-            $this->trigger,
-            array_reduce(array_keys($this->deployFlags), function ($carry, $item) {
-                return $carry . ' ' . $item . '=' . $this->deployFlags[$item];
-            })
-        );
-        echo 'Deploy Command: ' . $cmd . PHP_EOL;
+            '--entry-point=' . $this->entryPoint,
+            $trigger,
+            '--no-allow-unauthenticated',
+        ], $flattenedFlags);
 
-        $ret = $this->execWithRetry($cmd, $options['retries']);
-        chdir($orgDir);
-        if ($ret) {
-            $this->deployed = true;
+        $cmd = $this->gcloudCommand($args, $channel);
+        $cmd->setTimeout(self::DEFAULT_TIMEOUT_SECONDS);
+
+        // Run deploy command.
+        try {
+            $this->runWithRetry($cmd, $retries);
+        } catch (ProcessFailedException $e) {
+            $this->errorLog($e->getMessage());
+            return false;
         }
 
-        return $ret;
+        $this->deployed = true;
+        return true;
     }
 
     /**
@@ -148,113 +151,132 @@ class CloudFunction
     public function delete($retries = 3)
     {
         if (!$this->deployed) {
-            $this->errorLog('Nothing to delete: function not deployed.');
+            $this->errorLog('Nothing to delete: function not deployed during test');
 
             return false;
         }
-
-        $cmd = 'gcloud -q ' . self::GCLOUD_COMPONENT . ' delete '
-            . $this->functionName . ' --project ' . $this->project . ' --region ' . $this->region;
-        $ret = $this->execWithRetry($cmd, $retries);
-        if ($ret) {
+        
+        try {
+            $cmd = $this->gcloudCommand(['delete', $this->functionName]);
+            $this->runWithRetry($cmd, $retries);
             $this->deployed = false;
+        } catch (ProcessFailedException $e) {
+            $this->errorLog($e->getMessage());
+            return false;
         }
-
-        return $ret;
+        
+        return true;
     }
 
     /**
      * Return the base URL of the deployed function.
      *
-     * @return mixed returns the base URL of the deployed function, or false when
-     *               the function is not deployed or not HTTP triggered
+     * @param bool $force if true will proceed even if not deployed.
+     * @param int $retries number of retries to attempt.
+     * @return string returns the base URL of the deployed function.
+     * @throws \RuntimeException
      */
-    public function getBaseUrl($retries = 3)
+    public function getBaseUrl($force = false, $retries = 3)
     {
-        if (!$this->deployed && getenv('GOOGLE_SKIP_DEPLOYMENT') !== 'true') {
-            echo '$this->deployed is empty by the time getBaseUrl is called.' . PHP_EOL;
-            $this->errorLog('The function has not been deployed.');
-
-            return false;
-        }
-
-        if ($this->isCloudEventFunction()) {
-            $this->errorLog('The function is deployed as a CloudEvent Function.');
-
-            return false;
+        if (!$this->deployed && !$force) {
+            throw new \RuntimeException('The function has not been deployed.');
         }
 
         if (empty($this->url)) {
-            $cmd = 'gcloud -q ' . self::GCLOUD_COMPONENT . ' describe ' . $this->functionName
-            . ' --format \'value(httpsTrigger.url)\' --project ' . $this->project . ' --region ' . $this->region;
-            $this->url = $this->execWithRetry($cmd, $retries, $url);
-            $this->url = $url[0];
+            $cmd = $this->gcloudCommand(['describe', $this->functionName, '--format=value(httpsTrigger.url)']);
+            $this->url = trim($this->runWithRetry($cmd, $retries));
         }
 
         return $this->url;
     }
 
-    // Returns true if the function is a CloudEvent function.
-    private function isCloudEventFunction()
+    /**
+     * Creates a gcloud process using the array of arguments as the "core command".
+     *
+     * @param array $args
+     * @return \Symfony\Component\Process\Process
+     */
+    private function gcloudCommand(array $args, string $channel = null)
     {
-        // Default trigger is an http trigger. If that's not in use, assume an event trigger.
-        return  $this->trigger != self::DEFAULT_TRIGGER;
+        if (!in_array($channel, [null, 'alpha', 'beta'])) {
+            $this->errorLog('gcloud channel must use product (null), "alpha" or "beta". Defaulting to production.');
+
+            return false;
+        }
+
+        // Append current command arguments to the "permanent" arguments.
+        $args = array_merge([
+            'gcloud',
+            $channel,
+            '-q',
+            self::GCLOUD_COMPONENT,
+        ], $args, [
+            '--project', $this->projectId,
+            # Region is needed in most commands but is not global to component.
+            '--region', $this->region,
+        ]);
+
+        // Strip empty values such as null channel.
+        $args = array_filter($args);
+        return new Process($args, $this->dir);
     }
 
     /**
      * Run the function with the php development server.
      *
-     * @return bool true if the app is running, otherwise false
+     * @return \Symfony\Component\Process\Process returns the php server process
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function run($phpBin = 'php')
+    public function run($isCloudEventFunction = false, string $port = self::DEFAULT_PORT, string $phpBin = null)
     {
-        $cmd = $phpBin . ' -S localhost:' . $this->port . ' vendor/bin/router.php';
-        $orgDir = getcwd();
-        if (chdir($this->dir) === false) {
-            $this->errorLog('Can not chdir to ' . $this->dir);
+        $this->localUri = 'localhost:' . $port;
 
-            return false;
-        }
-        $this->process = $this->createProcess($cmd, [
-            'FUNCTION_TARGET' => $this->functionName,
-            'FUNCTION_SIGNATURE_TYPE' => $this->isCloudEventFunction() ? 'cloudevent' : 'http',
+        $phpBin = $phpBin ?? (new PhpExecutableFinder())->find();
+        $cmd = $phpBin . ' -S ' . $this->localUri . ' vendor/bin/router.php';
+
+        $this->process = $this->createProcess($cmd, $this->dir, [
+            'FUNCTION_TARGET' => $this->entryPoint,
+            'FUNCTION_SIGNATURE_TYPE' => $isCloudEventFunction ? 'cloudevent' : 'http',
         ]);
+        $this->process->setTimeout(self::DEFAULT_TIMEOUT_SECONDS);
         $this->process->start();
-        chdir($orgDir);
+
+        // Typically needs less than 1 second to be ready to serve requests.
+        // TODO: Switch to a healthcheck mechanism.
         sleep(1);
+
+        // Verify the server is running.
         if (!$this->process->isRunning()) {
-            $this->errorLog('php server failed to run');
-            $this->errorLog($this->process->getErrorOutput());
-
-            return false;
+            throw new ProcessFailedException($this->process);
         }
-        $this->isRunning = true;
 
-        return true;
+        // Allow the caller to directly check on process output.
+        return $this->process;
     }
 
     /**
-     * Get the PHP server process.
+     * Run a CloudEvent function with the PHP development server.
+     *
+     * @return \Symfony\Component\Process\Process returns the php server process
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getProcess()
+    public function runCloudEventFunction(string $port = '8080', string $phpBin = null)
     {
-        return $this->process;
+        return $this->run(true, $port, $phpBin);
     }
 
     /**
      * Return the base URL of the local dev_appserver.
      *
-     * @return mixed returns the base URL of the running app, or false when
-     *               the app is not running
+     * @return string
+     * @throws \RuntimeException
      */
     public function getLocalBaseUrl()
     {
-        if (!$this->isRunning) {
-            $this->errorLog('The function is not running.');
-
-            return false;
+        if (!$this->process->isRunning()) {
+            throw new \RuntimeException('PHP server is not running');
         }
 
-        return 'http://localhost:' . $this->port;
+        return 'http://' . $this->localUri;
     }
 }

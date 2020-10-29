@@ -35,6 +35,9 @@ trait CloudFunctionLocalTestTrait
     /** @var \Google\Cloud\TestUtils\GcloudWrapper\CloudFunction */
     private static $fn;
 
+    /** @var \Symfony\Component\Process\Process; */
+    private static $localhost;
+
     /**
      * Start the function service.
      *
@@ -44,7 +47,7 @@ trait CloudFunctionLocalTestTrait
     {
         $projectId = self::requireEnv('GOOGLE_PROJECT_ID');
         self::$fn = new CloudFunction($projectId, self::$name);
-        self::$fn->run();
+        self::$localhost = self::$fn->run(self::$isCloudEventFunction ?? false);
     }
 
     /**
