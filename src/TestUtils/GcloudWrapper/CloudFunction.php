@@ -41,16 +41,19 @@ class CloudFunction
     private $functionName;
 
     /** @var string */
+    private $functionSignatureType;
+
+    /** @var string */
     private $url;
 
     /** @var string */
     private $localUri;
 
     const GCLOUD_COMPONENT = 'functions';
+    const DEFAULT_PORT = '8080';
     const DEFAULT_REGION = 'us-central1';
     const DEFAULT_RUNTIME = 'php74';
     const DEFAULT_TRIGGER = '--trigger-http';
-    const DEFAULT_PORT = '8080';
     const DEFAULT_TIMEOUT_SECONDS = 300; // 5 minutes
 
     /**
@@ -58,20 +61,54 @@ class CloudFunction
      *
      * @param string $project
      * @param string $entryPoint
+     * @param string $functionSignatureType
      * @param string $region
      * @param string $dir
      */
     public function __construct(
         string $projectId,
         string $entryPoint,
-        string $region = self::DEFAULT_REGION,
+        string $functionSignatureType,
+        string $region,
         string $dir = null
     ) {
         $this->projectId = $projectId;
         $this->entryPoint = $entryPoint;
+        $this->functionSignatureType = $functionSignatureType ?: 'http';
+        $this->region = $region ?: self::DEFAULT_REGION;
+
+        // Validate properties.
+        foreach (['projectId', 'entryPoint', 'functionSignatureType', 'region'] as $required) {
+            if (empty($this->$required)) {
+                throw new \InvalidArgumentException('Missing required property: ' . $required);
+            }
+        }
+        $typeOptions = ['http', 'cloudevent'];
+        if (!in_array($this->functionSignatureType, $typeOptions)) {
+            throw new \InvalidArgumentException('Function Signature Type must be one of: ' . join(', ', $typeOptions));
+        }
+
+        // Initialize derived and internal state properties.
         $this->functionName = $this->getFunctionName();
-        $this->region = $region;
         $this->setDefaultVars($projectId, $dir);
+    }
+
+    public static function fromArray(array $arr)
+    {
+        $args = [];
+        $argKeys = [
+            'projectId',
+            'entryPoint',
+            'functionSignatureType',
+            'region',
+            'dir',
+        ];
+    
+        foreach ($argKeys as $key) {
+            $args[] = $arr[$key] ?? '';
+        }
+    
+        return new static(...$args);
     }
 
     /**
@@ -173,11 +210,15 @@ class CloudFunction
      *
      * @param bool $force if true will proceed even if not deployed.
      * @param int $retries number of retries to attempt.
-     * @return string returns the base URL of the deployed function.
+     * @return string returns the base URL of the deployed function, empty string for a CloudEvent function.
      * @throws \RuntimeException
      */
     public function getBaseUrl($force = false, $retries = 3)
     {
+        if ($this->functionSignatureType !== 'http') {
+            return '';
+        }
+
         if (!$this->deployed && !$force) {
             throw new \RuntimeException('The function has not been deployed.');
         }
@@ -227,7 +268,7 @@ class CloudFunction
      * @return \Symfony\Component\Process\Process returns the php server process
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function run($isCloudEventFunction = false, string $port = self::DEFAULT_PORT, string $phpBin = null)
+    public function run(string $port = self::DEFAULT_PORT, string $phpBin = null)
     {
         $this->localUri = 'localhost:' . $port;
 
@@ -236,7 +277,7 @@ class CloudFunction
 
         $this->process = $this->createProcess($cmd, $this->dir, [
             'FUNCTION_TARGET' => $this->entryPoint,
-            'FUNCTION_SIGNATURE_TYPE' => $isCloudEventFunction ? 'cloudevent' : 'http',
+            'FUNCTION_SIGNATURE_TYPE' => $this->functionSignatureType,
         ]);
         $this->process->setTimeout(self::DEFAULT_TIMEOUT_SECONDS);
         $this->process->start();

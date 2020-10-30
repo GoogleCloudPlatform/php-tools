@@ -51,7 +51,7 @@ trait GcloudWrapperTrait
         $dir = null
     ) {
         $this->project = $project;
-        if ($dir === null) {
+        if (empty($dir)) {
             $dir = getcwd();
         }
         $this->deployed = false;

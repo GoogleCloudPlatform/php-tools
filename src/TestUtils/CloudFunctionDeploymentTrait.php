@@ -33,12 +33,6 @@ trait CloudFunctionDeploymentTrait
     /** @var \Google\Cloud\TestUtils\GcloudWrapper\CloudFunction */
     private static $fn;
 
-    /** @var string */
-    private static $projectId;
-
-    /** @var string */
-    private static $versionId;
-
     /**
      * Prepare the Cloud Function.
      *
@@ -48,9 +42,29 @@ trait CloudFunctionDeploymentTrait
     {
         // If $fn is reinitialized, deployment state is reset.
         if (empty(self::$fn)) {
-            self::$projectId = self::requireEnv('GOOGLE_PROJECT_ID');
-            self::$fn = new CloudFunction(self::$projectId, self::$name);
+            $props = self::initFunctionProperties([
+                'projectId' => self::requireEnv('GOOGLE_PROJECT_ID'),
+            ]);
+            self::$fn = CloudFunction::fromArray($props);
         }
+    }
+
+    /**
+     * Configure CloudFunction properties.
+     *
+     * Example HTTP Function:
+     *
+     *     $props['entryPoint'] = 'helloHttp';
+     *     return $props;
+     *
+     * Example CloudEvent Function:
+     *
+     *     $props['entryPoint'] = 'helloEvent';
+     *     $props['functionSignatureType'] = 'cloudevent';
+     *     return $props;
+     */
+    private static function initFunctionProperties(array $props = [])
+    {
     }
 
     /**
@@ -89,13 +103,13 @@ trait CloudFunctionDeploymentTrait
      */
     public function setUpClient()
     {
-        // CloudEvent functions do not have URLs.
-        // Guzzle client creation stalls without a valid URL.
-        if (self::$isCloudEventFunction === true) {
+        // Get the Cloud Function URL.
+        $targetAudience = self::getBaseUri();
+        if ($targetAudience === '') {
+            // A URL was not available for this function.
+            // Skip client setup.
             return;
         }
-
-        $targetAudience = self::getBaseUri();
 
         // Create middleware.
         $middleware = ApplicationDefaultCredentials::getIdTokenMiddleware($targetAudience);

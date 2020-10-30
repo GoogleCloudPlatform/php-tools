@@ -45,9 +45,29 @@ trait CloudFunctionLocalTestTrait
      */
     public static function startFunction()
     {
-        $projectId = self::requireEnv('GOOGLE_PROJECT_ID');
-        self::$fn = new CloudFunction($projectId, self::$name);
-        self::$localhost = self::$fn->run(self::$isCloudEventFunction ?? false);
+        $props = self::initFunctionProperties([
+            'projectId' => self::requireEnv('GOOGLE_PROJECT_ID'),
+        ]);
+        self::$fn = CloudFunction::fromArray($props);
+        self::$localhost = self::$fn->run();
+    }
+
+    /**
+     * Configure CloudFunction properties.
+     *
+     * Example HTTP Function:
+     *
+     *     $props['entryPoint'] = 'helloHttp';
+     *     return $props;
+     *
+     * Example CloudEvent Function:
+     *
+     *     $props['entryPoint'] = 'helloEvent';
+     *     $props['functionSignatureType'] = 'cloudevent';
+     *     return $props;
+     */
+    private static function initFunctionProperties(array $props = [])
+    {
     }
 
     /**
