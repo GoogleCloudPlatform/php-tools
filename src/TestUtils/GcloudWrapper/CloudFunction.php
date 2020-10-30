@@ -265,20 +265,23 @@ class CloudFunction
     /**
      * Run the function with the php development server.
      *
+     * @param array $env environment variables in the form "[FOO] => bar"
+     * @param string $port override for local PHP server.
+     * @param string $phpBin override for PHP CLI path.
      * @return \Symfony\Component\Process\Process returns the php server process
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function run(string $port = self::DEFAULT_PORT, string $phpBin = null)
+    public function run(array $env = [], string $port = self::DEFAULT_PORT, string $phpBin = null)
     {
         $this->localUri = 'localhost:' . $port;
 
         $phpBin = $phpBin ?? (new PhpExecutableFinder())->find();
         $cmd = $phpBin . ' -S ' . $this->localUri . ' vendor/bin/router.php';
 
-        $this->process = $this->createProcess($cmd, $this->dir, [
+        $this->process = $this->createProcess($cmd, $this->dir, array_merge($env, [
             'FUNCTION_TARGET' => $this->entryPoint,
             'FUNCTION_SIGNATURE_TYPE' => $this->functionSignatureType,
-        ]);
+        ]));
         $this->process->setTimeout(self::DEFAULT_TIMEOUT_SECONDS);
         $this->process->start();
 
@@ -301,7 +304,7 @@ class CloudFunction
      * @return \Symfony\Component\Process\Process returns the php server process
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function runCloudEventFunction(string $port = '8080', string $phpBin = null)
+    public function runCloudEventFunction(string $port = self::DEFAULT_PORT, string $phpBin = null)
     {
         return $this->run(true, $port, $phpBin);
     }

@@ -39,7 +39,7 @@ trait CloudFunctionLocalTestTrait
     private static $localhost;
 
     /**
-     * Start the function service.
+     * Prepare and start the function in a local development server.
      *
      * @beforeClass
      */
@@ -49,7 +49,19 @@ trait CloudFunctionLocalTestTrait
             'projectId' => self::requireEnv('GOOGLE_PROJECT_ID'),
         ]);
         self::$fn = CloudFunction::fromArray($props);
-        self::$localhost = self::$fn->run();
+        self::$localhost = self::doRun();
+    }
+
+    /**
+     * Start the development server based on the prepared function.
+     *
+     * Allows configuring server properties, for example:
+     *
+     *     return self::$fn->run(['FOO' => 'bar'], '9090', '/usr/local/bin/php');
+     */
+    private static function doRun()
+    {
+        return self::$fn->run();
     }
 
     /**
