@@ -35,16 +35,51 @@ trait CloudFunctionLocalTestTrait
     /** @var \Google\Cloud\TestUtils\GcloudWrapper\CloudFunction */
     private static $fn;
 
+    /** @var \Symfony\Component\Process\Process; */
+    private static $localhost;
+
     /**
-     * Start the function service.
+     * Prepare and start the function in a local development server.
      *
      * @beforeClass
      */
     public static function startFunction()
     {
-        $projectId = self::requireEnv('GOOGLE_PROJECT_ID');
-        self::$fn = new CloudFunction($projectId, self::$name);
-        self::$fn->run();
+        $props = self::initFunctionProperties([
+            'projectId' => self::requireEnv('GOOGLE_PROJECT_ID'),
+        ]);
+        self::$fn = CloudFunction::fromArray($props);
+        self::$localhost = self::doRun();
+    }
+
+    /**
+     * Start the development server based on the prepared function.
+     *
+     * Allows configuring server properties, for example:
+     *
+     *     return self::$fn->run(['FOO' => 'bar'], '9090', '/usr/local/bin/php');
+     */
+    private static function doRun()
+    {
+        return self::$fn->run();
+    }
+
+    /**
+     * Configure CloudFunction properties.
+     *
+     * Example HTTP Function:
+     *
+     *     $props['entryPoint'] = 'helloHttp';
+     *     return $props;
+     *
+     * Example CloudEvent Function:
+     *
+     *     $props['entryPoint'] = 'helloEvent';
+     *     $props['functionSignatureType'] = 'cloudevent';
+     *     return $props;
+     */
+    private static function initFunctionProperties(array $props = [])
+    {
     }
 
     /**

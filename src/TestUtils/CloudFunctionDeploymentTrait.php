@@ -33,12 +33,6 @@ trait CloudFunctionDeploymentTrait
     /** @var \Google\Cloud\TestUtils\GcloudWrapper\CloudFunction */
     private static $fn;
 
-    /** @var string */
-    private static $projectId;
-
-    /** @var string */
-    private static $versionId;
-
     /**
      * Prepare the Cloud Function.
      *
@@ -46,23 +40,35 @@ trait CloudFunctionDeploymentTrait
      */
     public static function setUpFunction()
     {
-        // Avoid repeating work if this has already been called by DeploymentTrait::deployApp().
-        if (is_null(self::$fn)) {
-            self::$projectId = self::requireEnv('GOOGLE_PROJECT_ID');
-            self::$versionId = self::requireEnv('GOOGLE_VERSION_ID');
-            self::$fn = new CloudFunction(self::$projectId, self::$name, [
-                'functionName' => self::$name . '-' . self::$versionId,
-                'deployFlags' => self::deployFlags([])
-            ]);
+        // If $fn is reinitialized, deployment state is reset.
+        if (empty(self::$fn)) {
+            $props = [
+                'projectId' => self::requireEnv('GOOGLE_PROJECT_ID')
+            ];
+            if (isset(self::$entryPoint)) {
+                $props['entryPoint'] = self::$entryPoint;
+            }
+            if (isset(self::$functionSignatureType)) {
+                $props['functionSignatureType'] = self::$functionSignatureType;
+            }
+            self::$fn = CloudFunction::fromArray(
+                self::initFunctionProperties($props)
+            );
         }
     }
 
     /**
-     * Define initialization properties for the CloudFunction.
+     * Customize setUpFunction properties.
+     *
+     * Example:
+     *
+     *     $props['dir'] = 'path/to/function-dir';
+     *     $props['region'] = 'us-west1';
+     *     return $props;
      */
-    protected static function deployFlags(array $flags = [])
+    private static function initFunctionProperties(array $props = [])
     {
-        return $flags;
+        return $props;
     }
 
     /**
@@ -71,19 +77,19 @@ trait CloudFunctionDeploymentTrait
     private static function beforeDeploy()
     {
         // Ensure function is set up before depoyment is attempted.
-        self::setUpFunction();
+        if (empty(self::$fn)) {
+            self::setUpFunction();
+        }
     }
 
     /**
-     * Deploy the Cloud Function.
+     * Deploy the Cloud Function, called from DeploymentTrait::deployApp().
+     *
+     * Override this in your TestCase to change deploy behaviors.
      */
     private static function doDeploy()
     {
-        if (false === self::$fn->deploy()) {
-            return false;
-        }
-
-        return true;
+        return self::$fn->deploy();
     }
 
     /**
@@ -101,7 +107,13 @@ trait CloudFunctionDeploymentTrait
      */
     public function setUpClient()
     {
+        // Get the Cloud Function URL.
         $targetAudience = self::getBaseUri();
+        if ($targetAudience === '') {
+            // A URL was not available for this function.
+            // Skip client setup.
+            return;
+        }
 
         // Create middleware.
         $middleware = ApplicationDefaultCredentials::getIdTokenMiddleware($targetAudience);
@@ -119,6 +131,6 @@ trait CloudFunctionDeploymentTrait
 
     public function getBaseUri()
     {
-        return self::$fn->getBaseUrl();
+        return self::$fn->getBaseUrl(getenv("GOOGLE_SKIP_DEPLOYMENT") === 'true');
     }
 }
