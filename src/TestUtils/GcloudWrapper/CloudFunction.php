@@ -103,11 +103,11 @@ class CloudFunction
             'region',
             'dir',
         ];
-    
+
         foreach ($argKeys as $key) {
             $args[] = $arr[$key] ?? '';
         }
-    
+
         return new static(...$args);
     }
 
@@ -192,7 +192,7 @@ class CloudFunction
 
             return false;
         }
-        
+
         try {
             $cmd = $this->gcloudCommand(['delete', $this->functionName]);
             $this->runWithRetry($cmd, $retries);
@@ -201,7 +201,7 @@ class CloudFunction
             $this->errorLog($e->getMessage());
             return false;
         }
-        
+
         return true;
     }
 

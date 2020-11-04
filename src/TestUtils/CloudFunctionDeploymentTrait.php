@@ -42,29 +42,33 @@ trait CloudFunctionDeploymentTrait
     {
         // If $fn is reinitialized, deployment state is reset.
         if (empty(self::$fn)) {
-            $props = self::initFunctionProperties([
-                'projectId' => self::requireEnv('GOOGLE_PROJECT_ID'),
-            ]);
-            self::$fn = CloudFunction::fromArray($props);
+            $props = [
+                'projectId' => self::requireEnv('GOOGLE_PROJECT_ID')
+            ];
+            if (isset(self::$entryPoint)) {
+                $props['entryPoint'] = self::$entryPoint;
+            }
+            if (isset(self::$functionSignatureType)) {
+                $props['functionSignatureType'] = self::$functionSignatureType;
+            }
+            self::$fn = CloudFunction::fromArray(
+                self::initFunctionProperties($props)
+            );
         }
     }
 
     /**
-     * Configure CloudFunction properties.
+     * Customize setUpFunction properties.
      *
-     * Example HTTP Function:
+     * Example:
      *
-     *     $props['entryPoint'] = 'helloHttp';
-     *     return $props;
-     *
-     * Example CloudEvent Function:
-     *
-     *     $props['entryPoint'] = 'helloEvent';
-     *     $props['functionSignatureType'] = 'cloudevent';
+     *     $props['dir'] = 'path/to/function-dir';
+     *     $props['region'] = 'us-west1';
      *     return $props;
      */
     private static function initFunctionProperties(array $props = [])
     {
+        return $props;
     }
 
     /**
