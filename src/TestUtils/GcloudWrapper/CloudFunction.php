@@ -117,7 +117,7 @@ class CloudFunction
     public function getFunctionName()
     {
         if (empty($this->functionName)) {
-            $id = getenv('GOOGLE_VERSION_ID') ?? uniqid();
+            $id = getenv('GOOGLE_VERSION_ID') ?: uniqid();
             $this->functionName = $this->entryPoint . '-' . $id;
         }
         return $this->functionName;
