@@ -71,6 +71,24 @@ trait TestTrait
         }
     }
 
+    private static function runFunctionSnippet($sampleName, $params = [])
+    {
+        // Get the namespace of the sample function
+        $parts = explode('\\', debug_backtrace()[1]['class']);
+        array_pop($parts);
+        $snippet = implode('\\', $parts) . '\\' . $sampleName;
+
+        // The file has already been included. Execute the function directly
+        if (function_exists($snippet)) {
+            ob_start();
+            call_user_func_array($snippet, $params);
+            return ob_get_clean();
+        }
+        $parts = explode('\\', $snippet);
+        $sampleName = array_pop($parts);
+        return self::runSnippet($sampleName, $params);
+    }
+
     private static function runSnippet($sampleName, $params = [])
     {
         // Determine the snippet filename
