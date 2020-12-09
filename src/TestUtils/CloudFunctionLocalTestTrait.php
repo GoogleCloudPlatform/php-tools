@@ -109,4 +109,33 @@ trait CloudFunctionLocalTestTrait
     {
         self::$fn->stop();
     }
+
+    /**
+     * Make a request using a cloud event
+     *
+     * Example:
+     *
+     *     $this->request(CloudEvent::fromArray($params));
+     */
+    private function request(CloudEvent $cloudevent, array $params = [])
+    {
+        $cloudEventHeaders = array_filter([
+            'ce-id' => $cloudevent->getId(),
+            'ce-source' => $cloudevent->getSource(),
+            'ce-specversion' => $cloudevent->getSpecVersion(),
+            'ce-type' => $cloudevent->getType(),
+            'ce-datacontenttype' => $cloudevent->getDataContentType(),
+            'ce-dataschema' => $cloudevent->getDataSchema(),
+            'ce-subject' => $cloudevent->getSubject(),
+            'ce-time' => $cloudevent->getTime(),
+        ]);
+
+        return $this->client->request('POST', '/', array_merge_recursive(
+            $params,
+            [
+                'json' => $cloudevent->getData(),
+                'headers' => $cloudEventHeaders,
+            ]
+        ));
+    }
 }
