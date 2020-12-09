@@ -18,6 +18,7 @@
 namespace Google\Cloud\TestUtils;
 
 use Google\Cloud\TestUtils\GcloudWrapper\CloudFunction;
+use Google\CloudFunctions\CloudEvent;
 use GuzzleHttp\Client;
 
 /**
