@@ -41,6 +41,8 @@ trait AppEngineDeploymentTrait
     /**
      * Deploy the application.
      * Override DeploymentTrait::deployApp to ensure $gcloudWrapper exists.
+     *
+     * @beforeClass
      */
     public static function deployApp()
     {
