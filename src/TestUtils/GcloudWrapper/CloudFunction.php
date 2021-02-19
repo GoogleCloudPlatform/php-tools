@@ -20,6 +20,7 @@ namespace Google\Cloud\TestUtils\GcloudWrapper;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Exception\ProcessFailedException;
+use PHPUnit\Framework\ExpectationFailedException;
 
 /**
  * Class CloudFunction.
