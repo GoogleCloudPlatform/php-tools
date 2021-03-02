@@ -162,7 +162,7 @@ trait CloudFunctionDeploymentTrait
             $startTime
         );
 
-        echo "\nRetrieving logs [$filter]...\n";
+        echo PHP_EOL . "Retrieving logs [$filter]..." . PHP_EOL;
 
         // Check for new logs for the function.
         $attempt = 1;
