@@ -18,7 +18,9 @@
 namespace Google\Cloud\TestUtils;
 
 use Google\Auth\ApplicationDefaultCredentials;
+use Google\Cloud\Logging\LoggingClient;
 use Google\Cloud\TestUtils\GcloudWrapper\CloudFunction;
+use Google\Cloud\TestUtils\EventuallyConsistentTestTrait;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 
@@ -28,6 +30,7 @@ use GuzzleHttp\HandlerStack;
 trait CloudFunctionDeploymentTrait
 {
     use TestTrait;
+    use EventuallyConsistentTestTrait;
     use DeploymentTrait;
 
     /** @var \Google\Cloud\TestUtils\GcloudWrapper\CloudFunction */
@@ -132,5 +135,48 @@ trait CloudFunctionDeploymentTrait
     public function getBaseUri()
     {
         return self::$fn->getBaseUrl(getenv("GOOGLE_SKIP_DEPLOYMENT") === 'true');
+    }
+
+    /**
+     * Retrieve and process logs for the defined function.
+     *
+     * @param string $startTime RFC3339 timestamp marking start of time range to retrieve.
+     * @param callable $process callback function to run on the logs.
+     */
+    private function processFunctionLogs(string $startTime, callable $process)
+    {
+        $projectId = getenv('GOOGLE_CLOUD_PROJECT');
+
+        if (empty(self::$loggingClient)) {
+            self::$loggingClient = new LoggingClient([
+                'projectId' => $projectId
+            ]);
+        }
+
+        // Define the log search criteria.
+        $logFullName = 'projects/' . $projectId . '/logs/cloudfunctions.googleapis.com%2Fcloud-functions';
+        $filter = sprintf(
+            'logName="%s" resource.labels.function_name="%s" timestamp>="%s"',
+            $logFullName,
+            self::$fn->getFunctionName(),
+            $startTime
+        );
+
+        echo PHP_EOL . "Retrieving logs [$filter]..." . PHP_EOL;
+
+        // Check for new logs for the function.
+        $attempt = 1;
+        $this->runEventuallyConsistentTest(function () use ($filter, $process, &$attempt) {
+            $entries = self::$loggingClient->entries(['filter' => $filter]);
+
+            // If no logs came in try again.
+            if (empty($entries->current())) {
+                echo 'Logs not found, attempting retry #' . $attempt++ . PHP_EOL;
+                throw new ExpectationFailedException('Log Entries not available');
+            }
+            echo 'Processing logs...' . PHP_EOL;
+
+            $process($entries);
+        }, $retries = 10);
     }
 }
