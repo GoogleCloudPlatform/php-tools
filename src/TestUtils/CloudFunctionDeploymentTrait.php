@@ -23,6 +23,7 @@ use Google\Cloud\TestUtils\GcloudWrapper\CloudFunction;
 use Google\Cloud\TestUtils\EventuallyConsistentTestTrait;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
+use PHPUnit\Framework\ExpectationFailedException;
 
 /**
  * Trait CloudFunctionDeploymentTrait.
