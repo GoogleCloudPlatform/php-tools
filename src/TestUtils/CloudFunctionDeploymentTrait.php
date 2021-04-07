@@ -44,10 +44,15 @@ trait CloudFunctionDeploymentTrait
      */
     public static function setUpFunction()
     {
+        // Make sure projectId is initalized
+        if (empty(self::$projectId)) {
+            self::checkProjectEnvVars();
+        }
+        
         // If $fn is reinitialized, deployment state is reset.
         if (empty(self::$fn)) {
             $props = [
-                'projectId' => self::requireEnv('GOOGLE_PROJECT_ID')
+                'projectId' => self::$projectId
             ];
             if (isset(self::$entryPoint)) {
                 $props['entryPoint'] = self::$entryPoint;
@@ -146,16 +151,14 @@ trait CloudFunctionDeploymentTrait
      */
     private function processFunctionLogs(string $startTime, callable $process)
     {
-        $projectId = getenv('GOOGLE_CLOUD_PROJECT');
-
         if (empty(self::$loggingClient)) {
             self::$loggingClient = new LoggingClient([
-                'projectId' => $projectId
+                'projectId' => self::$projectId
             ]);
         }
 
         // Define the log search criteria.
-        $logFullName = 'projects/' . $projectId . '/logs/cloudfunctions.googleapis.com%2Fcloud-functions';
+        $logFullName = 'projects/' . self::$projectId . '/logs/cloudfunctions.googleapis.com%2Fcloud-functions';
         $filter = sprintf(
             'logName="%s" resource.labels.function_name="%s" timestamp>="%s"',
             $logFullName,
