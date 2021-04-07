@@ -44,6 +44,11 @@ trait CloudFunctionDeploymentTrait
      */
     public static function setUpFunction()
     {
+        // Make sure projectId is initalized
+        if (empty(self::$projectId)) {
+            self::checkProjectEnvVars();
+        }
+        
         // If $fn is reinitialized, deployment state is reset.
         if (empty(self::$fn)) {
             $props = [
