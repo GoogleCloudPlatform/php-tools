@@ -146,7 +146,7 @@ trait CloudFunctionDeploymentTrait
      */
     private function processFunctionLogs(string $startTime, callable $process)
     {
-        $projectId = getenv('GOOGLE_CLOUD_PROJECT');
+        $projectId = getenv('GOOGLE_CLOUD_PROJECT') ?: getenv('GOOGLE_PROJECT_ID');
 
         if (empty(self::$loggingClient)) {
             self::$loggingClient = new LoggingClient([
