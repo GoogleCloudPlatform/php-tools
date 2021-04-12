@@ -148,8 +148,9 @@ trait CloudFunctionDeploymentTrait
      *
      * @param string $startTime RFC3339 timestamp marking start of time range to retrieve.
      * @param callable $process callback function to run on the logs.
+     * @param int $retries the number of times to retry entry lookup
      */
-    private function processFunctionLogs(string $startTime, callable $process)
+    private function processFunctionLogs(string $startTime, callable $process, int $retries = 10)
     {
         if (empty(self::$loggingClient)) {
             self::$loggingClient = new LoggingClient([
@@ -181,6 +182,6 @@ trait CloudFunctionDeploymentTrait
             echo 'Processing logs...' . PHP_EOL;
 
             $process($entries);
-        }, $retries = 10);
+        }, $retries);
     }
 }
