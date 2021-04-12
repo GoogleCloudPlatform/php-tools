@@ -34,8 +34,11 @@ trait CloudFunctionDeploymentTrait
     use EventuallyConsistentTestTrait;
     use DeploymentTrait;
 
-    /** @var \Google\Cloud\TestUtils\GcloudWrapper\CloudFunction */
+    /** @var Google\Cloud\TestUtils\GcloudWrapper\CloudFunction */
     private static $fn;
+
+    /** @var Google\Cloud\Logging\LoggingClient */
+    private static $loggingClient;
 
     /**
      * Prepare the Cloud Function.
@@ -48,7 +51,7 @@ trait CloudFunctionDeploymentTrait
         if (empty(self::$projectId)) {
             self::checkProjectEnvVars();
         }
-        
+
         // If $fn is reinitialized, deployment state is reset.
         if (empty(self::$fn)) {
             $props = [
