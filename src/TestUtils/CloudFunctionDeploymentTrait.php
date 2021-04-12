@@ -148,7 +148,7 @@ trait CloudFunctionDeploymentTrait
      *
      * @param string $startTime RFC3339 timestamp marking start of time range to retrieve.
      * @param callable $process callback function to run on the logs.
-     * @param int
+     * @param int $retries the number of times to retry entry lookup
      */
     private function processFunctionLogs(string $startTime, callable $process, int $retries = 10)
     {
