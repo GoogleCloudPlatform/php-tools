@@ -153,7 +153,7 @@ trait CloudFunctionDeploymentTrait
      * @param callable $process callback function to run on the logs.
      * @param int $retries the number of times to retry entry lookup
      */
-    private function processFunctionLogs(string $startTime, callable $process, int $retries = 10)
+    private function processFunctionLogs(string $startTime, callable $process, int $retries = 3)
     {
         if (empty(self::$loggingClient)) {
             self::$loggingClient = new LoggingClient([
