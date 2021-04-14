@@ -39,6 +39,11 @@ trait CloudFunctionDeploymentTrait
 
     /** @var Google\Cloud\Logging\LoggingClient */
     private static $loggingClient;
+    
+    /**
+     * @var int default times to retry logs request
+     */
+    protected $eventuallyConsistentRetryCount = 5;
 
     /**
      * Prepare the Cloud Function.
@@ -153,7 +158,7 @@ trait CloudFunctionDeploymentTrait
      * @param callable $process callback function to run on the logs.
      * @param int $retries the number of times to retry entry lookup
      */
-    private function processFunctionLogs(string $startTime, callable $process, int $retries = 3)
+    private function processFunctionLogs(string $startTime, callable $process, int $retries = null)
     {
         if (empty(self::$loggingClient)) {
             self::$loggingClient = new LoggingClient([
