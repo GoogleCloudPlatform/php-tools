@@ -39,11 +39,6 @@ trait CloudFunctionDeploymentTrait
 
     /** @var Google\Cloud\Logging\LoggingClient */
     private static $loggingClient;
-    
-    /**
-     * @var int default times to retry logs request
-     */
-    protected $eventuallyConsistentRetryCount = 5;
 
     /**
      * Prepare the Cloud Function.
