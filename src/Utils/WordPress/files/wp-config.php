@@ -106,11 +106,25 @@ define('WPLANG', '');
 /**
  * For developers: WordPress debugging mode.
  *
- * Change this to true to enable the display of notices during development.
+ * Change these values to true to enable the display of notices during development.
  * It is strongly recommended that plugin and theme developers use WP_DEBUG
  * in their development environments.
  */
 define('WP_DEBUG', !$onGae);
+
+/**
+ * This setting logs errors to a file if WP_DEBUG is enabled.
+ * These files are NOT supported by App Engine; use WP_DEBUG_DISPLAY instead.
+ */
+define('WP_DEBUG_LOG', !$onGae);  // Not supported in App Engine
+
+/**
+ * This setting displays errors in the application if WP_DEBUG is enabled.
+ *
+ * WARNING: Enabling WP_DEBUG_DISPLAY in production is not secure.
+ * See https://owasp.org/www-project-proactive-controls/v3/en/c10-errors-exceptions
+ */
+define('WP_DEBUG_DISPLAY', !$onGae);
 
 /* That's all, stop editing! Happy blogging. */
 /** Absolute path to the WordPress directory. */
