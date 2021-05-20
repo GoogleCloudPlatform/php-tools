@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace Google\Cloud\TestUtils\test;
+namespace Google\Cloud\TestUtils\Tests;
 
 use Google\Cloud\TestUtils\TestTrait;
 use Google\Cloud\TestUtils\ExponentialBackoffTrait;
@@ -168,6 +168,26 @@ class TestTraitTest extends \PHPUnit_Framework_TestCase
     public function testRunSnippetWithException()
     {
         $this->runSnippet('snippet3');
+    }
+
+    public function testRunFunctionSnippet()
+    {
+        $output = $this->runFunctionSnippet('function_snippet1');
+        $this->assertContains(
+            'function_snippet1 called with 0 parameters',
+            $output
+        );
+
+        // Call function snippet again and ensure a fatal error is not thrown
+        $output = $this->runFunctionSnippet('function_snippet1', [
+            'parameter1',
+            'parameter2',
+        ]);
+
+        $this->assertContains(
+            'function_snippet1 called with 2 parameters',
+            $output
+        );
     }
 
     public function setUp()
