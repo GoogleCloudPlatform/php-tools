@@ -12,5 +12,4 @@ function function_snippet1()
     );
 }
 
-array_shift($argv);
-call_user_func_array(__NAMESPACE__ . '\function_snippet1', $argv);
+call_user_func_array(__NAMESPACE__ . '\function_snippet1', array_slice($argv, 1));
