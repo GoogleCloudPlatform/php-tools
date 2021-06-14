@@ -89,9 +89,14 @@ trait TestTrait
 
         // The file has already been included. Execute the function directly
         if (function_exists($snippet)) {
-            ob_start();
-            call_user_func_array($snippet, $params);
-            return ob_get_clean();
+            try {
+                ob_start();
+                call_user_func_array($snippet, $params);
+                return ob_get_clean();
+            } catch (\Exception $e) {
+                ob_get_clean();
+                throw $e;
+            }
         }
 
         // Include the file and run the snippet
