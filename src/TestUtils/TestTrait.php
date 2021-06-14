@@ -75,7 +75,16 @@ trait TestTrait
     {
         // Get the namespace of the sample function
         $parts = explode('\\', debug_backtrace()[1]['class']);
+
+        // Remove the name of the testcase class
         array_pop($parts);
+
+        // Some tests run in the "Tests" namespace, but the function isn't in
+        // that namespace, so remove it
+        if (end($parts) === 'Tests') {
+            array_pop($parts);
+        }
+
         $snippet = implode('\\', $parts) . '\\' . $sampleName;
 
         // The file has already been included. Execute the function directly
@@ -89,8 +98,8 @@ trait TestTrait
                 throw $e;
             }
         }
-        $parts = explode('\\', $snippet);
-        $sampleName = array_pop($parts);
+
+        // Include the file and run the snippet
         return self::runSnippet($sampleName, $params);
     }
 

@@ -152,8 +152,9 @@ trait CloudFunctionDeploymentTrait
      * @param string $startTime RFC3339 timestamp marking start of time range to retrieve.
      * @param callable $process callback function to run on the logs.
      * @param int $retries the number of times to retry entry lookup
+     * @param int sleep the number of seconds sleep before executing the log lookup
      */
-    private function processFunctionLogs(string $startTime, callable $process, int $retries = 10)
+    private function processFunctionLogs(string $startTime, callable $process, int $retries = null, int $sleep = null)
     {
         if (empty(self::$loggingClient)) {
             self::$loggingClient = new LoggingClient([
@@ -172,6 +173,11 @@ trait CloudFunctionDeploymentTrait
 
         echo PHP_EOL . "Retrieving logs [$filter]..." . PHP_EOL;
 
+        if (!is_null($sleep)) {
+            printf('Sleeping for %d second(s)' . PHP_EOL, $sleep);
+            sleep($sleep);
+        }
+        
         // Check for new logs for the function.
         $attempt = 1;
         $this->runEventuallyConsistentTest(function () use ($filter, $process, &$attempt) {
