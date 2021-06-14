@@ -100,7 +100,18 @@ trait TestTrait
         }
 
         // Include the file and run the snippet
-        return self::runSnippet($sampleName, $params);
+        $output = self::runSnippet($sampleName, $params);
+
+        if (!function_exists($snippet)) {
+            // We included the file but the function still isn't defined
+            throw new \LogicException(sprintf(
+                'Function %s() was not found in file src/%s.php',
+                $snippet,
+                $sampleName
+            ));
+        }
+
+        return $output;
     }
 
     private static function runSnippet($sampleName, $params = [])

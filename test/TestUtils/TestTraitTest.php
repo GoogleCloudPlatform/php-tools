@@ -190,6 +190,17 @@ class TestTraitTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testRunInvalidFunctionSnippet()
+    {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage(
+            'Function Google\Cloud\TestUtils\function_snippet_invalid() ' .
+            'was not found in file src/function_snippet_invalid.php'
+        );
+
+        $this->runFunctionSnippet('function_snippet_invalid');
+    }
+
     public function setUp()
     {
         // Clear backoffs before running each test
