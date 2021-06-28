@@ -42,10 +42,8 @@ trait CloudFunctionDeploymentTrait
 
     /**
      * Prepare the Cloud Function.
-     *
-     * @beforeClass
      */
-    public static function setUpFunction()
+    public static function setUpDeploy()
     {
         // Make sure projectId is initalized
         if (empty(self::$projectId)) {
@@ -81,17 +79,6 @@ trait CloudFunctionDeploymentTrait
     private static function initFunctionProperties(array $props = [])
     {
         return $props;
-    }
-
-    /**
-     * Prepare to deploy app, called from DeploymentTrait::deployApp().
-     */
-    private static function beforeDeploy()
-    {
-        // Ensure function is set up before depoyment is attempted.
-        if (empty(self::$fn)) {
-            self::setUpFunction();
-        }
     }
 
     /**
