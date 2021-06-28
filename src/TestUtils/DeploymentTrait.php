@@ -31,8 +31,16 @@ trait DeploymentTrait
     private $client;
 
     /**
-     * Called before deploying the app. The concrete test class can override
+     * Called before "beforeDeploy. Traits which extend this trait can override
      * this.
+     */
+    private static function setUpDeploy()
+    {
+    }
+
+    /**
+     * Called before deploying the app. Concrete tests which use this trait
+     * can override this.
      */
     private static function beforeDeploy()
     {
@@ -64,7 +72,8 @@ trait DeploymentTrait
             );
         }
         if (getenv('GOOGLE_SKIP_DEPLOYMENT') !== 'true') {
-            static::beforeDeploy();
+            static::setUpDeploy();  // for traits extending this trait
+            static::beforeDeploy(); // for individual tests
             if (static::doDeploy() === false) {
                 self::fail('Deployment failed.');
             }

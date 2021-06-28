@@ -26,9 +26,7 @@ namespace Google\Cloud\TestUtils;
 trait AppEngineDeploymentTrait
 {
     use TestTrait;
-    use DeploymentTrait {
-        DeploymentTrait::deployApp as baseDeployApp;
-    }
+    use DeploymentTrait;
 
     /** @var \Google\Cloud\TestUtils\GcloudWrapper */
     private static $gcloudWrapper;
@@ -39,18 +37,14 @@ trait AppEngineDeploymentTrait
     }
 
     /**
-     * Deploy the application.
-     * Override DeploymentTrait::deployApp to ensure $gcloudWrapper exists.
-     *
-     * @beforeClass
+     * Create the gcloudWrapper class, which is needed for deployment
      */
-    public static function deployApp()
+    public static function setUpDeploy()
     {
         self::$gcloudWrapper = new GcloudWrapper(
             self::requireEnv('GOOGLE_PROJECT_ID'),
             getenv('GOOGLE_VERSION_ID') ?: null
         );
-        self::baseDeployApp();
     }
 
     /**
