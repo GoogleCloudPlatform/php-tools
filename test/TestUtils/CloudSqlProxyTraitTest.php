@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2018 Google Inc.
+ * Copyright 2021 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 namespace Google\Cloud\TestUtils\test;
 
-use Google\Cloud\TestUtils\CloudSqlTestTrait;
+use Google\Cloud\TestUtils\CloudSqlProxyTrait;
 
 /**
  * Class ExecuteCommandTraitTest
@@ -25,10 +25,13 @@ use Google\Cloud\TestUtils\CloudSqlTestTrait;
  *
  * A class for testing ExecuteCommandTrait.
  */
-class CloudSqlTestTraitTest extends \PHPUnit_Framework_TestCase
+class CloudSqlProxyTraitTest extends \PHPUnit_Framework_TestCase
 {
-    use CloudSqlTestTrait;
+    use CloudSqlProxyTrait;
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testRunCloudSqlProxy()
     {
         $connectionString = '';
@@ -54,12 +57,12 @@ class CloudSqlTestTraitTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException Exception
      * @expectedExceptionMessage Failed to start cloud_sql_proxy
+     * @runInSeparateProcess
      */
     public function testFailedRunThrowsException()
     {
-        $connectionString = '';
-        $port = 'invalid port';
+        $connectionString = 'invalid';
         $socketDir = '/tmp/cloudsql';
-        $this->startCloudSqlProxy($connectionString, $socketDir, $port);
+        $this->startCloudSqlProxy($connectionString, $socketDir);
     }
 }

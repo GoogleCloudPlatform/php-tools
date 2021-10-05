@@ -26,11 +26,11 @@ use Exception;
  *
  * Use this trait to run the CloudSqlProxy
  */
-trait CloudSqlTestTrait
+trait CloudSqlProxyTrait
 {
     private static $cloudSqlProxyProcess;
 
-    public static function startCloudSqlProxy($connectionName, $socketDir, $port = null): void
+    public static function startCloudSqlProxy($connectionName, $socketDir, $port = null)
     {
         // create the directory to store the unix socket for cloud_sql_proxy
         if (!is_dir($socketDir) && !@mkdir($socketDir, 0755, true)) {
@@ -43,16 +43,21 @@ trait CloudSqlTestTrait
         }
 
         $process = new Process(['cloud_sql_proxy', $instances, '-dir', $socketDir]);
-        $process->setTimeout(120);
         $process->start();
         $process->waitUntil(function ($type, $buffer) {
             print($buffer);
             return str_contains($buffer, 'Ready for new connections');
         });
         if (!$process->isRunning()) {
+            if ($output = $process->getOutput()) {
+                print($output);
+            }
+            if ($errorOutput = $process->getErrorOutput()) {
+                print($errorOutput);
+            }
             throw new Exception('Failed to start cloud_sql_proxy');
         }
-        self::$cloudSqlProxyProcess = $process;
+        return self::$cloudSqlProxyProcess = $process;
     }
 
     /**

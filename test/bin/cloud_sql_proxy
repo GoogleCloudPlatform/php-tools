@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if [[ "$1" == "-instances=invalid" ]]; then
+    exit 1;
+fi
+
+echo "Ready for new connections"
+
+while [ true ]; do
+ # do nothing
+ sleep 1000
+done;
