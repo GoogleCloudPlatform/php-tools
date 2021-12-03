@@ -40,7 +40,7 @@ To use flex_exec, you will need:
 * An app deployed to Google App Engine Flex
 * The gcloud SDK installed and configured. See https://cloud.google.com/sdk/
 * The `google/cloud-tools` composer package
-  
+
 You may also need to grant the Cloud Container Builder service account
 any permissions needed by your command. For accessing Cloud SQL, you
 need to add `Cloud SQL Client` permission to the service account.
@@ -74,7 +74,7 @@ There are various test utilities in the `Google\Cloud\TestUtils` namespace.
 ## Test examples
 
 The example test cases are available in
-[`test/fixtures/appengine-standard`](https://github.com/GoogleCloudPlatform/php-testutils/tree/master/test/fixtures/appengine-standard) directory.
+[`test/fixtures/appengine-standard`](https://github.com/GoogleCloudPlatform/php-tools/tree/main/test/fixtures/appengine-standard) directory.
 
 ### Environment variables
 
