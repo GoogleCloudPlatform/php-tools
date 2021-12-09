@@ -31,7 +31,7 @@ trait DeploymentTrait
     private $client;
 
     /**
-     * Called before "beforeDeploy. Traits which extend this trait can override
+     * Called before beforeDeploy. Traits which extend this trait can override
      * this.
      */
     private static function setUpDeploy()
