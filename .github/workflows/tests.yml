@@ -2,7 +2,7 @@ name: Test Suite
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 
 jobs:
@@ -26,6 +26,8 @@ jobs:
                 timeout_minutes: 10
                 max_attempts: 3
                 command: composer install
+            - name: Set Test Bin Dir
+              run: echo "$GITHUB_WORKSPACE/test/bin" >> $GITHUB_PATH
             - name: Run Script
               run: vendor/bin/phpunit
 

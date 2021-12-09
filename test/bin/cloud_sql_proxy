@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# This file is to mock cloud_sql_proxy for GitHub actions, as setting up
+# cloud_sql_proxy requires gcloud and active credentials.
+
+if [[ "$1" == "-instances=invalid" ]]; then
+    exit 1;
+fi
+
+echo "Ready for new connections"
+
+while [ true ]; do
+ # do nothing
+ sleep 1000
+done;
