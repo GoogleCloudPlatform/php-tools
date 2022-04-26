@@ -52,10 +52,10 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
     public function testDownloadArchive()
     {
         $project = new Project(sys_get_temp_dir() . '/project' . rand());
-        $archiveUrl = 'https://github.com/GoogleCloudPlatform/google-cloud-php/archive/master.zip';
+        $archiveUrl = 'https://github.com/GoogleCloudPlatform/google-cloud-php/archive/main.zip';
         $project->downloadArchive('Google Cloud client libraries', $archiveUrl);
         $this->assertTrue(file_exists(
-            $project->getDir() . '/google-cloud-php-master/composer.json'));
+            $project->getDir() . '/google-cloud-php-main/composer.json'));
     }
 
     public function testCopyFiles()
