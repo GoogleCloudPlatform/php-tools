@@ -41,18 +41,6 @@ class TestTraitTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckProjectEnvVars()
     {
-        // Test GOOGLE_APPLICATION_CREDENTIALS
-        putenv('GOOGLE_APPLICATION_CREDENTIALS=');
-        putenv('GOOGLE_CLOUD_PROJECT=');
-        putenv('GOOGLE_PROJECT_ID=foo');
-        try {
-            self::checkProjectEnvVars();
-            $this->fail('should have skipped!');
-        } catch (\PHPUnit_Framework_SkippedTestError $e) {
-            $this->assertTrue(true);
-        }
-        $this->assertEquals('foo', self::$projectId);
-
         // Test GOOGLE_PROJECT_ID
         putenv('GOOGLE_APPLICATION_CREDENTIALS=foo');
         putenv('GOOGLE_PROJECT_ID=');
@@ -60,6 +48,8 @@ class TestTraitTest extends \PHPUnit_Framework_TestCase
             self::checkProjectEnvVars();
             $this->fail('should have skipped!');
         } catch (\PHPUnit_Framework_SkippedTestError $e) {
+            $this->assertTrue(true);
+        } catch (\PHPUnit\Framework\SkippedTestError $e) {
             $this->assertTrue(true);
         }
     }
@@ -72,6 +62,8 @@ class TestTraitTest extends \PHPUnit_Framework_TestCase
             $this->fail('should have skipped!');
         } catch (\PHPUnit_Framework_SkippedTestError $e) {
             $this->assertTrue(true);
+        } catch (\PHPUnit\Framework\SkippedTestError $e) {
+            $this->assertTrue(true);
         }
 
         putenv('FAKE_ENV=foo');
@@ -79,6 +71,8 @@ class TestTraitTest extends \PHPUnit_Framework_TestCase
             $val = $this->requireEnv('FAKE_ENV');
             $this->assertEquals('foo', $val);
         } catch (\PHPUnit_Framework_SkippedTestError $e) {
+            $this->fail('should not have skipped!');
+        } catch (\PHPUnit\Framework\SkippedTestError $e) {
             $this->fail('should not have skipped!');
         }
     }
@@ -92,6 +86,8 @@ class TestTraitTest extends \PHPUnit_Framework_TestCase
             $this->fail('should have skipped!');
         } catch (\PHPUnit_Framework_SkippedTestError $e) {
             $this->assertTrue(true);
+        } catch (\PHPUnit\Framework\SkippedTestError $e) {
+            $this->assertTrue(true);
         }
 
         putenv('FAKE_ENV1=foo');
@@ -101,6 +97,8 @@ class TestTraitTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('foo', $val);
         } catch (\PHPUnit_Framework_SkippedTestError $e) {
             $this->fail('should not have skipped!');
+        } catch (\PHPUnit\Framework\SkippedTestError $e) {
+            $this->fail('should not have skipped!');
         }
 
         putenv('FAKE_ENV1=');
@@ -109,6 +107,8 @@ class TestTraitTest extends \PHPUnit_Framework_TestCase
             $val = $this->requireOneOfEnv(['FAKE_ENV1', 'FAKE_ENV2']);
             $this->assertEquals('foo', $val);
         } catch (\PHPUnit_Framework_SkippedTestError $e) {
+            $this->fail('should not have skipped!');
+        } catch (\PHPUnit\Framework\SkippedTestError $e) {
             $this->fail('should not have skipped!');
         }
     }
