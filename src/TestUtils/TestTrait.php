@@ -22,6 +22,7 @@ use ReflectionClass;
 trait TestTrait
 {
     private static $projectId;
+    private static $lastSnippetReturnValue;
 
     /** @beforeClass */
     public static function checkProjectEnvVarBeforeClass()
@@ -35,7 +36,6 @@ trait TestTrait
             'GOOGLE_CLOUD_PROJECT',
             'GOOGLE_PROJECT_ID',
         ]);
-        self::requireEnv('GOOGLE_APPLICATION_CREDENTIALS');
     }
 
     private static function requireOneOfEnv($varNames)
@@ -91,7 +91,8 @@ trait TestTrait
         if (function_exists($snippet)) {
             try {
                 ob_start();
-                call_user_func_array($snippet, $params);
+                $ret = call_user_func_array($snippet, $params);
+                self::$lastSnippetReturnValue = $ret;
                 return ob_get_clean();
             } catch (\Exception $e) {
                 ob_get_clean();
@@ -130,7 +131,8 @@ trait TestTrait
             $argc = count($argv);
             try {
                 ob_start();
-                require $sampleFile;
+                $ret = require $sampleFile;
+                self::$lastSnippetReturnValue = $ret;
                 return ob_get_clean();
             } catch (\Exception $e) {
                 ob_get_clean();
@@ -142,5 +144,10 @@ trait TestTrait
             return self::$backoff->execute($testFunc);
         }
         return $testFunc();
+    }
+
+    private static function getLastReturnedSnippetValue()
+    {
+        return self::$lastSnippetReturnValue;
     }
 }
