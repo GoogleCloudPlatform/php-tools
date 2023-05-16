@@ -18,8 +18,9 @@
 namespace Google\Cloud\Utils\WordPress;
 
 use Google\Cloud\TestUtils\ExecuteCommandTrait;
+use PHPUnit\Framework\TestCase;
 
-class wpGaeTest extends \PHPUnit_Framework_TestCase
+class wpGaeTest extends TestCase
 {
     use ExecuteCommandTrait;
 
@@ -55,8 +56,8 @@ class wpGaeTest extends \PHPUnit_Framework_TestCase
 
         // check naively that variables were added
         $wpConfig = file_get_contents($dir . '/wp-config.php');
-        $this->assertContains($projectId, $wpConfig);
-        $this->assertContains($dbPassword, $wpConfig);
+        $this->assertStringContainsString($projectId, $wpConfig);
+        $this->assertStringContainsString($dbPassword, $wpConfig);
     }
 
     public function testUpdate()
@@ -92,7 +93,7 @@ class wpGaeTest extends \PHPUnit_Framework_TestCase
 
         // check naively that variables were added
         $wpConfig = file_get_contents($dir . '/wp-config.php');
-        $this->assertContains($projectId, $wpConfig);
-        $this->assertContains($dbPassword, $wpConfig);
+        $this->assertStringContainsString($projectId, $wpConfig);
+        $this->assertStringContainsString($dbPassword, $wpConfig);
     }
 }

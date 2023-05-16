@@ -18,6 +18,7 @@
 namespace Google\Cloud\TestUtils\Test;
 
 use Google\Cloud\TestUtils\FileUtil;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class FileUtilTest
@@ -25,7 +26,7 @@ use Google\Cloud\TestUtils\FileUtil;
  *
  * A class for testing the FileUtil class.
  */
-class FileUtilTest extends \PHPUnit_Framework_TestCase
+class FileUtilTest extends TestCase
 {
     public function testCloneDirectoryIntoTemp()
     {
@@ -45,7 +46,7 @@ class FileUtilTest extends \PHPUnit_Framework_TestCase
 
         $newDir = FileUtil::cloneDirectoryIntoTmp(__DIR__ . '/../fixtures/clonedir', $progress);
 
-        $this->assertContains('1 [', $output->fetch());
+        $this->assertStringContainsString('1 [', $output->fetch());
     }
 
     public function testCloneIntoDirectoryWithExistingFile()

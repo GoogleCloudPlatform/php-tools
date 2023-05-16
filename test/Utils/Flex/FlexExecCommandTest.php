@@ -22,6 +22,8 @@ use Google\Cloud\Utils\Gcloud;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use Prophecy\PhpUnit\ProphecyTrait;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class FlexExecCommandTest
@@ -29,14 +31,16 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
  *
  * A class for testing FlexExecCommand class
  */
-class FlexExecCommandTest extends \PHPUnit_Framework_TestCase
+class FlexExecCommandTest extends TestCase
 {
+    use ProphecyTrait;
+
     private $gcloud;
     private $fs;
     private $tempnam;
     private $workdir;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->gcloud = $this->prophesize(Gcloud::class);
         $this->fs = new Filesystem();
@@ -49,7 +53,7 @@ class FlexExecCommandTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         unlink($this->tempnam);
         $this->fs->remove($this->workdir);

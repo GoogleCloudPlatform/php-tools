@@ -19,8 +19,9 @@ namespace Google\Cloud\Utils\WordPress;
 
 use Google\Cloud\TestUtils\AppEngineDeploymentTrait;
 use Google\Cloud\TestUtils\ExecuteCommandTrait;
+use PHPUnit\Framework\TestCase;
 
-class DeployTest extends \PHPUnit_Framework_TestCase
+class DeployTest extends TestCase
 {
     use ExecuteCommandTrait;
     use AppEngineDeploymentTrait;
@@ -55,7 +56,7 @@ class DeployTest extends \PHPUnit_Framework_TestCase
         // Access the blog top page
         $resp = $this->client->get('');
         $this->assertEquals('200', $resp->getStatusCode());
-        $this->assertContains(
+        $this->assertStringContainsString(
             'It looks like your WordPress installation is running on App '
             . 'Engine for PHP 7.2!',
             $resp->getBody()->getContents()
