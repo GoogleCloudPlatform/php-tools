@@ -58,6 +58,11 @@ trait DeploymentTrait
      */
     public static function deployApp()
     {
+        self::doDeployApp();
+    }
+
+    private static function doDeployApp()
+    {
         if (getenv('RUN_DEPLOYMENT_TESTS') !== 'true') {
             self::markTestSkipped(
                 'To run this test, set RUN_DEPLOYMENT_TESTS env to true.'
