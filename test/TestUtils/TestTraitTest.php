@@ -19,6 +19,7 @@ namespace Google\Cloud\TestUtils\Tests;
 
 use Google\Cloud\TestUtils\TestTrait;
 use Google\Cloud\TestUtils\ExponentialBackoffTrait;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class TestTraitTest
@@ -26,7 +27,7 @@ use Google\Cloud\TestUtils\ExponentialBackoffTrait;
  *
  * A class for testing TestTrait.
  */
-class TestTraitTest extends \PHPUnit_Framework_TestCase
+class TestTraitTest extends TestCase
 {
     use TestTrait;
     use ExponentialBackoffTrait;
@@ -161,19 +162,17 @@ class TestTraitTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($retries, $timesCalled);
     }
 
-    /**
-     * @expectedException Exception
-     * @expectedExceptionMessage This is expected
-     */
     public function testRunSnippetWithException()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('This is expected');
         $this->runSnippet('snippet3');
     }
 
     public function testRunFunctionSnippet()
     {
         $output = $this->runFunctionSnippet('function_snippet1');
-        $this->assertContains(
+        $this->assertStringContainsString(
             'function_snippet1 called with 0 parameters',
             $output
         );
@@ -184,7 +183,7 @@ class TestTraitTest extends \PHPUnit_Framework_TestCase
             'parameter2',
         ]);
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             'function_snippet1 called with 2 parameters',
             $output
         );
@@ -201,7 +200,7 @@ class TestTraitTest extends \PHPUnit_Framework_TestCase
         $this->runFunctionSnippet('function_snippet_invalid');
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         // Clear backoffs before running each test
         self::$backoff = null;

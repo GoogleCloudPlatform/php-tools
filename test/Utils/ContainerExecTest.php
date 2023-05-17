@@ -21,6 +21,8 @@ use Google\Cloud\Utils\ContainerExec;
 use Google\Cloud\Utils\Gcloud;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use Prophecy\PhpUnit\ProphecyTrait;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class ContainerExecTest
@@ -28,14 +30,16 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
  *
  * A class for testing ContainerExec class
  */
-class ContainerExecTest extends \PHPUnit_Framework_TestCase
+class ContainerExecTest extends TestCase
 {
+    use ProphecyTrait;
+
     private $gcloud;
     private $fs;
     private $tempnam;
     private $workdir;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->gcloud = $this->prophesize(Gcloud::class);
         $this->fs = new Filesystem();
@@ -48,7 +52,7 @@ class ContainerExecTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         unlink($this->tempnam);
         $this->fs->remove($this->workdir);

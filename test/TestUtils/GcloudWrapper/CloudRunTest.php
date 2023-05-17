@@ -18,6 +18,7 @@
 namespace Google\Cloud\TestUtils\test;
 
 use Google\Cloud\TestUtils\GcloudWrapper\CloudRun;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class GcloudWrapper\AppEngineTest
@@ -25,7 +26,7 @@ use Google\Cloud\TestUtils\GcloudWrapper\CloudRun;
  *
  * A class for testing GcloudAppEngine class.
  */
-class CloudRunTest extends \PHPUnit_Framework_TestCase
+class CloudRunTest extends TestCase
 {
     private static $image = 'gcr.io/my-project/image';
 

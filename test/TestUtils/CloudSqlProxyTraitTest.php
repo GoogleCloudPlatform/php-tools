@@ -18,6 +18,7 @@
 namespace Google\Cloud\TestUtils\test;
 
 use Google\Cloud\TestUtils\CloudSqlProxyTrait;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class ExecuteCommandTraitTest
@@ -25,7 +26,7 @@ use Google\Cloud\TestUtils\CloudSqlProxyTrait;
  *
  * A class for testing ExecuteCommandTrait.
  */
-class CloudSqlProxyTraitTest extends \PHPUnit_Framework_TestCase
+class CloudSqlProxyTraitTest extends TestCase
 {
     use CloudSqlProxyTrait;
 
@@ -43,24 +44,22 @@ class CloudSqlProxyTraitTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(self::$cloudSqlProxyProcess->isRunning());
     }
 
-    /**
-     * @expectedException Exception
-     * @expectedExceptionMessage Unable to create socket dir /this/is/invalid
-     */
     public function testInvalidSocketDirThrowsException()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Unable to create socket dir /this/is/invalid');
         $connectionString = '';
         $socketDir = '/this/is/invalid';
         $this->startCloudSqlProxy($connectionString, $socketDir);
     }
 
     /**
-     * @expectedException Exception
-     * @expectedExceptionMessage Failed to start cloud_sql_proxy
      * @runInSeparateProcess
      */
     public function testFailedRunThrowsException()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Failed to start cloud_sql_proxy');
         $connectionString = 'invalid';
         $socketDir = '/tmp/cloudsql';
         $this->startCloudSqlProxy($connectionString, $socketDir);

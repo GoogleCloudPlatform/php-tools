@@ -24,7 +24,7 @@ class ExponentialBackoffTest extends TestCase
 {
     private $delayFunction;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->delayFunction = function () {
             return;

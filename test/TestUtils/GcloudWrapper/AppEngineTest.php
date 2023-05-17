@@ -19,6 +19,7 @@ namespace Google\Cloud\TestUtils\test;
 
 use Google\Cloud\TestUtils\GcloudWrapper\AppEngine;
 use Symfony\Component\Process\Process;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class GcloudWrapper\AppEngineTest
@@ -26,12 +27,12 @@ use Symfony\Component\Process\Process;
  *
  * A class for testing GcloudAppEngine class.
  */
-class AppEngineTest extends \PHPUnit_Framework_TestCase
+class AppEngineTest extends TestCase
 {
     /** @var \Symfony\Component\Process\Process */
     private $mockProcess;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->mockProcess = $this->getMockBuilder(Process::class)
             ->setMethods(array('start', 'isRunning', 'stop'))

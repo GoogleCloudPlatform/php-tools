@@ -20,6 +20,7 @@ namespace Google\Cloud\TestUtils\test;
 use Google\ApiCore\ApiException;
 use Google\Cloud\TestUtils\ExponentialBackoffTrait;
 use Google\Rpc\Code;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class ExponentialBackoffTraitTest
@@ -27,7 +28,7 @@ use Google\Rpc\Code;
  *
  * A class for testing ExponentialBackoffTrait.
  */
-class ExponentialBackoffTraitTest extends \PHPUnit_Framework_TestCase
+class ExponentialBackoffTraitTest extends TestCase
 {
     use ExponentialBackoffTrait;
 

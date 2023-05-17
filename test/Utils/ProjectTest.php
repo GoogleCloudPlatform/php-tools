@@ -18,6 +18,7 @@
 namespace Google\Cloud\Utils\Test;
 
 use Google\Cloud\Utils\Project;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class ProjectTest
@@ -25,7 +26,7 @@ use Google\Cloud\Utils\Project;
  *
  * A class for testing Project class.
  */
-class ProjectTest extends \PHPUnit_Framework_TestCase
+class ProjectTest extends TestCase
 {
     public function testProjectDir()
     {

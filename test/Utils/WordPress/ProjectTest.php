@@ -20,6 +20,7 @@ namespace Google\Cloud\Utils\WordPress;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\QuestionHelper;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class WordPress\ProjectTest
@@ -27,7 +28,7 @@ use Symfony\Component\Console\Helper\QuestionHelper;
  *
  * A class for testing WordPress\Project class.
  */
-class ProjectTest extends \PHPUnit_Framework_TestCase
+class ProjectTest extends TestCase
 {
     public function testInitializeDatabase()
     {

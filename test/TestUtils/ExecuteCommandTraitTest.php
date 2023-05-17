@@ -18,6 +18,7 @@
 namespace Google\Cloud\TestUtils\test;
 
 use Google\Cloud\TestUtils\ExecuteCommandTrait;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class ExecuteCommandTraitTest
@@ -25,7 +26,7 @@ use Google\Cloud\TestUtils\ExecuteCommandTrait;
  *
  * A class for testing ExecuteCommandTrait.
  */
-class ExecuteCommandTraitTest extends \PHPUnit_Framework_TestCase
+class ExecuteCommandTraitTest extends TestCase
 {
     use ExecuteCommandTrait;
 
@@ -41,9 +42,9 @@ class ExecuteCommandTraitTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("foo: yay, bar: baz", $output);
     }
 
-    /** @expectedException Exception */
     public function testRunCommandWithoutBackoffThrowsException()
     {
+        $this->expectException(\Exception::class);
         $this->runCommand('test', ['--exception' => true]);
     }
 

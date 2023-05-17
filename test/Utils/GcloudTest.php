@@ -18,6 +18,7 @@
 namespace Google\Cloud\Utils\Test;
 
 use Google\Cloud\Utils\Gcloud;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class GcloudTest
@@ -25,9 +26,9 @@ use Google\Cloud\Utils\Gcloud;
  *
  * A class for testing Gcloud class.
  */
-class GcloudTest extends \PHPUnit_Framework_TestCase
+class GcloudTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         require_once __DIR__ . '/mocked_exec.php';
     }

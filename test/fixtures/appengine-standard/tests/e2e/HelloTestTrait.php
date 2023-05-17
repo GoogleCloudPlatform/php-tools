@@ -28,7 +28,7 @@ trait HelloTestTrait
         }
         $this->assertEquals('200', $resp->getStatusCode(),
                             'top page status code');
-        $this->assertContains(
+        $this->assertStringContainsString(
             'Hello World',
             $resp->getBody()->getContents());
     }
