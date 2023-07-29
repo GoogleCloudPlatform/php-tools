@@ -73,10 +73,11 @@ class CloudRun
      * @param string $image   The container image to deploy
      * @param array  $options list of options
      *                        $retries int Number of retries upon failure
+     * @param string $source  Define explicity source path, defaults to current directory
      *
      * @return bool true if deployment suceeds, false upon failure
      */
-    public function build($image, array $options = [])
+    public function build($image, array $options = [], string $source = ".")
     {
         // Set default optioins
         $options = array_merge([
@@ -89,7 +90,7 @@ class CloudRun
 
             return false;
         }
-        $cmd = sprintf('gcloud builds submit --tag %s', $image);
+        $cmd = sprintf('gcloud builds submit --tag %s --source %s', $image, $source);
         $ret = $this->execWithRetry($cmd, $options['retries']);
         chdir($orgDir);
 
