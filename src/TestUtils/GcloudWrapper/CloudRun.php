@@ -90,7 +90,7 @@ class CloudRun
 
             return false;
         }
-        $cmd = sprintf('gcloud builds submit --tag %s --source %s', $image, $source);
+        $cmd = sprintf('gcloud builds submit %s --tag %s', $source, $image);
         $ret = $this->execWithRetry($cmd, $options['retries']);
         chdir($orgDir);
 
