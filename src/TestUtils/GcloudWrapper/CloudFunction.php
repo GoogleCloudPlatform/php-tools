@@ -263,7 +263,7 @@ class CloudFunction
     }
 
     /**
-     * Run the function with the php development server.
+     * Run the function with the Functions Framework router, or php development server.
      *
      * @param array $env environment variables in the form "[FOO] => bar"
      * @param string $port override for local PHP server.
@@ -276,7 +276,16 @@ class CloudFunction
         $this->localUri = 'localhost:' . $port;
 
         $phpBin = $phpBin ?? (new PhpExecutableFinder())->find();
-        $cmd = $phpBin . ' -S ' . $this->localUri . ' vendor/bin/router.php';
+
+        // Opt to use functions framework router, if available.
+        $ff_router = 'vendor/google/cloud-functions-framework/router.php';
+        $default_router = 'vendor/bin/router.php';
+
+        if (file_exists($ff_router)) {
+            $cmd = $phpBin . ' -S ' . $this->localUri . $ff_router;
+        } else {
+            $cmd = $phpBin . ' -S ' . $this->localUri . $default_router;
+        }
 
         $this->process = $this->createProcess($cmd, $this->dir, array_merge($env, [
             'FUNCTION_TARGET' => $this->entryPoint,
