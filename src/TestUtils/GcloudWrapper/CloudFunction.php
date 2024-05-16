@@ -276,7 +276,9 @@ class CloudFunction
         $this->localUri = 'localhost:' . $port;
 
         $phpBin = $phpBin ?? (new PhpExecutableFinder())->find();
-        $cmd = $phpBin . ' -S ' . $this->localUri . ' vendor/bin/router.php';
+
+        $router = 'vendor/google/cloud-functions-framework/router.php';
+        $cmd = sprintf('%s -S %s %s', $phpBin, $this->localUri, $router);
 
         $this->process = $this->createProcess($cmd, $this->dir, array_merge($env, [
             'FUNCTION_TARGET' => $this->entryPoint,
