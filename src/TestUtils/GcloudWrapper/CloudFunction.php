@@ -263,7 +263,7 @@ class CloudFunction
     }
 
     /**
-     * Run the function with the Functions Framework router, or php development server.
+     * Run the function with the php development server.
      *
      * @param array $env environment variables in the form "[FOO] => bar"
      * @param string $port override for local PHP server.
