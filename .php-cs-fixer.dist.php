@@ -1,6 +1,7 @@
 <?php
 
-return PhpCsFixer\Config::create()
+$config = new PhpCsFixer\Config();
+$config
     ->setRules([
         '@PSR2' => true,
         'concat_space' => ['spacing' => 'one'],
@@ -12,6 +13,4 @@ return PhpCsFixer\Config::create()
     )
 ;
 
-$finder = Symfony\CS\Finder\DefaultFinder::create()
-    ->in(__DIR__)
-;
+return $config;
