@@ -277,15 +277,8 @@ class CloudFunction
 
         $phpBin = $phpBin ?? (new PhpExecutableFinder())->find();
 
-        // Opt to use functions framework router, if available.
-        $ff_router = 'vendor/google/cloud-functions-framework/router.php';
-        $default_router = 'vendor/bin/router.php';
-
-        if (file_exists($ff_router)) {
-            $cmd = $phpBin . ' -S ' . $this->localUri . $ff_router;
-        } else {
-            $cmd = $phpBin . ' -S ' . $this->localUri . $default_router;
-        }
+        $router = 'vendor/google/cloud-functions-framework/router.php';
+        $cmd = sprintf('%s -S %s %s', $phpBin, $this->localUri, $router);
 
         $this->process = $this->createProcess($cmd, $this->dir, array_merge($env, [
             'FUNCTION_TARGET' => $this->entryPoint,
