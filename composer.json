@@ -37,7 +37,7 @@
         "google/cloud-core": "^1.20",
         "google/gax": "^0.35.0",
         "paragonie/random_compat": ">=2",
-        "phpunit/phpunit": "^9",
+        "phpunit/phpunit": "^11",
         "friendsofphp/php-cs-fixer": "^3.17",
         "phpspec/prophecy-phpunit": "^2.0"
     }
