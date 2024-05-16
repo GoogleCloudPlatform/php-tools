@@ -47,4 +47,4 @@ jobs:
                 max_attempts: 3
                 command: composer install
             - name: Run Script
-              run: vendor/bin/php-cs-fixer fix . --config=.php_cs.dist
+              run: vendor/bin/php-cs-fixer fix .
