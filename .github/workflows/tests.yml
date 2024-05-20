@@ -14,7 +14,7 @@ jobs:
                 php: [ "8.0", "8.1", "8.2", "8.3" ]
         name: PHP ${{matrix.php }} Unit Test
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
               with:
@@ -35,7 +35,7 @@ jobs:
         runs-on: ubuntu-latest
         name: PHP Style Check
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
               with:
