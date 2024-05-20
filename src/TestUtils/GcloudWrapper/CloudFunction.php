@@ -52,7 +52,7 @@ class CloudFunction
     const GCLOUD_COMPONENT = 'functions';
     const DEFAULT_PORT = '8080';
     const DEFAULT_REGION = 'us-central1';
-    const DEFAULT_RUNTIME = 'php74';
+    const DEFAULT_RUNTIME = 'php81';
     const DEFAULT_TRIGGER = '--trigger-http';
     const DEFAULT_TIMEOUT_SECONDS = 300; // 5 minutes
 

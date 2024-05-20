@@ -62,8 +62,8 @@ trait EventuallyConsistentTestTrait
         while ($attempts < $maxAttempts) {
             try {
                 return $func();
-            } catch (
-                \PHPUnit\Framework\ExpectationFailedException $testException) {
+            } catch (\PHPUnit\Framework\ExpectationFailedException $testException) {
+                // do nothing
             } catch (\Exception $testException) {
                 if (!$catchAllExceptions) {
                     throw $testException;
