@@ -19,7 +19,7 @@ composer require --dev "google/cloud-tools"
 Install `friendsofphp/php-cs-fixer`:
 
 ```sh
-composer require --dev "friendsofphp/cloud-tools:^3.21"
+composer require --dev "friendsofphp/php-cs-fixer:^3.21"
 ```
 
 ## Running the fixer
@@ -47,18 +47,21 @@ return (new PhpCsFixer\Config())
 ;
 ```
 
-Run this fixer with the following command:
+Next run this fixer with the following command:
 
 ```sh
-export DIR=examples
+# use the examples provided in this repo
+export DIR=vendor/google/cloud-tools/examples/ClientUpgradeFixer
+
+# run the CS fixer for that directory using the config above
 vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.google.php --dry-run --diff $DIR
 ```
 
 You should get an output similar to this
 
 ```diff
---- examples/legacy_optional_args.php
-+++ examples/legacy_optional_args.php
+--- legacy_optional_args.php
++++ legacy_optional_args.php
 @@ -2,10 +2,12 @@
 
  namespace Google\Cloud\Samples\Dlp;
