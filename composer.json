@@ -29,6 +29,7 @@
     ],
     "autoload": {
         "psr-4": {
+            "Google\\Cloud\\Fixers\\": "src/Fixers/",
             "Google\\Cloud\\TestUtils\\": "src/TestUtils/",
             "Google\\Cloud\\Utils\\": "src/Utils/"
         }
@@ -38,7 +39,10 @@
         "google/gax": "^1.0.0",
         "paragonie/random_compat": ">=2",
         "phpunit/phpunit": "^9",
-        "friendsofphp/php-cs-fixer": "^3.17",
-        "phpspec/prophecy-phpunit": "^2.0"
+        "phpspec/prophecy-phpunit": "^2.0",
+        "friendsofphp/php-cs-fixer": "^3.21",
+        "google/cloud-dlp": "^1.10",
+        "google/cloud-storage": "^1.33",
+        "google/cloud-secret-manager": "^1.12"
     }
 }
