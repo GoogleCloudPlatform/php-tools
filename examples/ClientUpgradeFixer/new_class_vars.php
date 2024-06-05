@@ -20,7 +20,7 @@ class ClientWrapper extends TestCase
     public $dlp;
     public $secretmanager;
 
-    public function __comnstruct()
+    public function __construct()
     {
         $this->dlp = new DlpServiceClient();
         $this->secretmanager = new SecretManagerServiceClient();

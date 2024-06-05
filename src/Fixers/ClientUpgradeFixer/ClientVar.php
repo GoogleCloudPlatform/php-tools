@@ -96,29 +96,38 @@ class ClientVar
         $clientVars = [];
         foreach ($tokens as $index => $token) {
             // get variables which are set directly
-            if ($token->isGivenKind(T_NEW)) {
-                $nextToken = $tokens[$tokens->getNextMeaningfulToken($index)];
-                $shortName = $nextToken->getContent();
-                if (in_array($shortName, $clientShortNames)) {
-                    if ($prevIndex = $tokens->getPrevMeaningfulToken($index)) {
-                        if ($tokens[$prevIndex]->getContent() === '=') {
-                            if ($prevIndex = $tokens->getPrevMeaningfulToken($prevIndex)) {
-                                if (
-                                    $tokens[$prevIndex]->isGivenKind(T_VARIABLE)
-                                    || (
-                                        $tokens[$prevIndex]->isGivenKind(T_STRING)
-                                        && $tokens[$prevIndex-1]->isGivenKind(T_OBJECT_OPERATOR)
-                                    )
-                                 ) {
-                                    // Handle clients set to $var
-                                    $clientClass = array_search($shortName, $clientShortNames);
-                                    $varName = $tokens[$prevIndex]->getContent();
-                                    $clientVars[$varName] = new ClientVar($varName, $clientClass);
-                                }
-                            }
-                        }
-                    }
-                }
+            if (!$token->isGivenKind(T_NEW)) {
+                continue;
+            }
+
+            $nextToken = $tokens[$tokens->getNextMeaningfulToken($index)];
+            $shortName = $nextToken->getContent();
+            if (!in_array($shortName, $clientShortNames)) {
+                continue;
+            }
+
+            if (!$prevIndex = $tokens->getPrevMeaningfulToken($index)) {
+                continue;
+            }
+
+            if ($tokens[$prevIndex]->getContent() !== '=') {
+                continue;
+            }
+
+            if (!$prevIndex = $tokens->getPrevMeaningfulToken($prevIndex)) {
+                continue;
+            }
+
+            if (
+                $tokens[$prevIndex]->isGivenKind(T_VARIABLE) || (
+                    $tokens[$prevIndex]->isGivenKind(T_STRING)
+                    && $tokens[$prevIndex-1]->isGivenKind(T_OBJECT_OPERATOR)
+                )
+            ) {
+                // Handle clients set to $var
+                $clientClass = array_search($shortName, $clientShortNames);
+                $varName = $tokens[$prevIndex]->getContent();
+                $clientVars[$varName] = new ClientVar($varName, $clientClass);
             }
         }
 
@@ -130,18 +139,28 @@ class ClientVar
         $clientVars = [];
         foreach ($tokens as $index => $token) {
             // get variables which are set directly
-            if ($token->isGivenKind(T_DOC_COMMENT) && false !== strpos($token->getContent(), '@var')) {
-                $varToken = $tokens[$tokens->getNextMeaningfulToken($index)];
-                if ($varToken->isGivenKind(T_VARIABLE)) {
-                    $regex = sprintf('/@var (.*) \\%s/', $varToken->getContent());
-                    if (preg_match($regex, $token->getContent(), $matches)) {
-                        $shortName = $matches[1];
-                        $varName = $varToken->getContent();
-                        if ($clientClass = array_search($shortName, $clientShortNames)) {
-                            $clientVars[$varName] = new ClientVar($varName, $clientClass);
-                        }
-                    }
-                }
+            if (!$token->isGivenKind(T_DOC_COMMENT)) {
+                continue;
+            }
+
+            if (false === strpos($token->getContent(), '@var')) {
+                continue;
+            }
+
+            $varToken = $tokens[$tokens->getNextMeaningfulToken($index)];
+            if (!$varToken->isGivenKind(T_VARIABLE)) {
+                continue;
+            }
+
+            $regex = sprintf('/@var (.*) \\%s/', $varToken->getContent());
+            if (!preg_match($regex, $token->getContent(), $matches)) {
+                continue;
+            }
+
+            $shortName = $matches[1];
+            $varName = $varToken->getContent();
+            if ($clientClass = array_search($shortName, $clientShortNames)) {
+                $clientVars[$varName] = new ClientVar($varName, $clientClass);
             }
         }
 
