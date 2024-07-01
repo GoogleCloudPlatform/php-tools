@@ -32,21 +32,35 @@ trait CloudSqlProxyTrait
 
     public static function startCloudSqlProxy($connectionName, $socketDir, $port = null)
     {
+        if (self::$cloudSqlProxyProcess) {
+            if (self::$cloudSqlProxyProcess->isRunning()) {
+                return self::$cloudSqlProxyProcess;
+            }
+        }
+
         // create the directory to store the unix socket for cloud_sql_proxy
         if (!is_dir($socketDir) && !@mkdir($socketDir, 0755, true)) {
             throw new Exception('Unable to create socket dir ' . $socketDir);
         }
 
-        $instances = sprintf('-instances=%s', $connectionName);
+        $cmd = [
+            'cloud-sql-proxy',
+            '--unix-socket',
+            $socketDir,
+        ];
+
         if ($port) {
-            $instances = sprintf('%s=tcp:%s,%s', $instances, $port, $connectionName);
+            $cmd[] = '--port';
+            $cmd[] = $port;
         }
 
-        $process = new Process(['cloud_sql_proxy', $instances, '-dir', $socketDir]);
+        $cmd[] = $connectionName;
+
+        $process = new Process($cmd);
         $process->start();
         $process->waitUntil(function ($type, $buffer) {
             print($buffer);
-            return str_contains($buffer, 'Ready for new connections');
+            return str_contains($buffer, 'ready for new connections');
         });
         if (!$process->isRunning()) {
             if ($output = $process->getOutput()) {
