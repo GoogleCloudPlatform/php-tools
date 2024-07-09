@@ -200,6 +200,15 @@ class TestTraitTest extends TestCase
         $this->runFunctionSnippet('function_snippet_invalid');
     }
 
+    public function testGetProjectNumber()
+    {
+        // This test requires ApplicatonDefaultCredentials
+        $this->requireEnv('GOOGLE_APPLICATION_CREDENTIALS');
+        $projectId = $this->requireEnv('GOOGLE_PROJECT_ID');
+
+        $this->assertTrue(!empty($this->getProjectNumber($projectId)));
+    }
+
     public function setUp(): void
     {
         // Clear backoffs before running each test

@@ -17,6 +17,9 @@
 
 namespace Google\Cloud\TestUtils;
 
+use Google\Auth\ApplicationDefaultCredentials;
+use Google\Auth\HttpHandler\HttpHandlerFactory;
+use GuzzleHttp\Psr7\Request;
 use ReflectionClass;
 
 trait TestTrait
@@ -149,5 +152,22 @@ trait TestTrait
     private static function getLastReturnedSnippetValue()
     {
         return self::$lastSnippetReturnValue;
+    }
+
+    private static function getProjectNumber(string $projectId): string
+    {
+        $credentials = ApplicationDefaultCredentials::getCredentials(
+            'https://www.googleapis.com/auth/cloud-platform'
+        );
+        $accessToken = $credentials->fetchAuthToken()['access_token'];
+
+        $url = 'https://cloudresourcemanager.googleapis.com/v1/projects/' . $projectId;
+        $request = new Request('GET', $url, ['authorization' => 'Bearer ' . $accessToken]);
+        $httpHandler = HttpHandlerFactory::build();
+        $response = $httpHandler($request);
+
+        $body = json_decode((string) $response->getBody(), true);
+
+        return $body['projectNumber'];
     }
 }
