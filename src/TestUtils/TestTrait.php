@@ -124,7 +124,7 @@ trait TestTrait
         $sampleFile = $sampleName;
         if ('/' !== $sampleName[0]) {
             // Default to 'src/' in sample directory
-            $reflector = new ReflectionClass(get_class());
+            $reflector = new ReflectionClass(__CLASS__);
             $testDir = dirname($reflector->getFileName());
             $sampleFile = sprintf('%s/../src/%s.php', $testDir, $sampleName);
         }
