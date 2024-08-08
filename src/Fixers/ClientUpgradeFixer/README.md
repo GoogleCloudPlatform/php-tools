@@ -4,8 +4,8 @@ This repo provides a Fixer, to be used with [PHP CS Fixer](https://github.com/PH
 which will automatically** upgrade your code to the
 [new Google Cloud PHP client surface](https://github.com/googleapis/google-cloud-php/discussions/5206).
 
-** this is an alpha tool and NOT recommended to use without thorough testing!
-It is also not guanteed by Google in any way.
+**IMPORTANT** This is an alpha tool and NOT recommended to use without thorough testing!
+It is also not guaranteed by Google in any way.
 
 ## Installation
 
