@@ -1,0 +1,11 @@
+name: Lint
+
+on:
+  pull_request:
+
+jobs:
+  code-standards:
+    uses: GoogleCloudPlatform/php-tools/.github/workflows/code-standards.yml@reusable-workflow
+
+  static-analysis:
+    uses: GoogleCloudPlatform/php-tools/.github/workflows/static-analysis.yml@reusable-workflow

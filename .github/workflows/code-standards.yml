@@ -1,0 +1,36 @@
+name: PHP Code Standards
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        default: "^3.0"
+      config:
+        type: string
+        default: ".php-cs-fixer.dist.php"
+      path:
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+    php_code_standards:
+      runs-on: ubuntu-latest
+      name: PHP Code Standards
+      steps:
+      - uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+      - name: Run PHP CS Fixer
+        run: |
+          composer install
+          composer global require friendsofphp/php-cs-fixer:${{ inputs.version }}
+          ~/.composer/vendor/bin/php-cs-fixer fix \
+            --config=${{ inputs.config }} \
+            ${{ inputs.path }} \
+            --dry-run --diff
