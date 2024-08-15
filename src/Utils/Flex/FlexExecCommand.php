@@ -244,7 +244,7 @@ class FlexExecCommand extends Command
      * @param string $service
      * @param InputInterface $input
      * @param OutputInterface $output
-     * @return string The version for the latest deployment for the given
+     * @return ?string The version for the latest deployment for the given
      *         service.
      */
     protected function detectLatestDeployedVersion(

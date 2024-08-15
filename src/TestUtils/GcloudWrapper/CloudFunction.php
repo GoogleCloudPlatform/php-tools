@@ -108,7 +108,7 @@ class CloudFunction
             $args[] = $arr[$key] ?? '';
         }
 
-        return new static(...$args);
+        return new self(...$args);
     }
 
     /**

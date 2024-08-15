@@ -41,6 +41,7 @@ class Project extends BaseProject
     private $input;
     private $output;
     private $helper;
+    private $filesystem;
     private $wordPressDir;
 
     public function __construct(InputInterface $input, OutputInterface $output, QuestionHelper $helper = null)

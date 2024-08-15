@@ -237,4 +237,5 @@ class AppEngine
     }
 }
 
+// @phpstan-ignore-next-line
 class_alias(AppEngine::class, \Google\Cloud\TestUtils\GcloudWrapper::class);

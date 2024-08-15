@@ -2,8 +2,6 @@
 
 namespace Google\Cloud\Fixers\ClientUpgradeFixer;
 
-use PhpCsFixer\Tokenizer\Tokens;
-
 class RequestVariableCounter
 {
     private array $varCounts = [];

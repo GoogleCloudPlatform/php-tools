@@ -3,7 +3,6 @@
 namespace Google\Cloud\Fixers\ClientUpgradeFixer;
 
 use PhpCsFixer\Tokenizer\Token;
-use PhpCsFixer\Tokenizer\Tokens;
 use ReflectionClass;
 
 class RequestClass
