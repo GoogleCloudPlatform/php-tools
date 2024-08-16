@@ -49,16 +49,10 @@ jobs:
           composer global require friendsofphp/php-cs-fixer:${{ inputs.version }} -q
           CONFIG="${{ inputs.config }}"
           RULES=$(echo $'${{ inputs.rules }}'|tr -d '\n\t\r ')
-          if [ ! -z "$CONFIG" ]; then
-            CONFIG="--config=$CONFIG"
-          elif [ ! -z "$RULES" ]; then
-            RULES=--rules=$RULES
-          fi
 
           set -x
 
           ~/.composer/vendor/bin/php-cs-fixer fix \
-            $CONFIG \
-            $RULES \
             ${{ inputs.path }} \
+            $(if [ ! -z "$CONFIG" ]; then echo "--config=$CONFIG"; elif [ ! -z "$RULES" ]; then echo --rules=$RULES; fi) \
             --dry-run --diff
