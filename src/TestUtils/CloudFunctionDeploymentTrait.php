@@ -142,7 +142,7 @@ trait CloudFunctionDeploymentTrait
 
     public function getBaseUri()
     {
-        return self::$fn->getBaseUrl(getenv("GOOGLE_SKIP_DEPLOYMENT") === 'true');
+        return self::$fn->getBaseUrl(getenv('GOOGLE_SKIP_DEPLOYMENT') === 'true');
     }
 
     /**

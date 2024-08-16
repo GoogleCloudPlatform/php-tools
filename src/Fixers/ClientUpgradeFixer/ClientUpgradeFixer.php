@@ -3,23 +3,21 @@
 namespace Google\Cloud\Fixers\ClientUpgradeFixer;
 
 use PhpCsFixer\AbstractFixer;
-use PhpCsFixer\Fixer\FixerInterface;
+use PhpCsFixer\Fixer\ConfigurableFixerInterface;
+use PhpCsFixer\Fixer\ConfigurableFixerTrait;
 use PhpCsFixer\Fixer\Import\OrderedImportsFixer;
+use PhpCsFixer\FixerConfiguration\FixerConfigurationResolver;
+use PhpCsFixer\FixerConfiguration\FixerConfigurationResolverInterface;
+use PhpCsFixer\FixerConfiguration\FixerOptionBuilder;
+use PhpCsFixer\FixerDefinition\FixerDefinition;
 use PhpCsFixer\FixerDefinition\FixerDefinitionInterface;
-use PhpCsFixer\Tokenizer\Analyzer\NamespaceUsesAnalyzer;
-use PhpCsFixer\Tokenizer\Analyzer\Analysis\NamespaceUseAnalysis;
-use PhpCsFixer\Tokenizer\CT;
 use PhpCsFixer\Tokenizer\Token;
 use PhpCsFixer\Tokenizer\Tokens;
-use ReflectionClass;
-use ReflectionMethod;
-use PhpCsFixer\Fixer\ConfigurableFixerInterface;
-use PhpCsFixer\FixerConfiguration\FixerConfigurationResolver;
-use PhpCsFixer\FixerConfiguration\FixerOptionBuilder;
-use PhpCsFixer\FixerConfiguration\FixerConfigurationResolverInterface;
 
 class ClientUpgradeFixer extends AbstractFixer implements ConfigurableFixerInterface
 {
+    use ConfigurableFixerTrait;
+
     /**
      * Check if the fixer is a candidate for given Tokens collection.
      *
@@ -35,18 +33,9 @@ class ClientUpgradeFixer extends AbstractFixer implements ConfigurableFixerInter
     }
 
     /**
-     * @param array<string, mixed> $configuration
-     */
-    public function configure(array $configuration): void
-    {
-        // no configuration assumes true
-        $this->configuration = $configuration;
-    }
-
-    /**
      * Defines the available configuration options of the fixer.
      */
-    public function getConfigurationDefinition(): FixerConfigurationResolverInterface
+    protected function createConfigurationDefinition(): FixerConfigurationResolverInterface
     {
         return new FixerConfigurationResolver([
             (new FixerOptionBuilder('clientVars', 'A map of client variables to their new class names'))
@@ -199,10 +188,10 @@ class ClientUpgradeFixer extends AbstractFixer implements ConfigurableFixerInter
             $importedClasses = array_map(fn ($useDeclaration) => $useDeclaration->getFullName(), $useDeclarations);
             $classesToImport = array_filter(
                 $classesToImport,
-                fn($requestClass) => !isset($importedClasses[$requestClass->getName()])
+                fn ($requestClass) => !isset($importedClasses[$requestClass->getName()])
             );
             $requestClassImportTokens = array_map(
-                fn($requestClass) => $requestClass->getImportTokens(),
+                fn ($requestClass) => $requestClass->getImportTokens(),
                 array_values($classesToImport)
             );
             $tokens->insertAt($importStart, array_merge(...$requestClassImportTokens));

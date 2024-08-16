@@ -20,8 +20,8 @@ namespace Google\Cloud\Utils;
 class Project
 {
     protected $dir;
-    private $errors = array();
-    private $info = array();
+    private $errors = [];
+    private $info = [];
     private static $availableDbRegions = [
         // North America
         'northamerica-northeast1',
@@ -80,7 +80,7 @@ class Project
         $dir = $this->getRelativeDir($dir);
 
         if (substr($url, -3, 3) === 'zip') {
-            $zip = new \ZipArchive;
+            $zip = new \ZipArchive();
             if ($zip->open($file) === false) {
                 $this->errors[] = 'Failed to open a zip file: ' . $file;
                 return;
@@ -135,7 +135,7 @@ class Project
     public function getInfo()
     {
         $ret = $this->info;
-        $this->info = array();
+        $this->info = [];
 
         return $ret;
     }

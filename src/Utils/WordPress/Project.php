@@ -19,12 +19,12 @@ namespace Google\Cloud\Utils\WordPress;
 
 use Exception;
 use Google\Cloud\Utils\Project as BaseProject;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Filesystem\Filesystem;
 
 class Project extends BaseProject
@@ -41,6 +41,7 @@ class Project extends BaseProject
     private $input;
     private $output;
     private $helper;
+    private $filesystem;
     private $wordPressDir;
 
     public function __construct(InputInterface $input, OutputInterface $output, QuestionHelper $helper = null)
@@ -260,7 +261,7 @@ class Project extends BaseProject
     private function report()
     {
         foreach ($this->getInfo() as $value) {
-            $this->output->writeln("<info>" . $value . "</info>");
+            $this->output->writeln('<info>' . $value . '</info>');
         }
         if ($this->getErrors()) {
             throw new Exception(implode("\n", $this->getErrors()));

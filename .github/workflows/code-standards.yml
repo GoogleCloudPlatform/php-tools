@@ -1,0 +1,58 @@
+name: PHP Code Standards
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        default: "^3.0"
+      config:
+        type: string
+        default: ""
+      path:
+        type: string
+        default: "."
+      rules:
+        type: string
+        default: |
+          {
+            "@PSR2": true,
+            "array_syntax": {"syntax":"short"},
+            "concat_space": {"spacing":"one"},
+            "no_unused_imports": true,
+            "ordered_imports": true,
+            "new_with_parentheses": true,
+            "whitespace_after_comma_in_array": true,
+            "method_argument_space": {
+              "keep_multiple_spaces_after_comma": true,
+              "on_multiline": "ignore"
+            },
+            "return_type_declaration": {"space_before": "none"},
+            "single_quote": true
+          }
+
+permissions:
+  contents: read
+
+jobs:
+    php_code_standards:
+      runs-on: ubuntu-latest
+      name: PHP Code Standards
+      steps:
+      - uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+      - name: Run PHP CS Fixer
+        run: |
+          composer global require friendsofphp/php-cs-fixer:${{ inputs.version }} -q
+          CONFIG="${{ inputs.config }}"
+          RULES=$(echo $'${{ inputs.rules }}'|tr -d '\n\t\r ')
+
+          set -x
+
+          ~/.composer/vendor/bin/php-cs-fixer fix \
+            ${{ inputs.path }} \
+            $(if [ ! -z "$CONFIG" ]; then echo "--config=$CONFIG"; elif [ ! -z "$RULES" ]; then echo --rules=$RULES; fi) \
+            --dry-run --diff

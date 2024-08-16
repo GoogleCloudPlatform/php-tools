@@ -17,8 +17,8 @@
 
 namespace Google\Cloud\TestUtils;
 
-use Symfony\Component\Process\Process;
 use Exception;
+use Symfony\Component\Process\Process;
 
 /**
  * Trait CloudSqlTestTrait

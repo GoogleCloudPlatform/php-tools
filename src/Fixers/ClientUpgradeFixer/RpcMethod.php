@@ -6,7 +6,6 @@ use PhpCsFixer\Tokenizer\CT;
 use PhpCsFixer\Tokenizer\Token;
 use PhpCsFixer\Tokenizer\Tokens;
 use ReflectionMethod;
-use ReflectionParameter;
 
 class RpcMethod
 {

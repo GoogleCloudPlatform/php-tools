@@ -28,7 +28,7 @@ class Gcloud
     public function __construct()
     {
         $auths = exec(
-            escapeshellcmd("gcloud auth list --format=value(account)"),
+            escapeshellcmd('gcloud auth list --format=value(account)'),
             $output,
             $ret
         );

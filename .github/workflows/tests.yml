@@ -31,20 +31,11 @@ jobs:
             - name: Run Script
               run: vendor/bin/phpunit
 
-    style:
-        runs-on: ubuntu-latest
-        name: PHP Style Check
-        steps:
-            - uses: actions/checkout@v4
-            - name: Setup PHP
-              uses: shivammathur/setup-php@v2
-              with:
-                php-version: "8.1"
-            - name: Install Dependencies
-              uses: nick-invision/retry@v3
-              with:
-                timeout_minutes: 10
-                max_attempts: 3
-                command: composer install
-            - name: Run Script
-              run: vendor/bin/php-cs-fixer fix .
+    code-standards:
+        uses: ./.github/workflows/code-standards.yml
+        with:
+            path: src
+
+    static-analysis:
+        uses: ./.github/workflows/static-analysis.yml
+

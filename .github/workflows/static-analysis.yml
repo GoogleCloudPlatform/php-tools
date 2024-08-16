@@ -1,0 +1,33 @@
+name: PHP Static Analysis
+on:
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        default: "^1.8"
+      paths:
+        type: string
+        default: "src"
+      autoload-file:
+        type: string
+        default: "vendor/autoload.php"
+
+permissions:
+  contents: read
+
+jobs:
+    static_analysis:
+      runs-on: ubuntu-latest
+      name: PHPStan Static Analysis
+      steps:
+      - uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+      - name: Run Script
+        run: |
+          composer install -q
+          composer global require phpstan/phpstan:${{ inputs.version }} -q
+          ~/.composer/vendor/bin/phpstan analyse ${{ inputs.paths }} \
+            --autoload-file=${{ inputs.autoload-file }}

@@ -62,7 +62,8 @@ class ContainerExec
             throw new \InvalidArgumentException("$workdir is not a directory");
         }
         $this->gcloud = ($gcloud == null) ? new Gcloud() : $gcloud;
-        if (class_exists(\Twig_Loader_Filesystem::class)) {
+        if (class_exists(\Twig_Loader_Filesystem::class)
+            && class_exists(\Twig_Environment::class)) {
             $loader = new \Twig_Loader_Filesystem(__DIR__ . '/templates');
             $this->twig = new \Twig_Environment($loader);
         } else {
@@ -109,7 +110,7 @@ class ContainerExec
             implode(PHP_EOL, $cmdOutput)
         );
         if ($result !== 0) {
-            throw new \RuntimeException("Failed to run the command");
+            throw new \RuntimeException('Failed to run the command');
         }
         $ret = '';
         if ($this->cloudSqlInstances) {
