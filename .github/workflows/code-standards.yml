@@ -55,6 +55,8 @@ jobs:
 
           echo $RULES // for debugging
 
+          set -x
+
           ~/.composer/vendor/bin/php-cs-fixer fix \
             $CONFIG \
             $RULES \
