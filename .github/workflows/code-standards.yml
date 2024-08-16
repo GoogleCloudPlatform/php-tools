@@ -46,7 +46,6 @@ jobs:
           php-version: '8.2'
       - name: Run PHP CS Fixer
         run: |
-          composer install -q
           composer global require friendsofphp/php-cs-fixer:${{ inputs.version }} -q
           CONFIG="${{ inputs.config }}"
           RULES=$(echo $'${{ inputs.rules }}'|tr -d '\n\t\r ')
