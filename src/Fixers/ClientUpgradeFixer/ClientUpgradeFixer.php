@@ -3,16 +3,16 @@
 namespace Google\Cloud\Fixers\ClientUpgradeFixer;
 
 use PhpCsFixer\AbstractFixer;
-use PhpCsFixer\Fixer\Import\OrderedImportsFixer;
-use PhpCsFixer\FixerDefinition\FixerDefinitionInterface;
-use PhpCsFixer\FixerDefinition\FixerDefinition;
-use PhpCsFixer\Tokenizer\Token;
-use PhpCsFixer\Tokenizer\Tokens;
 use PhpCsFixer\Fixer\ConfigurableFixerInterface;
 use PhpCsFixer\Fixer\ConfigurableFixerTrait;
+use PhpCsFixer\Fixer\Import\OrderedImportsFixer;
 use PhpCsFixer\FixerConfiguration\FixerConfigurationResolver;
-use PhpCsFixer\FixerConfiguration\FixerOptionBuilder;
 use PhpCsFixer\FixerConfiguration\FixerConfigurationResolverInterface;
+use PhpCsFixer\FixerConfiguration\FixerOptionBuilder;
+use PhpCsFixer\FixerDefinition\FixerDefinition;
+use PhpCsFixer\FixerDefinition\FixerDefinitionInterface;
+use PhpCsFixer\Tokenizer\Token;
+use PhpCsFixer\Tokenizer\Tokens;
 
 class ClientUpgradeFixer extends AbstractFixer implements ConfigurableFixerInterface
 {

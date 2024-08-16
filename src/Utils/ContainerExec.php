@@ -110,7 +110,7 @@ class ContainerExec
             implode(PHP_EOL, $cmdOutput)
         );
         if ($result !== 0) {
-            throw new \RuntimeException("Failed to run the command");
+            throw new \RuntimeException('Failed to run the command');
         }
         $ret = '';
         if ($this->cloudSqlInstances) {

@@ -77,7 +77,7 @@ class CloudRun
      *
      * @return bool true if deployment suceeds, false upon failure
      */
-    public function build($image, array $options = [], string $source = ".")
+    public function build($image, array $options = [], string $source = '.')
     {
         // Set default optioins
         $options = array_merge([

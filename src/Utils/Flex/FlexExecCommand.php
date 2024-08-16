@@ -24,8 +24,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * CLI command for running a command with an image deployed to App Engine
@@ -151,7 +151,7 @@ class FlexExecCommand extends Command
         }
         $output->writeln("Using workdir: <info>$workdir</info>");
         if ($preserveWorkdir) {
-            $output->writeln("<info>Preserving the workdir</info>");
+            $output->writeln('<info>Preserving the workdir</info>');
         } else {
             register_shutdown_function(function () use ($workdir, $fs) {
                 $fs->remove($workdir);
@@ -213,7 +213,7 @@ class FlexExecCommand extends Command
                 'describe',
                 $version,
                 "--service=$service",
-                "--format=json"
+                '--format=json'
             ]
         );
         if ($ret !== 0) {
@@ -258,9 +258,9 @@ class FlexExecCommand extends Command
                 'versions',
                 'list',
                 "--service=$service",
-                "--format=get(version.id)",
-                "--sort-by=~version.createTime",
-                "--limit=1"
+                '--format=get(version.id)',
+                '--sort-by=~version.createTime',
+                '--limit=1'
             ]
         );
         if (!empty($cmdOutput)) {

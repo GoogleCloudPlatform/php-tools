@@ -17,8 +17,8 @@
 
 namespace Google\Cloud\TestUtils\GcloudWrapper;
 
-use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
 
 /**
  * Trait GcloudWrapperTrait.
@@ -89,7 +89,7 @@ trait GcloudWrapperTrait
      */
     protected function runWithRetry(Process $cmd, $retries = 3)
     {
-        $this->errorLog('Running: ' . str_replace("'", "", $cmd->getCommandLine()));
+        $this->errorLog('Running: ' . str_replace("'", '', $cmd->getCommandLine()));
         for ($i = 0; $i <= $retries; ++$i) {
             // TODO: Use ExponentialBackoffTrait for more sophisticated handling.
             // Simple geometric backoff, .25 seconds * iteration.
