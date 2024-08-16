@@ -11,9 +11,6 @@ on:
       autoload-file:
         type: string
         default: "vendor/autoload.php"
-      level:
-        type: number
-        default: 0
 
 permissions:
   contents: read
@@ -33,5 +30,4 @@ jobs:
           composer install
           composer global require phpstan/phpstan:${{ inputs.version }}
           ~/.composer/vendor/bin/phpstan analyse ${{ inputs.paths }} \
-            --autoload-file=${{ inputs.autoload-file }} \
-            --level=${{ inputs.level }}
+            --autoload-file=${{ inputs.autoload-file }}
