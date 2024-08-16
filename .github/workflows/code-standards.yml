@@ -8,7 +8,7 @@ on:
         default: "^3.0"
       config:
         type: string
-        default: "~/.composer/vendor/google/cloud-tools/.php-cs-fixer.dist.php"
+        default: ""
       path:
         type: string
         default: ""
@@ -34,9 +34,10 @@ jobs:
           composer install
           composer global require friendsofphp/php-cs-fixer:${{ inputs.version }}
           CONFIG=""
+          RULES=""
           if [ ! -z "${{ inputs.config }}" ]; then
             CONFIG="--config=${{ inputs.config }}"
-          elfi [ ! -z "${{ inputs.rules }}" ]; then
+          elif [ ! -z "${{ inputs.rules }}" ]; then
             RULES="--rules=${{ inputs.rules }}"
           fi
 
