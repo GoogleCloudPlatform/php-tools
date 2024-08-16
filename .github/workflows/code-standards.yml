@@ -45,15 +45,13 @@ jobs:
         run: |
           composer install
           composer global require friendsofphp/php-cs-fixer:${{ inputs.version }}
-          CONFIG=""
-          RULES=""
-          if [ ! -z "${{ inputs.config }}" ]; then
-            CONFIG="--config=${{ inputs.config }}"
-          elif [ ! -z '${{ inputs.rules }}' ]; then
-            RULES=--rules=\''${{ inputs.rules }}'\'
+          CONFIG="${{ inputs.config }}"
+          RULES=$(echo $'${{ inputs.rules }}'|tr -d '\n\t\r ')
+          if [ ! -z "$CONFIG" ]; then
+            CONFIG="--config=$CONFIG"
+          elif [ ! -z "$RULES" ]; then
+            RULES=--rules=$RULES
           fi
-
-          echo $RULES // for debugging
 
           set -x
 
