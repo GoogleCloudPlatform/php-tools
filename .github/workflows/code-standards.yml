@@ -12,6 +12,9 @@ on:
       path:
         type: string
         default: ""
+      rules:
+        type: string
+        default: '{"@PSR2":true,"array_syntax":{"syntax":"short"},"concat_space":{"spacing":"one"},"no_unused_imports":true,"ordered_imports":true,"new_with_braces":true,"whitespace_after_comma_in_array":true,"method_argument_space":{"keep_multiple_spaces_after_comma":true,"on_multiline":"ignore"},"return_type_declaration":{"space_before":"none"},"single_quote":true}'
 
 permissions:
   contents: read
@@ -30,7 +33,15 @@ jobs:
         run: |
           composer install
           composer global require friendsofphp/php-cs-fixer:${{ inputs.version }}
+          CONFIG=""
+          if [ ! -z "${{ inputs.config }}" ]; then
+            CONFIG="--config=${{ inputs.config }}"
+          elfi [ ! -z "${{ inputs.rules }}" ]; then
+            RULES="--rules=${{ inputs.rules }}"
+          fi
+
           ~/.composer/vendor/bin/php-cs-fixer fix \
-            --config=${{ inputs.config }} \
+            $CONFIG \
+            $RULES \
             ${{ inputs.path }} \
             --dry-run --diff

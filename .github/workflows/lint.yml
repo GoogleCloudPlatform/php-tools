@@ -8,7 +8,6 @@ jobs:
     uses: GoogleCloudPlatform/php-tools/.github/workflows/code-standards.yml@reusable-workflow
     with:
       path: src
-      config: .php-cs-fixer.dist.php
 
   static-analysis:
     uses: GoogleCloudPlatform/php-tools/.github/workflows/static-analysis.yml@reusable-workflow
