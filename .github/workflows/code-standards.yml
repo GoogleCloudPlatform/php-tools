@@ -50,7 +50,7 @@ jobs:
           if [ ! -z "${{ inputs.config }}" ]; then
             CONFIG="--config=${{ inputs.config }}"
           elif [ ! -z '${{ inputs.rules }}' ]; then
-            RULES="--rules="'${{ inputs.rules }}'
+            RULES=--rules=\''${{ inputs.rules }}'\'
           fi
 
           ~/.composer/vendor/bin/php-cs-fixer fix \
