@@ -5,10 +5,10 @@ on:
 
 jobs:
   code-standards:
-    uses: GoogleCloudPlatform/php-tools/.github/workflows/code-standards.yml@reusable-workflow
+    uses: .github/workflows/code-standards.yml
     with:
       path: src
 
   static-analysis:
-    uses: GoogleCloudPlatform/php-tools/.github/workflows/static-analysis.yml@reusable-workflow
+    uses: .github/workflows/static-analysis.yml
 
