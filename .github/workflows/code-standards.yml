@@ -53,6 +53,8 @@ jobs:
             RULES=--rules=\''${{ inputs.rules }}'\'
           fi
 
+          echo $RULES // for debugging
+
           ~/.composer/vendor/bin/php-cs-fixer fix \
             $CONFIG \
             $RULES \
