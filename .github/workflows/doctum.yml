@@ -55,7 +55,7 @@ jobs:
                     ->files()
                     ->name('*.php')
                     ->exclude('GPBMetadata')
-                    ->exclude(json_decode(${{ inputs.exclude || '[]' }}. true))
+                    ->exclude(json_decode('{{ inputs.exclude }}', true) ?: '${{ inputs.exclude }}')
                     ->in(__DIR__ . '/src');
 
                 return new Doctum($iterator, [
