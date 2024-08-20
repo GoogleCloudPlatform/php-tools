@@ -77,11 +77,11 @@ jobs:
           run: |
             php doctum.phar update doctum-config.php -v --ignore-parse-errors
         - run: |
-            git submodule add -q -f -b gh-pages https://github.com/${{ github.repository }} ghpages
-            rsync -aP build/* ghpages/
+            git submodule add -q -f -b gh-pages https://github.com/${{ github.repository }} .ghpages
+            rsync -aP .build/* .ghpages/
         - name: Deploy 🚀
           uses: JamesIves/github-pages-deploy-action@releases/v3
           with:
             ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             BRANCH: gh-pages
-            FOLDER: ghpages
+            FOLDER: .ghpages
