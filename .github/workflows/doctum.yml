@@ -1,0 +1,89 @@
+name: Generate Reference Documentation
+
+on:
+  workflow_call:
+    inputs:
+      title:
+        type: string
+        default: "Reference Documentation"
+        required: true
+      version:
+        type: string
+        required: true
+      path:
+        type: string
+        default: "."
+
+permissions:
+  contents: write
+
+jobs:
+    docs:
+        name: "Generate and Deploy Documentation"
+        runs-on: ubuntu-latest
+        steps:
+        # - name: Checkout
+        #   uses: actions/checkout@v4
+        # - id: getTag
+        #   name: Get Tag
+        #   run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+        # - name: Setup PHP
+        #   uses: shivammathur/setup-php@v2
+        #   with:
+        #     php-version: 8.1
+        # - name: Strip "v" from Version
+        #   id: strip_v
+        #   run: |
+        #     # Remove "v" from start of string if it exists
+        #     TAG=${{ steps.getTag.outputs.tag }}
+        #     if [[ ${TAG::1} == "v" ]]; then
+        #         TAG="${TAG:1}"
+        #     fi
+        #     echo "tag=$TAG" >> $GITHUB_OUTPUT
+        - name: Setup PHP
+          uses: shivammathur/setup-php@v2
+          with:
+            php-version: 8.1
+        - name: Download Doctum
+          run: |
+            curl -# https://doctum.long-term.support/releases/5.5/doctum.phar -o doctum.phar
+            curl -# https://doctum.long-term.support/releases/5.5/doctum.phar.sha256  -o doctum.phar.sha256
+            sha256sum --strict --check doctum.phar.sha256
+        - name: Generate Doctum Config
+          run: |
+            DOCTUM_CONFIG=$(cat <<-EOF
+                <?php
+                use Doctum\Doctum;
+                use Symfony\Component\Finder\Finder;
+                use Doctum\RemoteRepository\GitHubRemoteRepository;
+
+                \$iterator = Finder::create()
+                    ->files()
+                    ->name('*.php')
+                    ->exclude('GPBMetadata')
+                    ->in("__DIR__/src");
+
+                return new Doctum(\$iterator, [
+                    'title'                => '${{ inputs.title }}',
+                    'version'              => '${{ inputs.version }}',
+                    'build_dir'            => __DIR__ . "/.build/%version%",
+                    'cache_dir'            => __DIR__ . "/.cache/%version%",
+                    'remote_repository'    => new GitHubRemoteRepository('${{ github.repository }}', __DIR__),
+                    'default_opened_level' => 1,
+                ]);
+            EOF
+            )
+            echo $DOCTUM_CONFIG; // for debugging
+            echo $DOCTUM_CONFIG > doctum-config.php;
+        - name: Generate Documentation
+          run: |
+            php doctum.phar update doctum-config.php -v
+        - run: |
+            git submodule add -q -f -b gh-pages https://github.com/${{github.repository}} ghpages
+            rsync -aP build/* ghpages/
+        - name: Deploy 🚀
+          uses: JamesIves/github-pages-deploy-action@releases/v3
+          with:
+            ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            BRANCH: gh-pages
+            FOLDER: ghpages
