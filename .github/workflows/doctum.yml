@@ -69,7 +69,7 @@ jobs:
                     'cache_dir'            => __DIR__ . '/.cache/%version%',
                     'remote_repository'    => new GitHubRemoteRepository('${{ github.repository }}', __DIR__),
                     'default_opened_level' => 2,
-                    'base_url' => 'https://googleapis.github.io/${{ github.event.repository.name }}',
+                    // 'base_url' => 'https://googleapis.github.io/${{ github.event.repository.name }}',
                 ]);
             EOF
             )
