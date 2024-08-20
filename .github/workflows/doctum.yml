@@ -82,8 +82,8 @@ jobs:
             cat << EOF > .build/index.html
               <meta http-equiv='refresh' content='0;url=/${{github.event.repository.name}}/${{ inputs.tag || steps.getTag.outputs.tag }}'>
             EOF
-
-        - run: |
+        - name: Move generated files into GitHub Pages branch
+          run: |
             git submodule add -q -f -b gh-pages https://github.com/${{ github.repository }} .ghpages
             rsync -aP .build/* .ghpages/
         - name: Deploy 🚀
