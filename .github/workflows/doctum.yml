@@ -1,16 +1,16 @@
 name: Generate Reference Documentation
 
 on:
-  workflow_call:
-    inputs:
-      title:
-        type: string
-        default: "Reference Documentation"
-        required: true
-      version:
-        type: string
-      tag:
-        type: string
+    workflow_call:
+        inputs:
+            title:
+                type: string
+                default: "Reference Documentation"
+                required: true
+            version:
+                type: string
+            tag:
+                type: string
 
 permissions:
   contents: write
@@ -59,25 +59,24 @@ jobs:
                     ->files()
                     ->name('*.php')
                     ->exclude('GPBMetadata')
-                    ->in("__DIR__/src");
+                    ->in(__DIR__ . '/src');
 
                 return new Doctum(\$iterator, [
                     'title'                => '${{ inputs.title }}',
                     'version'              => '${{ inputs.version || steps.strip_v.outputs.tag }}',
-                    'build_dir'            => __DIR__ . "/.build/%version%",
-                    'cache_dir'            => __DIR__ . "/.cache/%version%",
+                    'build_dir'            => __DIR__ . '/.build/%version%',
+                    'cache_dir'            => __DIR__ . '/.cache/%version%',
                     'remote_repository'    => new GitHubRemoteRepository('${{ github.repository }}', __DIR__),
                     'default_opened_level' => 1,
                 ]);
-            EOF
             )
-            echo $DOCTUM_CONFIG; // for debugging
+            echo $DOCTUM_CONFIG; # for debugging
             echo $DOCTUM_CONFIG > doctum-config.php;
         - name: Generate Documentation
           run: |
             php doctum.phar update doctum-config.php -v
         - run: |
-            git submodule add -q -f -b gh-pages https://github.com/${{github.repository}} ghpages
+            git submodule add -q -f -b gh-pages https://github.com/${{ github.repository }} ghpages
             rsync -aP build/* ghpages/
         - name: Deploy 🚀
           uses: JamesIves/github-pages-deploy-action@releases/v3
