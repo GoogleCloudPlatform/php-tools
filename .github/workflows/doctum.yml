@@ -75,7 +75,7 @@ jobs:
             echo $DOCTUM_CONFIG > doctum-config.php;
         - name: Generate Documentation
           run: |
-            php doctum.phar update doctum-config.php -v
+            php doctum.phar update doctum-config.php -v --ignore-parse-errors
         - run: |
             git submodule add -q -f -b gh-pages https://github.com/${{ github.repository }} ghpages
             rsync -aP build/* ghpages/
