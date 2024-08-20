@@ -7,15 +7,16 @@ on:
                 type: string
                 default: "Reference Documentation"
                 required: true
-            tag:
+            default_tag:
                 type: string
-                description: "The version tag to use for the documentation. Uses current tag if empty."
-            exclude:
-                type: string
-                description: "JSON array of directories to exclude from documentation"
+                description: "The version tag to use as the latest version."
             exclude_file:
                 type: string
                 description: "exclude a file from documentation"
+            tag_pattern:
+                type: string
+                description: "tags to include in version selector"
+                default: "v1.*"
 
 permissions:
   contents: write
@@ -31,16 +32,6 @@ jobs:
           uses: shivammathur/setup-php@v2
           with:
             php-version: 8.1
-        - if: inputs.tag == ''
-          id: getTag
-          name: Get Tag
-          run: |
-            TAG=${GITHUB_REF#refs/*/}
-            if [ -z "$TAG" ]; then
-                echo "No tag found"
-                exit 1
-            fi
-            echo ::set-output name=tag::$TAG
         - name: Download Doctum
           run: |
             curl -# https://doctum.long-term.support/releases/5.5/doctum.phar -o doctum.phar
@@ -51,24 +42,32 @@ jobs:
             DOCTUM_CONFIG=$(cat <<'EOF'
                 <?php
                 use Doctum\Doctum;
-                use Symfony\Component\Finder\Finder;
                 use Doctum\RemoteRepository\GitHubRemoteRepository;
+                use Doctum\Version\GitVersionCollection;
+                use Symfony\Component\Finder\Finder;
 
                 $iterator = Finder::create()
                     ->files()
                     ->name('*.php')
-                    ->notName("${{ inputs.exclude_file }}")
+                    ->notName('${{ inputs.exclude_file }}')
                     ->exclude('GPBMetadata')
-                    ->exclude(json_decode('${{ inputs.exclude }}', true) ?: '${{ inputs.exclude }}')
                     ->in(__DIR__ . '/src');
+
+                $versions = GitVersionCollection::create(__DIR__);
+                if ('${{ inputs.tag_pattern }}') {
+                    $versions->addFromTags('${{ inputs.tag_pattern }}');
+                } else {
+                    $versions->add('main', 'main');
+                }
 
                 return new Doctum($iterator, [
                     'title'                => '${{ inputs.title }}',
-                    'version'              => '${{ inputs.tag || steps.getTag.outputs.tag }}',
+                    'versions'             => $versions,
                     'build_dir'            => __DIR__ . '/.build/%version%',
                     'cache_dir'            => __DIR__ . '/.cache/%version%',
                     'remote_repository'    => new GitHubRemoteRepository('${{ github.repository }}', __DIR__),
-                    'default_opened_level' => 1,
+                    'default_opened_level' => 2,
+                    'base_url' => 'https://googleapis.github.io/${{ github.event.repository.name }}',
                 ]);
             EOF
             )
@@ -76,11 +75,12 @@ jobs:
             echo $DOCTUM_CONFIG > doctum-config.php;
         - name: Run Doctum to Generate Documentation
           run: |
-            php doctum.phar update doctum-config.php -v --ignore-parse-errors
-        - name: Redirect Index to Latest Version
+            php doctum.phar update doctum-config.php --ignore-parse-errors
+        - if: inputs.default_tag
+          name: Redirect Index to Latest Version
           run: |
             cat << EOF > .build/index.html
-              <meta http-equiv='refresh' content='0;url=/${{github.event.repository.name}}/${{ inputs.tag || steps.getTag.outputs.tag }}'>
+              <meta http-equiv='refresh' content='0;url=/${{ github.event.repository.name }}/${{ inputs.default_tag }}'>
             EOF
         - name: Move generated files into GitHub Pages branch
           run: |
