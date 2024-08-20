@@ -9,6 +9,10 @@ on:
                 required: true
             tag:
                 type: string
+                description: "The version tag to use for the documentation. Uses current tag if empty."
+            exclude:
+                type: string
+                description: "JSON array of directories to exclude from documentation"
 
 permissions:
   contents: write
@@ -24,6 +28,16 @@ jobs:
           uses: shivammathur/setup-php@v2
           with:
             php-version: 8.1
+        - if: !inputs.tag
+          id: getTag
+          name: Get Tag
+          run: |
+            TAG=${GITHUB_REF#refs/*/}
+            if [ -z "$TAG" ]; then
+                echo "No tag found"
+                exit 1
+            fi
+            echo ::set-output name=tag::$TAG
         - name: Download Doctum
           run: |
             curl -# https://doctum.long-term.support/releases/5.5/doctum.phar -o doctum.phar
@@ -41,11 +55,12 @@ jobs:
                     ->files()
                     ->name('*.php')
                     ->exclude('GPBMetadata')
+                    ->exclude(json_decode(${{ inputs.exclude || '[]' }}. true))
                     ->in(__DIR__ . '/src');
 
                 return new Doctum($iterator, [
                     'title'                => '${{ inputs.title }}',
-                    'version'              => '${{ inputs.tag }}',
+                    'version'              => '${{ inputs.tag || steps.getTag.outputs.tag }}',
                     'build_dir'            => __DIR__ . '/.build/%version%',
                     'cache_dir'            => __DIR__ . '/.cache/%version%',
                     'remote_repository'    => new GitHubRemoteRepository('${{ github.repository }}', __DIR__),
@@ -61,7 +76,7 @@ jobs:
         - name: Redirect Index to Latest Version
           run: |
             cat << EOF > .build/index.html
-              <meta http-equiv='refresh' content='0;url=/${{github.event.repository.name}}/${{ inputs.tag }}'>
+              <meta http-equiv='refresh' content='0;url=/${{github.event.repository.name}}/${{ inputs.tag || steps.getTag.outputs.tag }}'>
             EOF
 
         - run: |
