@@ -13,6 +13,9 @@ on:
             exclude:
                 type: string
                 description: "JSON array of directories to exclude from documentation"
+            exclude_file:
+                type: string
+                description: "exclude a file from documentation"
 
 permissions:
   contents: write
@@ -54,8 +57,9 @@ jobs:
                 $iterator = Finder::create()
                     ->files()
                     ->name('*.php')
+                    ->notFile("${{ inputs.exclude_file }}")
                     ->exclude('GPBMetadata')
-                    ->exclude(json_decode('{{ inputs.exclude }}', true) ?: '${{ inputs.exclude }}')
+                    ->exclude(json_decode('${{ inputs.exclude }}', true) ?: '${{ inputs.exclude }}')
                     ->in(__DIR__ . '/src');
 
                 return new Doctum($iterator, [
