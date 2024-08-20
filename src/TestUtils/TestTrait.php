@@ -50,7 +50,8 @@ trait TestTrait
         }
 
         self::markTestSkipped(
-            sprintf('Set the %s environment variable',
+            sprintf(
+                'Set the %s environment variable',
                 implode(' or ', (array) $varName)
             )
         );

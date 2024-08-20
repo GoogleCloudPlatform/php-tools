@@ -119,7 +119,9 @@ class Project
         chdir($this->dir);
         exec(
             'composer update --no-interaction --no-progress --no-ansi',
-            $output, $ret);
+            $output,
+            $ret
+        );
         $this->info = array_merge($this->info, $output);
         if ($ret !== 0) {
             $this->errors[] = 'Failed to run composer update in ' . $this->dir
