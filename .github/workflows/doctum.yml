@@ -57,7 +57,7 @@ jobs:
                 $iterator = Finder::create()
                     ->files()
                     ->name('*.php')
-                    ->notFile("${{ inputs.exclude_file }}")
+                    ->notName("${{ inputs.exclude_file }}")
                     ->exclude('GPBMetadata')
                     ->exclude(json_decode('${{ inputs.exclude }}', true) ?: '${{ inputs.exclude }}')
                     ->in(__DIR__ . '/src');
