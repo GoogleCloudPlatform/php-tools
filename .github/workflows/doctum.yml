@@ -49,7 +49,7 @@ jobs:
             sha256sum --strict --check doctum.phar.sha256
         - name: Generate Doctum Config
           run: |
-            DOCTUM_CONFIG=$(cat <<-EOF
+            DOCTUM_CONFIG=$(cat <<EOF
                 <?php
                 use Doctum\Doctum;
                 use Symfony\Component\Finder\Finder;
@@ -69,6 +69,7 @@ jobs:
                     'remote_repository'    => new GitHubRemoteRepository('${{ github.repository }}', __DIR__),
                     'default_opened_level' => 1,
                 ]);
+            EOF
             )
             echo $DOCTUM_CONFIG; # for debugging
             echo $DOCTUM_CONFIG > doctum-config.php;
