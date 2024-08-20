@@ -9,10 +9,8 @@ on:
         required: true
       version:
         type: string
-        required: true
-      path:
+      tag:
         type: string
-        default: "."
 
 permissions:
   contents: write
@@ -22,24 +20,24 @@ jobs:
         name: "Generate and Deploy Documentation"
         runs-on: ubuntu-latest
         steps:
-        # - name: Checkout
-        #   uses: actions/checkout@v4
-        # - id: getTag
-        #   name: Get Tag
-        #   run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
-        # - name: Setup PHP
-        #   uses: shivammathur/setup-php@v2
-        #   with:
-        #     php-version: 8.1
-        # - name: Strip "v" from Version
-        #   id: strip_v
-        #   run: |
-        #     # Remove "v" from start of string if it exists
-        #     TAG=${{ steps.getTag.outputs.tag }}
-        #     if [[ ${TAG::1} == "v" ]]; then
-        #         TAG="${TAG:1}"
-        #     fi
-        #     echo "tag=$TAG" >> $GITHUB_OUTPUT
+        - name: Checkout
+          uses: actions/checkout@v4
+        - if: ${{ !inputs.tag && !inputs.version }}
+          run: echo "Either a tag or version must be provided"; exit 1;
+        - if: inputs.tag
+          id: getTag
+          name: Get Tag
+          run: echo ::set-output name=tag::${{ inputs.tag }}
+        - if: ${{ inputs.tag }}
+          name: Strip "v" from Version
+          id: strip_v
+          run: |
+            # Remove "v" from start of string if it exists
+            TAG=${{ steps.getTag.outputs.tag }}
+            if [[ ${TAG::1} == "v" ]]; then
+                TAG="${TAG:1}"
+            fi
+            echo "tag=$TAG" >> $GITHUB_OUTPUT
         - name: Setup PHP
           uses: shivammathur/setup-php@v2
           with:
@@ -65,7 +63,7 @@ jobs:
 
                 return new Doctum(\$iterator, [
                     'title'                => '${{ inputs.title }}',
-                    'version'              => '${{ inputs.version }}',
+                    'version'              => '${{ inputs.version || steps.strip_v.outputs.tag }}',
                     'build_dir'            => __DIR__ . "/.build/%version%",
                     'cache_dir'            => __DIR__ . "/.cache/%version%",
                     'remote_repository'    => new GitHubRemoteRepository('${{ github.repository }}', __DIR__),
