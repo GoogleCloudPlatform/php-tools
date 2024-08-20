@@ -17,6 +17,10 @@ on:
                 type: string
                 description: "tags to include in version selector"
                 default: "v1.*"
+            include_search:
+                type: boolean
+                description: whether or not to include search
+                default: true
 
 permissions:
   contents: write
@@ -69,7 +73,7 @@ jobs:
                     'cache_dir'            => __DIR__ . '/.cache/%version%',
                     'remote_repository'    => new GitHubRemoteRepository('${{ github.repository }}', __DIR__),
                     'default_opened_level' => 2,
-                    'base_url' => 'https://googleapis.github.io/${{ github.event.repository.name }}',
+                    'base_url' => ${{ inputs.include_search }} ? 'https://googleapis.github.io/${{ github.event.repository.name }}' : null,
                 ]);
             EOF
             )
