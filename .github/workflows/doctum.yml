@@ -7,8 +7,6 @@ on:
                 type: string
                 default: "Reference Documentation"
                 required: true
-            version:
-                type: string
             tag:
                 type: string
 
@@ -22,22 +20,6 @@ jobs:
         steps:
         - name: Checkout
           uses: actions/checkout@v4
-        - if: ${{ !inputs.tag && !inputs.version }}
-          run: echo "Either a tag or version must be provided"; exit 1;
-        - if: inputs.tag
-          id: getTag
-          name: Get Tag
-          run: echo ::set-output name=tag::${{ inputs.tag }}
-        - if: ${{ inputs.tag }}
-          name: Strip "v" from Version
-          id: strip_v
-          run: |
-            # Remove "v" from start of string if it exists
-            TAG=${{ steps.getTag.outputs.tag }}
-            if [[ ${TAG::1} == "v" ]]; then
-                TAG="${TAG:1}"
-            fi
-            echo "tag=$TAG" >> $GITHUB_OUTPUT
         - name: Setup PHP
           uses: shivammathur/setup-php@v2
           with:
@@ -49,21 +31,21 @@ jobs:
             sha256sum --strict --check doctum.phar.sha256
         - name: Generate Doctum Config
           run: |
-            DOCTUM_CONFIG=$(cat <<EOF
+            DOCTUM_CONFIG=$(cat <<'EOF'
                 <?php
                 use Doctum\Doctum;
                 use Symfony\Component\Finder\Finder;
                 use Doctum\RemoteRepository\GitHubRemoteRepository;
 
-                \$iterator = Finder::create()
+                $iterator = Finder::create()
                     ->files()
                     ->name('*.php')
                     ->exclude('GPBMetadata')
                     ->in(__DIR__ . '/src');
 
-                return new Doctum(\$iterator, [
+                return new Doctum($iterator, [
                     'title'                => '${{ inputs.title }}',
-                    'version'              => '${{ inputs.version || steps.strip_v.outputs.tag }}',
+                    'version'              => '${{ inputs.tag }}',
                     'build_dir'            => __DIR__ . '/.build/%version%',
                     'cache_dir'            => __DIR__ . '/.cache/%version%',
                     'remote_repository'    => new GitHubRemoteRepository('${{ github.repository }}', __DIR__),
@@ -73,9 +55,15 @@ jobs:
             )
             echo $DOCTUM_CONFIG; # for debugging
             echo $DOCTUM_CONFIG > doctum-config.php;
-        - name: Generate Documentation
+        - name: Run Doctum to Generate Documentation
           run: |
             php doctum.phar update doctum-config.php -v --ignore-parse-errors
+        - name: Redirect Index to Latest Version
+          run: |
+            cat << EOF > .build/index.html
+              <meta http-equiv='refresh' content='0;url=/${{github.event.repository.name}}/${{ inputs.tag }}'>
+            EOF
+
         - run: |
             git submodule add -q -f -b gh-pages https://github.com/${{ github.repository }} .ghpages
             rsync -aP .build/* .ghpages/
