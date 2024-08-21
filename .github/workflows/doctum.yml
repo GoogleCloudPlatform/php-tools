@@ -20,6 +20,10 @@ on:
             dry_run:
                 type: boolean
                 description: "do not deploy to gh-pages"
+            theme:
+                type: string
+                description: "doctum theme"
+                default: default
 
 permissions:
   contents: write
@@ -65,12 +69,13 @@ jobs:
 
             return new Doctum($iterator, [
                 'title'                => '${{ inputs.title }}',
+                'theme'                => '${{ inputs.theme }}',
                 'versions'             => $versions,
                 'build_dir'            => __DIR__ . '/.build/%version%',
                 'cache_dir'            => __DIR__ . '/.cache/%version%',
                 'remote_repository'    => new GitHubRemoteRepository('${{ github.repository }}', __DIR__),
                 'default_opened_level' => 2,
-                // 'base_url' => 'https://googleapis.github.io/${{ github.event.repository.name }}',
+                'template_dirs'        => [__DIR__ . '/.github'],
             ]);
             EOF
             )
