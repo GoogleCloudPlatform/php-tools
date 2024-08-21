@@ -25,6 +25,7 @@ on:
             "return_type_declaration": {"space_before": "none"},
             "single_quote": true,
             "single_space_around_construct": true,
+            "cast_spaces": true,
             "whitespace_after_comma_in_array": true
           }
 
