@@ -44,6 +44,6 @@
         "google/cloud-dlp": "^1.10",
         "google/cloud-storage": "^1.33",
         "google/cloud-secret-manager": "^1.12",
-        "symfony/yaml": "^6.4"
+        "symfony/yaml": "^5"
     }
 }
