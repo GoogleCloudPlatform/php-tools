@@ -55,6 +55,9 @@ jobs:
             use Doctum\Version\GitVersionCollection;
             use Symfony\Component\Finder\Finder;
 
+            $defaultVersion = '${{ inputs.default_version }}';
+            $tagPattern = '${{ inputs.tag_pattern }}';
+
             $iterator = Finder::create()
                 ->files()
                 ->name('*.php')
@@ -63,11 +66,11 @@ jobs:
                 ->in(__DIR__ . '/src');
 
             $versions = GitVersionCollection::create(__DIR__);
-            if ('${{ inputs.tag_pattern }}') {
-                $versions->addFromTags('${{ inputs.tag_pattern }}');
+            if ($tagPattern) {
+                $versions->addFromTags($tagPattern);
             }
-            if ('${{ inputs.default_version }}') {
-                $versions->add('${{ inputs.default_version }}', '${{ inputs.default_version }}');
+            if ($defaultVersion) {
+                $versions->add($defaultVersion, $defaultVersion);
             }
 
             return new Doctum($iterator, [
