@@ -17,6 +17,9 @@ on:
                 type: string
                 description: "tags to include in version selector"
                 default: "v1.*"
+            dry_run:
+                type: boolean
+                description: "do not deploy to gh-pages"
 
 permissions:
   contents: write
@@ -42,39 +45,37 @@ jobs:
         - name: Generate Doctum Config
           run: |
             DOCTUM_CONFIG=$(cat <<'EOF'
-                <?php
-                use Doctum\Doctum;
-                use Doctum\RemoteRepository\GitHubRemoteRepository;
-                use Doctum\Version\GitVersionCollection;
-                use Symfony\Component\Finder\Finder;
+            <?php
+            use Doctum\Doctum;
+            use Doctum\RemoteRepository\GitHubRemoteRepository;
+            use Doctum\Version\GitVersionCollection;
+            use Symfony\Component\Finder\Finder;
 
-                $iterator = Finder::create()
-                    ->files()
-                    ->name('*.php')
-                    ->notName('${{ inputs.exclude_file }}')
-                    ->exclude('GPBMetadata')
-                    ->in(__DIR__ . '/src');
+            $iterator = Finder::create()
+                ->files()
+                ->name('*.php')
+                ->notName('${{ inputs.exclude_file }}')
+                ->exclude('GPBMetadata')
+                ->in(__DIR__ . '/src');
 
-                $versions = GitVersionCollection::create(__DIR__);
-                if ('${{ inputs.tag_pattern }}') {
-                    $versions->addFromTags('${{ inputs.tag_pattern }}');
-                } else {
-                    $versions->add('main', 'main');
-                }
+            $versions = GitVersionCollection::create(__DIR__);
+            empty('${{ inputs.tag_pattern }}')
+                ? $versions->add('main', 'main')
+                : $versions->addFromTags('${{ inputs.tag_pattern }}');
 
-                return new Doctum($iterator, [
-                    'title'                => '${{ inputs.title }}',
-                    'versions'             => $versions,
-                    'build_dir'            => __DIR__ . '/.build/%version%',
-                    'cache_dir'            => __DIR__ . '/.cache/%version%',
-                    'remote_repository'    => new GitHubRemoteRepository('${{ github.repository }}', __DIR__),
-                    'default_opened_level' => 2,
-                    // 'base_url' => 'https://googleapis.github.io/${{ github.event.repository.name }}',
-                ]);
+            return new Doctum($iterator, [
+                'title'                => '${{ inputs.title }}',
+                'versions'             => $versions,
+                'build_dir'            => __DIR__ . '/.build/%version%',
+                'cache_dir'            => __DIR__ . '/.cache/%version%',
+                'remote_repository'    => new GitHubRemoteRepository('${{ github.repository }}', __DIR__),
+                'default_opened_level' => 2,
+                // 'base_url' => 'https://googleapis.github.io/${{ github.event.repository.name }}',
+            ]);
             EOF
             )
-            echo $DOCTUM_CONFIG; # for debugging
-            echo $DOCTUM_CONFIG > doctum-config.php;
+            echo "$DOCTUM_CONFIG"; # for debugging
+            echo "$DOCTUM_CONFIG" > doctum-config.php;
         - name: Run Doctum to Generate Documentation
           run: |
             php doctum.phar update doctum-config.php --ignore-parse-errors
@@ -84,11 +85,13 @@ jobs:
             cat << EOF > .build/index.html
               <meta http-equiv='refresh' content='0;url=/${{ github.event.repository.name }}/${{ inputs.default_tag }}'>
             EOF
-        - name: Move generated files into GitHub Pages branch
+        - if: !inputs.dry_run
+          name: Move generated files into GitHub Pages branch
           run: |
             git submodule add -q -f -b gh-pages https://github.com/${{ github.repository }} .ghpages
             rsync -aP .build/* .ghpages/
-        - name: Deploy 🚀
+        - if: !inputs.dry_run
+          name: Deploy 🚀
           uses: JamesIves/github-pages-deploy-action@releases/v3
           with:
             ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}

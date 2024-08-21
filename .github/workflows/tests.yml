@@ -39,3 +39,8 @@ jobs:
     static-analysis:
         uses: ./.github/workflows/static-analysis.yml
 
+    build_docs:
+      uses: ./.github/workflows/doctum.yml
+      with:
+        title: "Google Cloud PHP Tools"
+        dry_run: true
