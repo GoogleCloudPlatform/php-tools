@@ -7,12 +7,13 @@ on:
                 type: string
                 default: "Reference Documentation"
                 required: true
-            default_tag:
+            theme:
+                type: string
+                description: "doctum theme"
+                default: default
+            default_version:
                 type: string
                 description: "The version tag to use as the latest version."
-            exclude_file:
-                type: string
-                description: "exclude a file from documentation"
             tag_pattern:
                 type: string
                 description: "tags to include in version selector"
@@ -20,10 +21,9 @@ on:
             dry_run:
                 type: boolean
                 description: "do not deploy to gh-pages"
-            theme:
-                type: string
-                description: "doctum theme"
-                default: default
+            exclude_file:
+              type: string
+              description: "exclude a file from documentation"
 
 permissions:
   contents: write
@@ -63,9 +63,12 @@ jobs:
                 ->in(__DIR__ . '/src');
 
             $versions = GitVersionCollection::create(__DIR__);
-            empty('${{ inputs.tag_pattern }}')
-                ? $versions->add('main', 'main')
-                : $versions->addFromTags('${{ inputs.tag_pattern }}');
+            if ('${{ inputs.tag_pattern }}') {
+                $versions->addFromTags('${{ inputs.tag_pattern }}');
+            }
+            if ('${{ inputs.default_version }}') {
+                $versions->add('${{ inputs.default_version }}', '${{ inputs.default_version }}');
+            }
 
             return new Doctum($iterator, [
                 'title'                => '${{ inputs.title }}',
@@ -84,11 +87,11 @@ jobs:
         - name: Run Doctum to Generate Documentation
           run: |
             php doctum.phar update doctum-config.php --ignore-parse-errors
-        - if: inputs.default_tag
+        - if: inputs.default_version
           name: Redirect Index to Latest Version
           run: |
             cat << EOF > .build/index.html
-              <meta http-equiv='refresh' content='0;url=/${{ github.event.repository.name }}/${{ inputs.default_tag }}'>
+              <meta http-equiv='refresh' content='0;url=/${{ github.event.repository.name }}/${{ inputs.default_version }}'>
             EOF
         - if: ${{ !inputs.dry_run }}
           name: Move generated files into GitHub Pages branch
