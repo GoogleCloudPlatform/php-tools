@@ -90,13 +90,13 @@ jobs:
         - name: Run Doctum to Generate Documentation
           run: |
             php doctum.phar update doctum-config.php --ignore-parse-errors
-        - if: inputs.default_version
-          name: Redirect Index to Latest Version
-          run: |
             if [ ! -d .build ]; then
               echo "Action did not generate any documentation. Did you forget to provide a default_version or tag_pattern?";
               exit 1;
             fi
+        - if: inputs.default_version
+          name: Redirect Index to Latest Version
+          run: |
             cat << EOF > .build/index.html
               <meta http-equiv='refresh' content='0;url=/${{ github.event.repository.name }}/${{ inputs.default_version }}'>
             EOF
