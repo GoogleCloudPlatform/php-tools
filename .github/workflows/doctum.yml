@@ -93,7 +93,7 @@ jobs:
         - if: inputs.default_version
           name: Redirect Index to Latest Version
           run: |
-            if [ ! -f .build/index.html ]; then
+            if [ ! -d .build ]; then
               echo "Action did not generate any documentation. Did you forget to provide a default_version or tag_pattern?";
               exit 1;
             fi
