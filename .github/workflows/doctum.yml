@@ -1,0 +1,114 @@
+name: Generate Reference Documentation
+
+on:
+    workflow_call:
+        inputs:
+            title:
+                type: string
+                default: "Reference Documentation"
+                required: true
+            theme:
+                type: string
+                description: "doctum theme"
+                default: default
+            default_version:
+                type: string
+                description: "The version tag to use as the latest version."
+            tag_pattern:
+                type: string
+                description: "tags to include in version selector"
+                default: "v1.*"
+            dry_run:
+                type: boolean
+                description: "do not deploy to gh-pages"
+            exclude_file:
+              type: string
+              description: "exclude a file from documentation"
+
+permissions:
+  contents: write
+
+jobs:
+    docs:
+        name: "Generate and Deploy Documentation"
+        runs-on: ubuntu-latest
+        steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+          with:
+            fetch-depth: 0
+        - name: Setup PHP
+          uses: shivammathur/setup-php@v2
+          with:
+            php-version: 8.1
+        - name: Download Doctum
+          run: |
+            curl -# https://doctum.long-term.support/releases/5.5/doctum.phar -o doctum.phar
+            curl -# https://doctum.long-term.support/releases/5.5/doctum.phar.sha256  -o doctum.phar.sha256
+            sha256sum --strict --check doctum.phar.sha256
+        - name: Generate Doctum Config
+          run: |
+            DOCTUM_CONFIG=$(cat <<'EOF'
+            <?php
+            use Doctum\Doctum;
+            use Doctum\RemoteRepository\GitHubRemoteRepository;
+            use Doctum\Version\GitVersionCollection;
+            use Symfony\Component\Finder\Finder;
+
+            $defaultVersion = '${{ inputs.default_version }}';
+            $tagPattern = '${{ inputs.tag_pattern }}';
+
+            $iterator = Finder::create()
+                ->files()
+                ->name('*.php')
+                ->notName('${{ inputs.exclude_file }}')
+                ->exclude('GPBMetadata')
+                ->in(__DIR__ . '/src');
+
+            $versions = GitVersionCollection::create(__DIR__);
+            if ($tagPattern) {
+                $versions->addFromTags($tagPattern);
+            }
+            if ($defaultVersion) {
+                $versions->add($defaultVersion, $defaultVersion);
+            }
+
+            return new Doctum($iterator, [
+                'title'                => '${{ inputs.title }}',
+                'theme'                => '${{ inputs.theme }}',
+                'versions'             => $versions,
+                'build_dir'            => __DIR__ . '/.build/%version%',
+                'cache_dir'            => __DIR__ . '/.cache/%version%',
+                'remote_repository'    => new GitHubRemoteRepository('${{ github.repository }}', __DIR__),
+                'default_opened_level' => 2,
+                'template_dirs'        => [__DIR__ . '/.github'],
+            ]);
+            EOF
+            )
+            echo "$DOCTUM_CONFIG"; # for debugging
+            echo "$DOCTUM_CONFIG" > doctum-config.php;
+        - name: Run Doctum to Generate Documentation
+          run: |
+            php doctum.phar update doctum-config.php --ignore-parse-errors
+            if [ ! -d .build ]; then
+              echo "Action did not generate any documentation. Did you forget to provide a default_version or tag_pattern?";
+              exit 1;
+            fi
+        - if: inputs.default_version
+          name: Redirect Index to Latest Version
+          run: |
+            cat << EOF > .build/index.html
+              <meta http-equiv='refresh' content='0;url=/${{ github.event.repository.name }}/${{ inputs.default_version }}'>
+            EOF
+        - if: ${{ !inputs.dry_run }}
+          name: Move generated files into GitHub Pages branch
+          run: |
+            git submodule add -q -f -b gh-pages https://github.com/${{ github.repository }} .ghpages
+            rsync -aP .build/* .ghpages/
+        - if: ${{ !inputs.dry_run }}
+          name: Deploy 🚀
+          uses: JamesIves/github-pages-deploy-action@releases/v3
+          with:
+            ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            BRANCH: gh-pages
+            FOLDER: .ghpages
