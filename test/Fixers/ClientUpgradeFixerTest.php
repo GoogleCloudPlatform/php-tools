@@ -11,7 +11,7 @@ class ClientUpgradeFixerTest extends TestCase
 {
     private ClientUpgradeFixer $fixer;
 
-    private const SAMPLES_DIR = __DIR__ . '/../../examples/ClientUpgradeFixer/';
+    private const SAMPLES_DIR = __DIR__ . '/../../src/Fixers/ClientUpgradeFixer/examples/';
 
     public function setUp(): void
     {
