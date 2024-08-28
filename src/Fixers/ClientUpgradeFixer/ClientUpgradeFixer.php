@@ -49,8 +49,8 @@ class ClientUpgradeFixer extends AbstractFixer implements ConfigurableFixerInter
     {
         if (!class_exists('Google\Auth\OAuth2')) {
             throw new \LogicException(
-                'In order for Google\Cloud\NewSurfaceFixer to work, you must install the google '
-                . 'cloud client library and include its autoloader in .php-cs-fixer.dist.php'
+                'In order for Google\Cloud\NewSurfaceFixer to work, you must install the '
+                . 'google/cloud client library and include its autoloader in .php-cs-fixer.dist.php'
             );
         }
 

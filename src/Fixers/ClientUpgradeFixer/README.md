@@ -10,21 +10,16 @@ It is also not guaranteed by Google in any way.
 ## Installation
 
 
-Install the `google/cloud-tools` package, which includes the fixer:
+Install the `google/cloud-tools` package, which includes the `ClientUpgradeFixer`,
+along with the `friendsofphp/php-cs-fixer` package:
 
 ```sh
-composer require --dev "google/cloud-tools"
-```
-
-Install `friendsofphp/php-cs-fixer`:
-
-```sh
-composer require --dev "friendsofphp/php-cs-fixer:^3.21"
+composer require --dev "google/cloud-tools" "friendsofphp/php-cs-fixer:^3.21"
 ```
 
 ## Running the fixer
 
-First, create a `.php-cs-fixer.google.php` in your project which will be
+Create the file `.php-cs-fixer.google.php` in your project, which will be
 configured to use the custom fixer:
 
 ```php
@@ -40,7 +35,7 @@ return (new PhpCsFixer\Config())
         new Google\Cloud\Fixers\ClientUpgradeFixer\ClientUpgradeFixer(),
     ])
     ->setRules([
-        // See "Configuring Client Vars" below for more configuration options
+        // See "Configuring Client Vars" for more configuration options
         'GoogleCloud/upgrade_clients' => true,
     ])
 ;
@@ -53,8 +48,14 @@ Next run this fixer with the following command:
 export DIR=vendor/google/cloud-tools/examples/ClientUpgradeFixer
 
 # run the CS fixer for that directory using the config above
-vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.google.php --dry-run --diff $DIR
+vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.google.php --dry-run --diff $DIR -vv
 ```
+
+<?php
+// .php-cs-fixer.google.php
+
+// The fixer MUST autoload google/cloud classes.
+require __DIR__ . '/vendor/autoload.php';
 
 You should get an output similar to this
 
@@ -124,4 +125,48 @@ return (new PhpCsFixer\Config())
         ],
     ])
 ;
+```
+
+This will ensure that these variables are updated wherever they are:
+
+```diff
+6c6,8
+< use Google\Cloud\Dlp\V2\DlpServiceClient;
+---
+> use Google\Cloud\Dlp\V2\Client\DlpServiceClient;
+> use Google\Cloud\Dlp\V2\ListInfoTypesRequest;
+> use Google\Cloud\SecretManager\V1\ListSecretsRequest;
+12c14,15
+< $infoTypes = $myclient->listInfoTypes();
+---
+> $listInfoTypesRequest = new ListInfoTypesRequest();
+> $infoTypes = $myclient->listInfoTypes($listInfoTypesRequest);
+14c17,19
+< $secrets = $secretmanager->listSecrets('this/is/a/parent');
+---
+> $listSecretsRequest = (new ListSecretsRequest())
+>     ->setParent('this/is/a/parent');
+> $secrets = $secretmanager->listSecrets($listSecretsRequest);
+27,28c32,35
+<         $this->dlp->listInfoTypes();
+<         self::$dlp->listInfoTypes();
+---
+>         $listInfoTypesRequest2 = new ListInfoTypesRequest();
+>         $this->dlp->listInfoTypes($listInfoTypesRequest2);
+>         $listInfoTypesRequest3 = new ListInfoTypesRequest();
+>         self::$dlp->listInfoTypes($listInfoTypesRequest3);
+41,44c48,55
+<         $this->secretManagerClient->listSecrets();
+<         $this::$secretManagerClient->listSecrets();
+<         $this->parent->secretManagerClient->listSecrets();
+<         $this->parent::$secretManagerClient->listSecrets();
+---
+>         $listSecretsRequest2 = new ListSecretsRequest();
+>         $this->secretManagerClient->listSecrets($listSecretsRequest2);
+>         $listSecretsRequest3 = new ListSecretsRequest();
+>         $this::$secretManagerClient->listSecrets($listSecretsRequest3);
+>         $listSecretsRequest4 = new ListSecretsRequest();
+>         $this->parent->secretManagerClient->listSecrets($listSecretsRequest4);
+>         $listSecretsRequest5 = new ListSecretsRequest();
+>         $this->parent::$secretManagerClient->listSecrets($listSecretsRequest5);
 ```
