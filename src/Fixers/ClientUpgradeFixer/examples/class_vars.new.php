@@ -38,14 +38,20 @@ class ClientWrapper extends TestCase
             ->setParent('this/is/a/parent');
         $secrets = $this->secretmanager->listSecrets($listSecretsRequest);
     }
+
+    public function callDlpFromFunction(DlpServiceClient $client)
+    {
+        $listInfoTypesRequest2 = new ListInfoTypesRequest();
+        $infoTypes = $client->listInfoTypes($listInfoTypesRequest2);
+    }
 }
 
 // Instantiate a wrapping object.
 $wrapper = new ClientWrapper();
 
 // these should update
-$listInfoTypesRequest2 = new ListInfoTypesRequest();
-$infoTypes = $wrapper->dlp->listInfoTypes($listInfoTypesRequest2);
+$listInfoTypesRequest3 = new ListInfoTypesRequest();
+$infoTypes = $wrapper->dlp->listInfoTypes($listInfoTypesRequest3);
 $listSecretsRequest2 = (new ListSecretsRequest())
     ->setParent('this/is/a/parent');
 $secrets = $wrapper->secretmanager->listSecrets($listSecretsRequest2);
