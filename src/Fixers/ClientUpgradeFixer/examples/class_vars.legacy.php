@@ -33,6 +33,11 @@ class ClientWrapper extends TestCase
     {
         $secrets = $this->secretmanager->listSecrets('this/is/a/parent');
     }
+
+    public function callDlpFromFunction(DlpServiceClient $client)
+    {
+        $infoTypes = $client->listInfoTypes();
+    }
 }
 
 // Instantiate a wrapping object.
