@@ -264,7 +264,7 @@ class FlexExecCommand extends Command
             ]
         );
         if (!empty($cmdOutput)) {
-            return  preg_split('/\s+/', $cmdOutput[0])[0];
+            return preg_split('/\s+/', $cmdOutput[0])[0];
         }
     }
 }
