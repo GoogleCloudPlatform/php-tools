@@ -35,7 +35,7 @@ return (new PhpCsFixer\Config())
         new Google\Cloud\Fixers\ClientUpgradeFixer\ClientUpgradeFixer(),
     ])
     ->setRules([
-        // See "Configuring Client Vars" for more configuration options
+        // See "Configuring Client Variables" for more configuration options
         'GoogleCloud/upgrade_clients' => true,
     ])
 ;
@@ -89,14 +89,58 @@ You should get an output similar to this
       ----------- end diff -----------
 ```
 
-## Configuring Client Vars
+## Client Variable detection
+
+Client variables are detected in the same file as long as one of the following
+takes place:
+
+ - The variable is assigned to a client instance using the `new` keyword
+   ```php
+   $client = new DlpServiceClient()
+   ```
+ - The variable class is defined using "@var" in a comment
+   ```php
+   /** @var DlpServiceClient */
+   $dlp = $container->getDlpClient();
+   ```
+ - The variable is passed into a function where the parameter is typehinted with
+   the client class
+   ```php
+   public function callDlp(DlpServiceClient $dlp)
+   ```
+ - The variable is defined with a typehint as a client property
+   ```php
+   private DlpServiceClient $dlp;
+   private static DlpServiceClient $dlpStatic;
+   ```
+
+For all other cases, a map of variable name to class name can be configured using
+the `clientVars` configuration in `.php-cs-fixer.google.php` (see below).
+
+## Configuring Client Variables
 
 There are instances where the fixer cannot detect where a client variable is
 defined. For instance, variables defined in dependency injection containers.
-For these, you can add to `clientVars` an array of variable names and their
-classes:
+For these, you can add to the `clientVars` configuration a amap of your variable
+names and their client classes:
 
 ```php
+$clientVars = [
+    // a variable that was not detected
+    '$myclient' => 'Google\\Cloud\\SecretManager\\V1\\SecretManagerServiceClient',
+
+    // a variable that is called inside a class
+    '$this->dlp' => 'Google\\Cloud\\Dlp\\V2\\DlpServiceClient',
+    'self::$dlp' => 'Google\\Cloud\\Dlp\\V2\\DlpServiceClient',
+
+    // a variable in a class property
+    '$classWrapper->dlp' => 'Google\\Cloud\\Dlp\\V2\\DlpServiceClient',
+    '$classWrapper::$dlp' => 'Google\\Cloud\\Dlp\\V2\\DlpServiceClient',
+
+    // match all class instance variables (regardless of where they're being called)
+    'secretManagerClient' => 'Google\\Cloud\\SecretManager\\V1\\SecretManagerServiceClient',
+];
+
 return (new PhpCsFixer\Config())
     ->registerCustomFixers([
         new Google\Cloud\Fixers\ClientUpgradeFixer\ClientUpgradeFixer(),
@@ -104,18 +148,7 @@ return (new PhpCsFixer\Config())
     ->setRules([
         'GoogleCloud/upgrade_clients' => [
             // array of variable names to their legacy class names
-            'clientVars' => [
-                // a variable that was not detected
-                '$myclient' => 'Google\\Cloud\\SecretManager\\V1\\SecretManagerServiceClient',
-
-                // a variable that is part of a class
-                '$this->dlp' => 'Google\\Cloud\\Dlp\\V2\\DlpServiceClient',
-                'self::$dlp' => 'Google\\Cloud\\Dlp\\V2\\DlpServiceClient',
-
-                // match all variable by name (regardless of where they're being called)
-                'secretManagerClient' => 'Google\\Cloud\\SecretManager\\V1\\SecretManagerServiceClient',
-                '$secretManagerClient' => 'Google\\Cloud\\SecretManager\\V1\\SecretManagerServiceClient',
-            ]
+            'clientVars' => $clientVars
         ],
     ])
 ;
