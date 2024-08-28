@@ -51,12 +51,6 @@ export DIR=vendor/google/cloud-tools/examples/ClientUpgradeFixer
 vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.google.php --dry-run --diff $DIR -vv
 ```
 
-<?php
-// .php-cs-fixer.google.php
-
-// The fixer MUST autoload google/cloud classes.
-require __DIR__ . '/vendor/autoload.php';
-
 You should get an output similar to this
 
 ```diff
