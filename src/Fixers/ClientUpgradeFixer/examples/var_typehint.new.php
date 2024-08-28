@@ -59,8 +59,9 @@ class VariablesInsideClass extends TestCase
     public function callDlp()
     {
         // These should update
-        $listInfoTypesRequest2 = new ListInfoTypesRequest();
-        $infoTypes = $this->dlp->listInfoTypes($listInfoTypesRequest2);
-        $secrets = $this->secretmanager->listSecrets('this/is/a/parent');
+        $infoTypes = $this->dlp->listInfoTypes();
+        $listSecretsRequest2 = (new ListSecretsRequest())
+            ->setParent('this/is/a/parent');
+        $secrets = $this->secretmanager->listSecrets($listSecretsRequest2);
     }
 }

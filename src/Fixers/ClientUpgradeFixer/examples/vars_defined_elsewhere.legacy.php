@@ -11,7 +11,7 @@ $dlpServiceClient = new DlpServiceClient();
 // this should update (from detection)
 $infoTypes = $dlpServiceClient->listInfoTypes();
 // this should also update (from config)
-$secrets = $secretmanager->listSecrets('this/is/a/parent');
+$secrets = $secretmanagerFromConfig->listSecrets('this/is/a/parent');
 
 // these shouldn't update
 $operations = $longrunning->listOperations();
@@ -23,22 +23,24 @@ class MyClass extends SomethingWhichDefinedAClient
 
     public function callTheDlpClient()
     {
-        $this->dlp->listInfoTypes();
-        self::$dlp->listInfoTypes();
+        // These are updated from values in the "clientVars" confguration
+        $this->dlpFromConfig->listInfoTypes();
+        self::$dlpFromConfig->listInfoTypes();
     }
 
     public function callTheDlpClientWithADifferentParent()
     {
         // these should not be updated
-        $this->parent->dlp->listInfoTypes();
-        $this->parent::$dlp->listInfoTypes();
+        $this->parent->dlpFromConfig->listInfoTypes();
+        $this->parent::$dlpFromConfig->listInfoTypes();
     }
 
     public function callSecretManagerWithWildcardParent()
     {
-        $this->secretManagerClient->listSecrets();
-        $this::$secretManagerClient->listSecrets();
-        $this->parent->secretManagerClient->listSecrets();
-        $this->parent::$secretManagerClient->listSecrets();
+        // These are updated from values in the "clientVars" confguration
+        $this->secretManagerClientFromConfig->listSecrets();
+        $this::$secretManagerClientFromConfig->listSecrets();
+        $this->parent->secretManagerClientFromConfig->listSecrets();
+        $this->parent::$secretManagerClientFromConfig->listSecrets();
     }
 }

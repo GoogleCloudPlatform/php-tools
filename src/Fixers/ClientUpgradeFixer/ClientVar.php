@@ -14,9 +14,12 @@ class ClientVar
 
     public function __construct(
         $varName,
-        $className
+        $className,
+        $parent = null
     ) {
-        if (str_contains($varName, '->')) {
+        if ($parent) {
+            $this->parent = $parent;
+        } elseif (str_contains($varName, '->')) {
             list($this->parent, $varName) = explode('->', $varName);
         } elseif (str_contains($varName, '::')) {
             list($this->parent, $varName) = explode('::', $varName);
@@ -178,6 +181,37 @@ class ClientVar
             $varName = $varToken->getContent();
             if ($clientClass = array_search($shortName, $clientShortNames)) {
                 $clientVars[$varName] = new ClientVar($varName, $clientClass);
+            }
+        }
+
+        return $clientVars;
+    }
+
+    public static function getClientVarsFromTypehint(Tokens $tokens, array $clientShortNames): array
+    {
+        $clientVars = [];
+        foreach ($tokens as $index => $token) {
+            // get variables which are set directly
+            if (!in_array($token->getContent(), $clientShortNames)) {
+                continue;
+            }
+
+            $varToken = $tokens[$tokens->getNextMeaningfulToken($index)];
+            if (!$varToken->isGivenKind(T_VARIABLE)) {
+                continue;
+            }
+
+            $prevToken = $tokens[$tokens->getPrevMeaningfulToken($index)];
+            $varName = $varToken->getContent();
+            $parent = null;
+            if (in_array($prevToken->getContent(), ['protected', 'private', 'public'])) {
+                $parent = '$this';
+                $varName = substr($varName, 1);
+            } elseif ($prevToken->getContent() === 'static') {
+                $parent = 'self';
+            }
+            if ($clientClass = array_search($token->getContent(), $clientShortNames)) {
+                $clientVars[] = new ClientVar($varName, $clientClass, $parent);
             }
         }
 

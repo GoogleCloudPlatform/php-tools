@@ -78,9 +78,10 @@ class ClientUpgradeFixer extends AbstractFixer implements ConfigurableFixerInter
             $clientShortNames[$clientClass] = $shortName;
         }
         $clientVars = array_merge(
+            ClientVar::getClientVarsFromConfiguration($this->configuration),
             ClientVar::getClientVarsFromNewKeyword($tokens, $clientShortNames),
             ClientVar::getClientVarsFromVarTypehint($tokens, $clientShortNames),
-            ClientVar::getClientVarsFromConfiguration($this->configuration),
+            ClientVar::getClientVarsFromTypehint($tokens, $clientShortNames),
         );
 
         // Find the RPC methods being called on the clients

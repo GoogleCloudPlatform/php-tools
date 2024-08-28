@@ -16,7 +16,7 @@ $infoTypes = $dlpServiceClient->listInfoTypes($listInfoTypesRequest);
 // this should also update (from config)
 $listSecretsRequest = (new ListSecretsRequest())
     ->setParent('this/is/a/parent');
-$secrets = $secretmanager->listSecrets($listSecretsRequest);
+$secrets = $secretmanagerFromConfig->listSecrets($listSecretsRequest);
 
 // these shouldn't update
 $operations = $longrunning->listOperations();
@@ -28,28 +28,30 @@ class MyClass extends SomethingWhichDefinedAClient
 
     public function callTheDlpClient()
     {
+        // These are updated from values in the "clientVars" confguration
         $listInfoTypesRequest2 = new ListInfoTypesRequest();
-        $this->dlp->listInfoTypes($listInfoTypesRequest2);
+        $this->dlpFromConfig->listInfoTypes($listInfoTypesRequest2);
         $listInfoTypesRequest3 = new ListInfoTypesRequest();
-        self::$dlp->listInfoTypes($listInfoTypesRequest3);
+        self::$dlpFromConfig->listInfoTypes($listInfoTypesRequest3);
     }
 
     public function callTheDlpClientWithADifferentParent()
     {
         // these should not be updated
-        $this->parent->dlp->listInfoTypes();
-        $this->parent::$dlp->listInfoTypes();
+        $this->parent->dlpFromConfig->listInfoTypes();
+        $this->parent::$dlpFromConfig->listInfoTypes();
     }
 
     public function callSecretManagerWithWildcardParent()
     {
+        // These are updated from values in the "clientVars" confguration
         $listSecretsRequest2 = new ListSecretsRequest();
-        $this->secretManagerClient->listSecrets($listSecretsRequest2);
+        $this->secretManagerClientFromConfig->listSecrets($listSecretsRequest2);
         $listSecretsRequest3 = new ListSecretsRequest();
-        $this::$secretManagerClient->listSecrets($listSecretsRequest3);
+        $this::$secretManagerClientFromConfig->listSecrets($listSecretsRequest3);
         $listSecretsRequest4 = new ListSecretsRequest();
-        $this->parent->secretManagerClient->listSecrets($listSecretsRequest4);
+        $this->parent->secretManagerClientFromConfig->listSecrets($listSecretsRequest4);
         $listSecretsRequest5 = new ListSecretsRequest();
-        $this->parent::$secretManagerClient->listSecrets($listSecretsRequest5);
+        $this->parent::$secretManagerClientFromConfig->listSecrets($listSecretsRequest5);
     }
 }
