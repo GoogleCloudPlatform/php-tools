@@ -9,12 +9,18 @@ class ClientVar
 {
     public $varName;
     public $className;
+    private $parent;
     private $startIndex;
 
     public function __construct(
         $varName,
         $className
     ) {
+        if (str_contains($varName, '->')) {
+            list($this->parent, $varName) = explode('->', $varName);
+        } elseif (str_contains($varName, '::')) {
+            list($this->parent, $varName) = explode('::', $varName);
+        }
         $this->varName = $varName;
         $this->className = $className;
     }
@@ -31,10 +37,21 @@ class ClientVar
      */
     public function isDeclaredAt(Tokens $tokens, int $index): bool
     {
+        if ($tokens[$index]->getContent() !== $this->varName) {
+            // The token does not contain this client var
+            return false;
+        }
+
         $token = $tokens[$index];
         if ($token->isGivenKind(T_VARIABLE)
             || ($token->isGivenKind(T_STRING) && $tokens[$index-1]->isGivenKind(T_OBJECT_OPERATOR))
         ) {
+            if ($this->parent) {
+                // look back to ensure the parent matches
+                if ($tokens[$index-2]->getContent() !== $this->parent) {
+                    return false;
+                }
+            }
             $this->startIndex = $index;
             return true;
         }

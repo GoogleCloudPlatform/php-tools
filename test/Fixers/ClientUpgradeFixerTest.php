@@ -19,8 +19,11 @@ class ClientUpgradeFixerTest extends TestCase
         $this->fixer->configure([
             'clientVars' => [
                 '$secretmanager' => 'Google\\Cloud\\SecretManager\\V1\\SecretManagerServiceClient',
-                'dlpClient' => 'Google\\Cloud\\Dlp\\V2\\DlpServiceClient',
                 '$dlpClient' => 'Google\\Cloud\\Dlp\\V2\\DlpServiceClient',
+                '$this->dlp' => 'Google\\Cloud\\Dlp\\V2\\DlpServiceClient',
+                'self::$dlp' => 'Google\\Cloud\\Dlp\\V2\\DlpServiceClient',
+                'secretManagerClient' => 'Google\\Cloud\\SecretManager\\V1\\SecretManagerServiceClient',
+                '$secretManagerClient' => 'Google\\Cloud\\SecretManager\\V1\\SecretManagerServiceClient',
             ]
         ]);
     }
@@ -31,7 +34,7 @@ class ClientUpgradeFixerTest extends TestCase
     public function testLegacySamples($filename)
     {
         $legacyFilepath = self::SAMPLES_DIR . $filename;
-        $newFilepath = str_replace('legacy_', 'new_', $legacyFilepath);
+        $newFilepath = str_replace('legacy.', 'new.', $legacyFilepath);
         $tokens = Tokens::fromCode(file_get_contents($legacyFilepath));
         $fileInfo = new SplFileInfo($legacyFilepath);
         $this->fixer->fix($fileInfo, $tokens);
@@ -54,7 +57,7 @@ class ClientUpgradeFixerTest extends TestCase
             fn ($file) => [basename($file)],
             array_filter(
                 glob(self::SAMPLES_DIR . '*'),
-                fn ($file) => 0 === strpos(basename($file), 'legacy_')
+                fn ($file) => '.legacy.php' === substr(basename($file), -11)
             )
         );
     }

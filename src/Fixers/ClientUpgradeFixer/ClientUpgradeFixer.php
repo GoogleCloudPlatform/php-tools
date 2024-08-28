@@ -89,14 +89,15 @@ class ClientUpgradeFixer extends AbstractFixer implements ConfigurableFixerInter
         $importStart = $this->getImportStart($tokens);
         $insertStart = null;
         for ($index = 0; $index < count($tokens); $index++) {
-            $clientVar = $clientVars[$tokens[$index]->getContent()] ?? null;
-            if (is_null($clientVar)) {
-                // The token does not contain a client var
-                continue;
+            $foundClientVar = false;
+            foreach ($clientVars as $clientVar) {
+                if ($foundClientVar = $clientVar->isDeclaredAt($tokens, $index)) {
+                    break;
+                }
             }
 
-            if (!$clientVar->isDeclaredAt($tokens, $index)) {
-                // The token looks like our client var but isn't
+            if (!$foundClientVar) {
+                // The token is not a client var
                 continue;
             }
 

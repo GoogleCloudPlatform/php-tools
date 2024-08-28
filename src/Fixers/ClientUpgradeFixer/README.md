@@ -31,9 +31,7 @@ configured to use the custom fixer:
 <?php
 // .php-cs-fixer.google.php
 
-// The fixer MUST autoload google/cloud classes. This line is only necessary if
-// "php-cs-fixer" was installed in a different composer.json, e.g. with
-// "composer global require".
+// The fixer MUST autoload google/cloud classes.
 require __DIR__ . '/vendor/autoload.php';
 
 // configure the fixer to run with the new surface fixer
@@ -42,6 +40,7 @@ return (new PhpCsFixer\Config())
         new Google\Cloud\Fixers\ClientUpgradeFixer\ClientUpgradeFixer(),
     ])
     ->setRules([
+        // See "Configuring Client Vars" below for more configuration options
         'GoogleCloud/upgrade_clients' => true,
     ])
 ;
@@ -92,23 +91,37 @@ You should get an output similar to this
 +    ->setLocationId('def');
 +$job = $dlp->createDlpJob($request2);
 
- // optional args array (inline with nested arrays)
--$job = $dlp->createDlpJob($parent, [
--    'inspectJob' => new InspectJobConfig([
-+$request3 = (new CreateDlpJobRequest())
-+    ->setParent($parent)
-+    ->setInspectJob(new InspectJobConfig([
-         'inspect_config' => (new InspectConfig())
-             ->setMinLikelihood(likelihood::LIKELIHOOD_UNSPECIFIED)
-             ->setLimits($limits)
-@@ -28,5 +36,5 @@
-         'storage_config' => (new StorageConfig())
-             ->setCloudStorageOptions(($cloudStorageOptions))
-             ->setTimespanConfig($timespanConfig),
--    ])
--]);
-+    ]));
-+$job = $dlp->createDlpJob($request3);
-
       ----------- end diff -----------
+```
+
+## Configuring Client Vars
+
+There are instances where the fixer cannot detect where a client variable is
+defined. For instance, variables defined in dependency injection containers.
+For these, you can add to `clientVars` an array of variable names and their
+classes:
+
+```php
+return (new PhpCsFixer\Config())
+    ->registerCustomFixers([
+        new Google\Cloud\Fixers\ClientUpgradeFixer\ClientUpgradeFixer(),
+    ])
+    ->setRules([
+        'GoogleCloud/upgrade_clients' => [
+            // array of variable names to their legacy class names
+            'clientVars' => [
+                // a variable that was not detected
+                '$myclient' => 'Google\\Cloud\\SecretManager\\V1\\SecretManagerServiceClient',
+
+                // a variable that is part of a class
+                '$this->dlp' => 'Google\\Cloud\\Dlp\\V2\\DlpServiceClient',
+                'self::$dlp' => 'Google\\Cloud\\Dlp\\V2\\DlpServiceClient',
+
+                // match all variable by name (regardless of where they're being called)
+                'secretManagerClient' => 'Google\\Cloud\\SecretManager\\V1\\SecretManagerServiceClient',
+                '$secretManagerClient' => 'Google\\Cloud\\SecretManager\\V1\\SecretManagerServiceClient',
+            ]
+        ],
+    ])
+;
 ```
