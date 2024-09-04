@@ -32,14 +32,14 @@ class MyClass extends SomethingWhichDefinedAClient
     {
         // these should not be updated
         $this->parent->dlpFromConfig->listInfoTypes();
-        $this->parent::$dlpFromConfig->listInfoTypes(); // @phpstan-ignore-line
+        $this->parent::$dlpFromConfig->listInfoTypes();
     }
 
     public function callSecretManagerWithWildcardParent()
     {
         // These are updated from values in the "clientVars" confguration
         $this->secretManagerClientFromConfig->listSecrets();
-        $this::$secretManagerClientFromConfig->listSecrets();
+        $this::$secretManagerClientFromConfig->listSecrets(); // @phpstan-ignore-line
         $this->parent->secretManagerClientFromConfig->listSecrets();
         $this->parent::$secretManagerClientFromConfig->listSecrets(); // @phpstan-ignore-line
     }

@@ -8,7 +8,7 @@ use Google\Cloud\Dlp\V2\ListInfoTypesRequest;
 use Google\Cloud\SecretManager\V1\Client\SecretManagerServiceClient;
 use Google\Cloud\SecretManager\V1\ListSecretsRequest;
 
-class ClientWrapper extends TestCase
+class ClientWrapper
 {
     private static DlpServiceClient $staticDlp;
 
