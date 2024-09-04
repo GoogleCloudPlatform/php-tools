@@ -6,6 +6,7 @@ use Google\Cloud\Dlp\V2\Client\DlpServiceClient;
 use Google\Cloud\Dlp\V2\ListDlpJobsRequest;
 use Google\Cloud\SecretManager\V1\Client\SecretManagerServiceClient;
 use Google\Cloud\SecretManager\V1\ListSecretsRequest;
+use Google\Protobuf\Internal\Message;
 
 // Instantiate clients for calling the Google Cloud APIs.
 $secretManagerClient = new SecretManagerServiceClient();

@@ -15,7 +15,7 @@ use Google\Cloud\SecretManager\V1\Client\SecretManagerServiceClient;
 use Google\Cloud\SecretManager\V1\ListSecretsRequest;
 use Google\Cloud\Storage\StorageClient;
 
-class ClientWrapper extends TestCase
+class ClientWrapper
 {
     public $dlp;
     public $secretmanager;
@@ -38,14 +38,20 @@ class ClientWrapper extends TestCase
             ->setParent('this/is/a/parent');
         $secrets = $this->secretmanager->listSecrets($listSecretsRequest);
     }
+
+    public function callDlpFromFunction(DlpServiceClient $client)
+    {
+        $listInfoTypesRequest2 = new ListInfoTypesRequest();
+        $infoTypes = $client->listInfoTypes($listInfoTypesRequest2);
+    }
 }
 
 // Instantiate a wrapping object.
 $wrapper = new ClientWrapper();
 
 // these should update
-$listInfoTypesRequest2 = new ListInfoTypesRequest();
-$infoTypes = $wrapper->dlp->listInfoTypes($listInfoTypesRequest2);
+$listInfoTypesRequest3 = new ListInfoTypesRequest();
+$infoTypes = $wrapper->dlp->listInfoTypes($listInfoTypesRequest3);
 $listSecretsRequest2 = (new ListSecretsRequest())
     ->setParent('this/is/a/parent');
 $secrets = $wrapper->secretmanager->listSecrets($listSecretsRequest2);
