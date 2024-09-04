@@ -27,7 +27,7 @@ trait ExecuteCommandTrait
 
     use ExponentialBackoffTrait;
 
-    private static function runCommand($commandName, $args=[])
+    private static function runCommand($commandName, $args = [])
     {
         if (!isset(self::$commandFile) || !file_exists(self::$commandFile)) {
             throw new \LogicException('$commandFile is not set or is missing.');
@@ -106,7 +106,7 @@ trait ExecuteCommandTrait
         $process = is_array($cmd) ?
             new Process($cmd) :
             Process::fromShellCommandline($cmd);
-        
+
         if (self::$workingDirectory) {
             $process->setWorkingDirectory(self::$workingDirectory);
         }

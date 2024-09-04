@@ -161,16 +161,16 @@ class RpcMethod
             }
             $setterName = 'set' . ucfirst(trim($tokens[$keyIndex]->getContent(), '"\''));
             $tokens->removeLeadingWhitespace($doubleArrowIndex + 1);
-            $valueEnd = isset($arrayEntryIndices[$i+1])
-                ? $tokens->getPrevTokenOfKind($arrayEntryIndices[$i+1], [new Token(',')])
+            $valueEnd = isset($arrayEntryIndices[$i + 1])
+                ? $tokens->getPrevTokenOfKind($arrayEntryIndices[$i + 1], [new Token(',')])
                 : $closeIndex;
             $varTokens = array_slice($tokens->toArray(), $doubleArrowIndex + 1, $valueEnd - $doubleArrowIndex - 1);
             // Remove trailing whitespace
-            for ($i = count($varTokens)-1; $varTokens[$i]->isGivenKind(T_WHITESPACE); $i--) {
+            for ($i = count($varTokens) - 1; $varTokens[$i]->isGivenKind(T_WHITESPACE); $i--) {
                 unset($varTokens[$i]);
             }
             // Remove trailing commas
-            for ($i = count($varTokens)-1; $varTokens[$i]->getContent() === ','; $i--) {
+            for ($i = count($varTokens) - 1; $varTokens[$i]->getContent() === ','; $i--) {
                 unset($varTokens[$i]);
             }
             // Remove leading whitespace
@@ -210,8 +210,8 @@ class RpcMethod
                 new Token([CT::T_ARRAY_SQUARE_BRACE_CLOSE, ']']),
             ];
             $setters[] = [$setterName, $varTokens];
-            $valueEnd = isset($arrayEntryIndices[$i+1])
-                ? $tokens->getPrevTokenOfKind($arrayEntryIndices[$i+1], [new Token(',')])
+            $valueEnd = isset($arrayEntryIndices[$i + 1])
+                ? $tokens->getPrevTokenOfKind($arrayEntryIndices[$i + 1], [new Token(',')])
                 : $closeIndex;
             $index = $valueEnd;
         }

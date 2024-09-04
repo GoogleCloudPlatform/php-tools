@@ -99,7 +99,7 @@ trait GcloudWrapperTrait
             if ($cmd->isSuccessful()) {
                 return $cmd->getOutput();
             } elseif ($i < $retries) {
-                $this->errorLog('Retry Attempt #' . ($i+1));
+                $this->errorLog('Retry Attempt #' . ($i + 1));
                 $cmd->clearOutput();
                 $cmd->clearErrorOutput();
             }
