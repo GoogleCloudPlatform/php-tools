@@ -28,6 +28,9 @@ on:
             "cast_spaces": true,
             "whitespace_after_comma_in_array": true
           }
+      add_rules:
+        type: string
+        default: "{}"
 
 permissions:
   contents: read
@@ -42,11 +45,15 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
+      - name: 'Setup jq'
+        uses: dcarbone/install-jq-action@v2
       - name: Run PHP CS Fixer
         run: |
           composer global require friendsofphp/php-cs-fixer:${{ inputs.version }} -q
           CONFIG="${{ inputs.config }}"
-          RULES=$(echo $'${{ inputs.rules }}'|tr -d '\n\t\r ')
+          DEFAULT_RULES=$(echo $'${{ inputs.rules }}'|tr -d '\n\t\r ')
+          ADDITIONAL_RULES=$(echo $'${{ inputs.add_rules }}'|tr -d '\n\t\r ')
+          RULES=$(echo $RULES $ADDITIONAL_RULES | jq -s '.[0] * .[1]' -crM)
 
           set -x
 
