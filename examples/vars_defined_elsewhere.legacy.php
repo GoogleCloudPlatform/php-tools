@@ -25,14 +25,14 @@ class MyClass extends SomethingWhichDefinedAClient
     {
         // These are updated from values in the "clientVars" confguration
         $this->dlpFromConfig->listInfoTypes();
-        self::$dlpFromConfig->listInfoTypes();
+        self::$dlpFromConfig->listInfoTypes(); // @phpstan-ignore-line
     }
 
     public function callTheDlpClientWithADifferentParent()
     {
         // these should not be updated
         $this->parent->dlpFromConfig->listInfoTypes();
-        $this->parent::$dlpFromConfig->listInfoTypes();
+        $this->parent::$dlpFromConfig->listInfoTypes(); // @phpstan-ignore-line
     }
 
     public function callSecretManagerWithWildcardParent()
@@ -41,6 +41,12 @@ class MyClass extends SomethingWhichDefinedAClient
         $this->secretManagerClientFromConfig->listSecrets();
         $this::$secretManagerClientFromConfig->listSecrets();
         $this->parent->secretManagerClientFromConfig->listSecrets();
-        $this->parent::$secretManagerClientFromConfig->listSecrets();
+        $this->parent::$secretManagerClientFromConfig->listSecrets(); // @phpstan-ignore-line
     }
+}
+
+class SomethingWhichDefinedAClient
+{
+    public $dlpFromConfig;
+    public $secretManagerClientFromConfig;
 }

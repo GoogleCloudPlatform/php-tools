@@ -34,8 +34,8 @@ class ClientWrapper extends TestCase
     public function callStatic()
     {
         // These shouldn't update
-        $secrets = self::$dlp->listInfoTypes();
-        $secrets = self::$secretmanager->listSecrets('this/is/a/parent');
+        $secrets = self::$dlp->listInfoTypes(); // @phpstan-ignore-line
+        $secrets = self::$secretmanager->listSecrets('this/is/a/parent'); // @phpstan-ignore-line
 
         // This should
         $listInfoTypesRequest2 = new ListInfoTypesRequest();

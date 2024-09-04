@@ -45,7 +45,7 @@ function get_operations_service_client()
     return new DlpServiceClient();
 }
 
-class VariablesInsideClass extends TestCase
+class VariablesInsideClass
 {
     /** @var DlpServiceClient $dlp */
     private $dlp;

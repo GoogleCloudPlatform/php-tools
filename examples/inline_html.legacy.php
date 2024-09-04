@@ -4,6 +4,7 @@ require_once 'vendor/autoload.php';
 
 use Google\Cloud\SecretManager\V1\SecretManagerServiceClient;
 use Google\Cloud\Dlp\V2\DlpServiceClient;
+use Google\Protobuf\Internal\Message;
 
 // Instantiate clients for calling the Google Cloud APIs.
 $secretManagerClient = new SecretManagerServiceClient();

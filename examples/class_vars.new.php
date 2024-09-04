@@ -15,7 +15,7 @@ use Google\Cloud\SecretManager\V1\Client\SecretManagerServiceClient;
 use Google\Cloud\SecretManager\V1\ListSecretsRequest;
 use Google\Cloud\Storage\StorageClient;
 
-class ClientWrapper extends TestCase
+class ClientWrapper
 {
     public $dlp;
     public $secretmanager;

@@ -6,7 +6,7 @@ namespace Google\Cloud\Samples\Dlp;
 use Google\Cloud\Dlp\V2\DlpServiceClient;
 use Google\Cloud\SecretManager\V1\SecretManagerServiceClient;
 
-class ClientWrapper extends TestCase
+class ClientWrapper
 {
     private static DlpServiceClient $staticDlp;
 
@@ -29,8 +29,8 @@ class ClientWrapper extends TestCase
     public function callStatic()
     {
         // These shouldn't update
-        $secrets = self::$dlp->listInfoTypes();
-        $secrets = self::$secretmanager->listSecrets('this/is/a/parent');
+        $secrets = self::$dlp->listInfoTypes(); // @phpstan-ignore-line
+        $secrets = self::$secretmanager->listSecrets('this/is/a/parent'); // @phpstan-ignore-line
 
         // This should
         $secrets = self::$staticDlp->listInfoTypes();
