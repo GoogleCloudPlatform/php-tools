@@ -52,7 +52,7 @@ class MyClass extends SomethingWhichDefinedAClient
         $listSecretsRequest4 = new ListSecretsRequest();
         $this->parent->secretManagerClientFromConfig->listSecrets($listSecretsRequest4);
         $listSecretsRequest5 = new ListSecretsRequest();
-        $this->parent::$secretManagerClientFromConfig->listSecrets($listSecretsRequest5); // @phpstan-ignore-line
+        $this->parent::$secretManagerClientFromConfig->listSecrets($listSecretsRequest5);
     }
 }
 

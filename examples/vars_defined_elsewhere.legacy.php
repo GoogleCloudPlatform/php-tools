@@ -41,7 +41,7 @@ class MyClass extends SomethingWhichDefinedAClient
         $this->secretManagerClientFromConfig->listSecrets();
         $this::$secretManagerClientFromConfig->listSecrets(); // @phpstan-ignore-line
         $this->parent->secretManagerClientFromConfig->listSecrets();
-        $this->parent::$secretManagerClientFromConfig->listSecrets(); // @phpstan-ignore-line
+        $this->parent::$secretManagerClientFromConfig->listSecrets();
     }
 }
 
