@@ -50,7 +50,7 @@ function get_operations_service_client()
     return new DlpServiceClient();
 }
 
-class VariablesInsideClass extends TestCase
+class VariablesInsideClass
 {
     /** @var DlpServiceClient $dlp */
     private $dlp;
@@ -60,6 +60,8 @@ class VariablesInsideClass extends TestCase
     {
         // These should update
         $infoTypes = $this->dlp->listInfoTypes();
-        $secrets = $this->secretmanager->listSecrets('this/is/a/parent');
+        $listSecretsRequest2 = (new ListSecretsRequest())
+            ->setParent('this/is/a/parent');
+        $secrets = $this->secretmanager->listSecrets($listSecretsRequest2);
     }
 }

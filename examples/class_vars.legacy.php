@@ -13,7 +13,7 @@ use Google\Cloud\SecretManager\V1\SecretManagerServiceClient;
 // new client surface won't exist (not a generator client)
 use Google\Cloud\Storage\StorageClient;
 
-class ClientWrapper extends TestCase
+class ClientWrapper
 {
     public $dlp;
     public $secretmanager;
@@ -32,6 +32,11 @@ class ClientWrapper extends TestCase
     public function callSecretManager()
     {
         $secrets = $this->secretmanager->listSecrets('this/is/a/parent');
+    }
+
+    public function callDlpFromFunction(DlpServiceClient $client)
+    {
+        $infoTypes = $client->listInfoTypes();
     }
 }
 

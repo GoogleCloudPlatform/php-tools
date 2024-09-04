@@ -49,8 +49,8 @@ class ClientUpgradeFixer extends AbstractFixer implements ConfigurableFixerInter
     {
         if (!class_exists('Google\Auth\OAuth2')) {
             throw new \LogicException(
-                'In order for Google\Cloud\NewSurfaceFixer to work, you must install the google '
-                . 'cloud client library and include its autoloader in .php-cs-fixer.dist.php'
+                'In order for Google\Cloud\NewSurfaceFixer to work, you must install the '
+                . 'google/cloud client library and include its autoloader in .php-cs-fixer.dist.php'
             );
         }
 
@@ -78,9 +78,10 @@ class ClientUpgradeFixer extends AbstractFixer implements ConfigurableFixerInter
             $clientShortNames[$clientClass] = $shortName;
         }
         $clientVars = array_merge(
+            ClientVar::getClientVarsFromConfiguration($this->configuration),
             ClientVar::getClientVarsFromNewKeyword($tokens, $clientShortNames),
             ClientVar::getClientVarsFromVarTypehint($tokens, $clientShortNames),
-            ClientVar::getClientVarsFromConfiguration($this->configuration),
+            ClientVar::getClientVarsFromTypehint($tokens, $clientShortNames),
         );
 
         // Find the RPC methods being called on the clients
@@ -89,14 +90,15 @@ class ClientUpgradeFixer extends AbstractFixer implements ConfigurableFixerInter
         $importStart = $this->getImportStart($tokens);
         $insertStart = null;
         for ($index = 0; $index < count($tokens); $index++) {
-            $clientVar = $clientVars[$tokens[$index]->getContent()] ?? null;
-            if (is_null($clientVar)) {
-                // The token does not contain a client var
-                continue;
+            $foundClientVar = false;
+            foreach ($clientVars as $clientVar) {
+                if ($foundClientVar = $clientVar->isDeclaredAt($tokens, $index)) {
+                    break;
+                }
             }
 
-            if (!$clientVar->isDeclaredAt($tokens, $index)) {
-                // The token looks like our client var but isn't
+            if (!$foundClientVar) {
+                // The token is not a client var
                 continue;
             }
 

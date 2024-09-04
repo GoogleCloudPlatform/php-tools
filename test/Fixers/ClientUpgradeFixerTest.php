@@ -13,25 +13,18 @@ class ClientUpgradeFixerTest extends TestCase
 
     private const SAMPLES_DIR = __DIR__ . '/../../src/Fixers/ClientUpgradeFixer/examples/';
 
-    public function setUp(): void
-    {
-        $this->fixer = new ClientUpgradeFixer();
-        $this->fixer->configure([
-            'clientVars' => [
-                '$secretmanager' => 'Google\\Cloud\\SecretManager\\V1\\SecretManagerServiceClient',
-                'dlpClient' => 'Google\\Cloud\\Dlp\\V2\\DlpServiceClient',
-                '$dlpClient' => 'Google\\Cloud\\Dlp\\V2\\DlpServiceClient',
-            ]
-        ]);
-    }
-
     /**
      * @dataProvider provideLegacySamples
      */
-    public function testLegacySamples($filename)
+    public function testLegacySamples(string $filename, array $config = [])
     {
+        $this->fixer = new ClientUpgradeFixer();
+        if ($config) {
+            $this->fixer->configure($config);
+        }
+
         $legacyFilepath = self::SAMPLES_DIR . $filename;
-        $newFilepath = str_replace('legacy_', 'new_', $legacyFilepath);
+        $newFilepath = str_replace('legacy.', 'new.', $legacyFilepath);
         $tokens = Tokens::fromCode(file_get_contents($legacyFilepath));
         $fileInfo = new SplFileInfo($legacyFilepath);
         $this->fixer->fix($fileInfo, $tokens);
@@ -50,12 +43,29 @@ class ClientUpgradeFixerTest extends TestCase
 
     public static function provideLegacySamples()
     {
-        return array_map(
+        $samples = array_map(
             fn ($file) => [basename($file)],
             array_filter(
                 glob(self::SAMPLES_DIR . '*'),
-                fn ($file) => 0 === strpos(basename($file), 'legacy_')
+                fn ($file) => '.legacy.php' === substr(basename($file), -11)
             )
         );
+        $samples = array_combine(
+            array_map(fn ($file) => substr($file[0], 0, -11), $samples),
+            $samples
+        );
+
+        // add custom config for vars_defined_elsewhere samples
+        $samples['vars_defined_elsewhere'][] = [
+            'clientVars' => [
+                '$secretmanagerFromConfig' => 'Google\\Cloud\\SecretManager\\V1\\SecretManagerServiceClient',
+                '$this->dlpFromConfig' => 'Google\\Cloud\\Dlp\\V2\\DlpServiceClient',
+                'self::$dlpFromConfig' => 'Google\\Cloud\\Dlp\\V2\\DlpServiceClient',
+                'secretManagerClientFromConfig' => 'Google\\Cloud\\SecretManager\\V1\\SecretManagerServiceClient',
+                '$secretManagerClientFromConfig' => 'Google\\Cloud\\SecretManager\\V1\\SecretManagerServiceClient',
+            ]
+        ];
+
+        return $samples;
     }
 }
