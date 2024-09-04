@@ -28,7 +28,8 @@ on:
             "cast_spaces": true,
             "whitespace_after_comma_in_array": true,
             "no_whitespace_in_blank_line": true,
-            "binary_operator_spaces": true
+            "binary_operator_spaces": true,
+            "no_extra_blank_lines": true
           }
       add_rules:
         type: string
