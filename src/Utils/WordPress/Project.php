@@ -175,7 +175,8 @@ class Project extends BaseProject
         $this->output->writeln('Downloading the Batcache plugin...');
         $dir = $this->getWordpressDir();
         $this->downloadArchive(
-            'Batcache plugin', self::LATEST_BATCACHE,
+            'Batcache plugin',
+            self::LATEST_BATCACHE,
             $dir . '/wp-content/plugins'
         );
         $this->report();
@@ -191,7 +192,8 @@ class Project extends BaseProject
         $this->output->writeln('Downloading the Memcached plugin...');
         $dir = $this->getWordpressDir();
         $this->downloadArchive(
-            'Memcached plugin', self::LATEST_MEMCACHED,
+            'Memcached plugin',
+            self::LATEST_MEMCACHED,
             $dir . '/wp-content/plugins'
         );
         $this->report();
@@ -207,7 +209,8 @@ class Project extends BaseProject
         $this->output->writeln('Downloading the appengine-wordpress plugin...');
         $dir = $this->getWordpressDir();
         $this->downloadArchive(
-            'App Engine WordPress plugin', self::LATEST_GAE_WP,
+            'App Engine WordPress plugin',
+            self::LATEST_GAE_WP,
             $dir . '/wp-content/plugins'
         );
         $this->report();
@@ -218,7 +221,8 @@ class Project extends BaseProject
         $this->output->writeln('Downloading the GCS plugin...');
         $dir = $this->getWordpressDir();
         $this->downloadArchive(
-            'GCS plugin', self::LATEST_GCS_PLUGIN,
+            'GCS plugin',
+            self::LATEST_GCS_PLUGIN,
             $dir . '/wp-content/plugins'
         );
         $this->report();

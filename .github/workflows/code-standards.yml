@@ -19,16 +19,14 @@ on:
             "@PSR2": true,
             "array_syntax": {"syntax":"short"},
             "concat_space": {"spacing":"one"},
+            "new_with_parentheses": true,
             "no_unused_imports": true,
             "ordered_imports": true,
-            "new_with_parentheses": true,
-            "whitespace_after_comma_in_array": true,
-            "method_argument_space": {
-              "keep_multiple_spaces_after_comma": true,
-              "on_multiline": "ignore"
-            },
             "return_type_declaration": {"space_before": "none"},
-            "single_quote": true
+            "single_quote": true,
+            "single_space_around_construct": true,
+            "cast_spaces": true,
+            "whitespace_after_comma_in_array": true
           }
 
 permissions:
