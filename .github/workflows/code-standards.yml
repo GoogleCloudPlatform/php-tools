@@ -26,7 +26,8 @@ on:
             "single_quote": true,
             "single_space_around_construct": true,
             "cast_spaces": true,
-            "whitespace_after_comma_in_array": true
+            "whitespace_after_comma_in_array": true,
+            "no_trailing_whitespace": true
           }
       add_rules:
         type: string
