@@ -34,6 +34,9 @@ on:
       add-rules:
         type: string
         default: "{}"
+      exclude-patterns:
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -42,23 +45,35 @@ jobs:
     php_code_standards:
       runs-on: ubuntu-latest
       name: PHP Code Standards
+      env:
+        CONFIG: ${{ inputs.config }}
+        CONFIG_PATH: ${{ inputs.path }}
       steps:
       - uses: actions/checkout@v4
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
+      - if: ${{ startsWith(inputs.config, 'GoogleCloudPlatform/php-tools/') }}
+        name: Install Google Cloud Tools
+        run: |
+          BRANCH=${CONFIG#GoogleCloudPlatform/php-tools/}
+          composer global require google/cloud-tools:dev-${BRANCH#*@} -q
+          echo "CONFIG=$HOME/.composer/vendor/google/cloud-tools/${BRANCH%@*}" >> $GITHUB_ENV
       - name: 'Setup jq'
         uses: dcarbone/install-jq-action@v2
       - name: Run PHP CS Fixer
         run: |
-          composer global require friendsofphp/php-cs-fixer:${{ inputs.version }} -q
-          CONFIG="${{ inputs.config }}"
-          RULES=$(echo $'${{ inputs.rules }} ${{ inputs.add-rules }}'|tr -d '\n\t\r '|jq -s '.[0] * .[1]' -crM)
+          composer global require friendsofphp/php-cs-fixer:${{ inputs.version }}
+          export RULES=$(echo $'${{ inputs.rules }} ${{ inputs.add-rules }}'|tr -d '\n\t\r '|jq -s '.[0] * .[1]' -crM)
+          export EXCLUDE_PATTERNS=$(echo $'${{ inputs.exclude-patterns }}'|tr -d '\n\t\r ')
+          CMD_PATH=$([ "$EXCLUDE_PATTERNS" == "" ] && echo "$CONFIG_PATH")
+          CONFIG_OR_RULES=$([ ! -z "$CONFIG" ] && echo "--config=$CONFIG" || echo --rules=$RULES)
 
+          echo "TEST"
           set -x
 
           ~/.composer/vendor/bin/php-cs-fixer fix \
-            ${{ inputs.path }} \
-            $(if [ ! -z "$CONFIG" ]; then echo "--config=$CONFIG"; else echo --rules=$RULES; fi) \
+            $CMD_PATH \
+            $CONFIG_OR_RULES \
             --dry-run --diff
