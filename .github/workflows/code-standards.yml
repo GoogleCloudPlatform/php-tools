@@ -27,7 +27,7 @@ on:
             "single_space_around_construct": true,
             "cast_spaces": true,
             "whitespace_after_comma_in_array": true,
-            "no_trailing_whitespace": true
+            "no_whitespace_in_blank_line": true
           }
       add_rules:
         type: string
