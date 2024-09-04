@@ -53,7 +53,7 @@ jobs:
           CONFIG="${{ inputs.config }}"
           DEFAULT_RULES=$(echo $'${{ inputs.rules }}'|tr -d '\n\t\r ')
           ADDITIONAL_RULES=$(echo $'${{ inputs.add_rules }}'|tr -d '\n\t\r ')
-          RULES=$(echo $RULES $ADDITIONAL_RULES | jq -s '.[0] * .[1]' -crM)
+          RULES=$(echo $DEFAULT_RULES $ADDITIONAL_RULES | jq -s '.[0] * .[1]' -crM)
 
           set -x
 
