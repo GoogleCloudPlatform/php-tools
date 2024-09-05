@@ -31,7 +31,7 @@ on:
             "binary_operator_spaces": {"default": "at_least_single_space"},
             "no_extra_blank_lines": true
           }
-      add_rules:
+      add-rules:
         type: string
         default: "{}"
 
@@ -54,7 +54,7 @@ jobs:
         run: |
           composer global require friendsofphp/php-cs-fixer:${{ inputs.version }} -q
           CONFIG="${{ inputs.config }}"
-          RULES=$(echo $'${{ inputs.rules }} ${{ inputs.add_rules }}'|tr -d '\n\t\r '|jq -s '.[0] * .[1]' -crM)
+          RULES=$(echo $'${{ inputs.rules }} ${{ inputs.add-rules }}'|tr -d '\n\t\r '|jq -s '.[0] * .[1]' -crM)
 
           set -x
 
