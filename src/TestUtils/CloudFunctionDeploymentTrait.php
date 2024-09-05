@@ -176,7 +176,7 @@ trait CloudFunctionDeploymentTrait
             printf('Sleeping for %d second(s)' . PHP_EOL, $sleep);
             sleep($sleep);
         }
-        
+
         // Check for new logs for the function.
         $attempt = 1;
         $this->runEventuallyConsistentTest(function () use ($filter, $process, &$attempt) {

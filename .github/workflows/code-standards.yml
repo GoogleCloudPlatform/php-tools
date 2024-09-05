@@ -26,8 +26,14 @@ on:
             "single_quote": true,
             "single_space_around_construct": true,
             "cast_spaces": true,
-            "whitespace_after_comma_in_array": true
+            "whitespace_after_comma_in_array": true,
+            "no_whitespace_in_blank_line": true,
+            "binary_operator_spaces": {"default": "at_least_single_space"},
+            "no_extra_blank_lines": true
           }
+      add-rules:
+        type: string
+        default: "{}"
 
 permissions:
   contents: read
@@ -42,15 +48,17 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
+      - name: 'Setup jq'
+        uses: dcarbone/install-jq-action@v2
       - name: Run PHP CS Fixer
         run: |
           composer global require friendsofphp/php-cs-fixer:${{ inputs.version }} -q
           CONFIG="${{ inputs.config }}"
-          RULES=$(echo $'${{ inputs.rules }}'|tr -d '\n\t\r ')
+          RULES=$(echo $'${{ inputs.rules }} ${{ inputs.add-rules }}'|tr -d '\n\t\r '|jq -s '.[0] * .[1]' -crM)
 
           set -x
 
           ~/.composer/vendor/bin/php-cs-fixer fix \
             ${{ inputs.path }} \
-            $(if [ ! -z "$CONFIG" ]; then echo "--config=$CONFIG"; elif [ ! -z "$RULES" ]; then echo --rules=$RULES; fi) \
+            $(if [ ! -z "$CONFIG" ]; then echo "--config=$CONFIG"; else echo --rules=$RULES; fi) \
             --dry-run --diff

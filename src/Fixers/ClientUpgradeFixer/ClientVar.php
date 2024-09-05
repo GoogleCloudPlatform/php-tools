@@ -47,11 +47,11 @@ class ClientVar
 
         $token = $tokens[$index];
         if ($token->isGivenKind(T_VARIABLE)
-            || ($token->isGivenKind(T_STRING) && $tokens[$index-1]->isGivenKind(T_OBJECT_OPERATOR))
+            || ($token->isGivenKind(T_STRING) && $tokens[$index - 1]->isGivenKind(T_OBJECT_OPERATOR))
         ) {
             if ($this->parent) {
                 // look back to ensure the parent matches
-                if ($tokens[$index-2]->getContent() !== $this->parent) {
+                if ($tokens[$index - 2]->getContent() !== $this->parent) {
                     return false;
                 }
             }
@@ -141,7 +141,7 @@ class ClientVar
             if (
                 $tokens[$prevIndex]->isGivenKind(T_VARIABLE) || (
                     $tokens[$prevIndex]->isGivenKind(T_STRING)
-                    && $tokens[$prevIndex-1]->isGivenKind(T_OBJECT_OPERATOR)
+                    && $tokens[$prevIndex - 1]->isGivenKind(T_OBJECT_OPERATOR)
                 )
             ) {
                 // Handle clients set to $var

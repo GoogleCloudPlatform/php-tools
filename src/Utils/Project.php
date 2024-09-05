@@ -72,7 +72,7 @@ class Project
         return realpath($dir);
     }
 
-    public function downloadArchive($name, $url, $dir='')
+    public function downloadArchive($name, $url, $dir = '')
     {
         $tmpdir = sys_get_temp_dir();
         $file = $tmpdir . DIRECTORY_SEPARATOR . basename($url);
