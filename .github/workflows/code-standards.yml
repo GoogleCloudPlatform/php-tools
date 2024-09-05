@@ -60,5 +60,5 @@ jobs:
 
           ~/.composer/vendor/bin/php-cs-fixer fix \
             ${{ inputs.path }} \
-            $(if [ ! -z "$CONFIG" ]; then echo "--config=$CONFIG"; elif [ ! -z "$RULES" ]; then echo --rules=$RULES; fi) \
+            $(if [ ! -z "$CONFIG" ]; then echo "--config=$CONFIG"; else echo --rules=$RULES; fi) \
             --dry-run --diff
