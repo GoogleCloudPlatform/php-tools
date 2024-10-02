@@ -34,6 +34,9 @@ on:
       add-rules:
         type: string
         default: "{}"
+      exclude-patterns:
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -42,23 +45,50 @@ jobs:
     php_code_standards:
       runs-on: ubuntu-latest
       name: PHP Code Standards
+      env:
+        CONFIG: ${{ inputs.config }}
+        CONFIG_PATH: ${{ inputs.path }}
       steps:
       - uses: actions/checkout@v4
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
+      # install Google Cloud Tools if a config is provided which starts with "GoogleCloudPlatform/php-tools/"
+      - if: ${{ startsWith(inputs.config, 'GoogleCloudPlatform/php-tools/') }}
+        name: Install Google Cloud Tools
+        run: |
+          BRANCH=${CONFIG#GoogleCloudPlatform/php-tools/}
+          composer global require google/cloud-tools:dev-${BRANCH#*@} -q
+          echo "CONFIG=$HOME/.composer/vendor/google/cloud-tools/${BRANCH%@*}" >> $GITHUB_ENV
       - name: 'Setup jq'
         uses: dcarbone/install-jq-action@v2
+      - name: Install PHP CS Fixer
+        run: composer global require friendsofphp/php-cs-fixer:${{ inputs.version }}
       - name: Run PHP CS Fixer
         run: |
-          composer global require friendsofphp/php-cs-fixer:${{ inputs.version }} -q
-          CONFIG="${{ inputs.config }}"
-          RULES=$(echo $'${{ inputs.rules }} ${{ inputs.add-rules }}'|tr -d '\n\t\r '|jq -s '.[0] * .[1]' -crM)
+          # set environment variables in script
+          export RULES=$(echo $'${{ inputs.rules }} ${{ inputs.add-rules }}'|tr -d '\n\t\r '|jq -s '.[0] * .[1]' -crM)
+          export EXCLUDE_PATTERNS=$(echo $'${{ inputs.exclude-patterns }}'|tr -d '\n\t\r ')
 
-          set -x
+          # use config path only if EXCLUDE_PATTERN is empty
+          CMD_PATH=$([ "$EXCLUDE_PATTERNS" = "" ] && echo "$CONFIG_PATH" || echo "")
+          CONFIG_OR_RULES=$([ ! -z "$CONFIG" ] && echo "--config=$CONFIG" || echo --rules=$RULES)
+
+          # do not fail if php-cs-fixer fails (so we can print debugging info)
+          set +e
 
           ~/.composer/vendor/bin/php-cs-fixer fix \
-            ${{ inputs.path }} \
-            $(if [ ! -z "$CONFIG" ]; then echo "--config=$CONFIG"; else echo --rules=$RULES; fi) \
+            $CMD_PATH \
+            $CONFIG_OR_RULES \
             --dry-run --diff
+
+          if [ "$?" -ne 0 ]; then
+            echo "Run this script locally by executing the following command" \
+                 "from the root of your ${{ github.repository }} repo:"
+            echo ""
+            echo "    composer global require google/cloud-tools"
+            echo "    ~/.composer/vendor/bin/php-tools cs-fixer ${{ github.repository }} --ref ${{ github.ref_name }}"
+            echo ""
+            exit 1
+          fi

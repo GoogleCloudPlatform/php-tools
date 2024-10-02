@@ -36,6 +36,13 @@ jobs:
         with:
             path: src
 
+    code-standards-with-config:
+        uses: ./.github/workflows/code-standards.yml
+        with:
+            path: .
+            config: .php-cs-fixer.default.php
+            exclude-patterns: '["vendor", "test", "examples", "scripts"]'
+
     static-analysis:
         uses: ./.github/workflows/static-analysis.yml
 

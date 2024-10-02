@@ -1,16 +1,25 @@
 <?php
 
-require __DIR__ . '/vendor/autoload.php';
-
 use Symfony\Component\Yaml\Yaml;
 
-$workflow = Yaml::parse(file_get_contents(__DIR__ . '/.github/workflows/code-standards.yml'));
-$rules = json_decode($workflow['on']['workflow_call']['inputs']['rules']['default'], true);
+$rulesJson = getenv('RULES');
+$configPath = getenv('CONFIG_PATH');
+$excludePatternsJson = getenv('EXCLUDE_PATTERNS');
+
+if (!$rulesJson) {
+    // Use default rules
+    $workflow = Yaml::parse(file_get_contents(__DIR__ . '/.github/workflows/code-standards.yml'));
+    $rulesJson = $workflow['on']['workflow_call']['inputs']['rules']['default'];
+}
+
+$rules = json_decode($rulesJson, true);
+$excludePatterns = json_decode($excludePatternsJson ?: '[]', true);
 
 return (new PhpCsFixer\Config())
     ->setRules($rules)
     ->setFinder(
         PhpCsFixer\Finder::create()
-            ->in(__DIR__)
+            ->in($configPath ?: __DIR__)
+            ->notPath($excludePatterns)
     )
 ;
