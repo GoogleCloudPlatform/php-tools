@@ -1,0 +1,32 @@
+#!/usr/bin/env php
+<?php
+/**
+ * Copyright 2024 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+if (file_exists($autoload = __DIR__ . '/../vendor/autoload.php')) {
+    // ran in cloned repo (e.g. "git clone https://github.com/GoogleCloudPlatform/php-tools")
+    require $autoload;
+} elseif (file_exists($autoload = __DIR__ . '/../../../autoload.php')) {
+    // ran in composer installed repo (e.g. "composer install google/cloud-tools")
+    require $autoload;
+}
+
+use Google\Cloud\Utils\Actions\RunCsFixerCommand;
+use Symfony\Component\Console\Application;
+
+$app = new Application();
+$app->add(new RunCsFixerCommand());
+$app->run();

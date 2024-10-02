@@ -2,18 +2,24 @@
 
 use Symfony\Component\Yaml\Yaml;
 
-if (!$rulesJson = getenv('RULES')) {
+$rulesJson = getenv('RULES');
+$configPath = getenv('CONFIG_PATH');
+$excludePatternsJson = getenv('EXCLUDE_PATTERNS');
+
+if (!$rulesJson) {
+    // Use default rules
     $workflow = Yaml::parse(file_get_contents(__DIR__ . '/.github/workflows/code-standards.yml'));
     $rulesJson = $workflow['on']['workflow_call']['inputs']['rules']['default'];
 }
 
-$excludePatterns = json_decode(getenv('EXCLUDE_PATTERNS') ?: '[]', true);
+$rules = json_decode($rulesJson, true);
+$excludePatterns = json_decode($excludePatternsJson ?: '[]', true);
 
 return (new PhpCsFixer\Config())
-    ->setRules(json_decode($rulesJson, true))
+    ->setRules($rules)
     ->setFinder(
         PhpCsFixer\Finder::create()
-            ->in(getenv('CONFIG_PATH') ?: __DIR__)
+            ->in($configPath ?: __DIR__)
             ->notPath($excludePatterns)
     )
 ;

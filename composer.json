@@ -19,13 +19,15 @@
         "symfony/console": "^5.0",
         "symfony/filesystem": "^5.0",
         "symfony/process": "^5.0",
+        "symfony/yaml": "^5",
         "twig/twig": "~3.0"
     },
     "bin": [
         "src/Utils/Flex/flex_exec",
         "src/Utils/WordPress/wp-gae",
         "scripts/dump_credentials.php",
-        "scripts/install_test_deps.sh"
+        "scripts/install_test_deps.sh",
+        "scripts/php-tools"
     ],
     "autoload": {
         "psr-4": {
@@ -43,7 +45,6 @@
         "friendsofphp/php-cs-fixer": "^3.62",
         "google/cloud-dlp": "^1.10",
         "google/cloud-storage": "^1.33",
-        "google/cloud-secret-manager": "^1.12",
-        "symfony/yaml": "^5"
+        "google/cloud-secret-manager": "^1.12"
     }
 }
