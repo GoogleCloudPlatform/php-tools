@@ -30,6 +30,8 @@ use Symfony\Component\Yaml\Yaml;
  */
 class RunCsFixerCommand extends Command
 {
+    private Client $client;
+
     protected function configure()
     {
         $this
@@ -45,7 +47,7 @@ class RunCsFixerCommand extends Command
                 '',
                 InputOption::VALUE_REQUIRED,
                 'name of the github workflow file which contains the configuration',
-                'lint.yaml'
+                null
             )
             ->addOption(
                 'ref',
@@ -70,35 +72,17 @@ class RunCsFixerCommand extends Command
             throw new \Exception('Invalid repo name. Use the format: owner/repo');
         }
 
-        $url = sprintf(
-            'https://raw.githubusercontent.com/%s/%s/.github/workflows/%s',
-            $repo,
-            $input->getOption('ref'),
-            $input->getOption('workflow-file'),
-        );
+        $this->client = new Client(['http_errors' => false]);
+        $ref = $input->getOption('ref');
+        $job = ($workflowFile = $input->getOption('workflow-file'))
+            ? $this->getJobFromWorkflowFile($repo, $ref, $workflowFile)
+            : $this->determineWorkflowFile($repo, $ref);
 
-        $client = new Client(['http_errors' => false]);
-        $response = $client->request('GET', $url);
-        if ($response->getStatusCode() === 404) {
-            throw new \Exception(sprintf(
-                'Failed to fetch the workflow file at "%s", maybe it doesn\'t exist? '
-                . 'Try supplying the "--workflow-file" option.',
-                $url
-            ));
-        }
-        $workflow = Yaml::parse($response->getBody());
-        $job = null;
-
-        foreach ($workflow['jobs'] as $id => $workflowJob) {
-            if (str_contains($workflowJob['uses'] ?? '', '.github/workflows/code-standards.yml')) {
-                $output->writeln(sprintf('Found job "%s"', $workflowJob['name'] ?? $id));
-                $job = $workflowJob;
-                break;
-            }
-        }
         if (!$job) {
-            throw new \Exception('No job found for php-tools/code-standards.yaml in the workflow file');
+            throw new \Exception('No job found for php-tools/code-standards.yaml found in the workflow file(s)');
         }
+
+        $output->writeln(sprintf('Using workflow job "%s" in "%s"', $job['name'], $job['file']));
 
         // get the default config
         $defaultWorkflow = Yaml::parse(file_get_contents(__DIR__ . '/../../../.github/workflows/code-standards.yml'));
@@ -167,5 +151,53 @@ class RunCsFixerCommand extends Command
         passthru($cmd, $resultCode);
 
         return $resultCode;
+    }
+
+    private function determineWorkflowFile(string $repo, string $ref): ?array
+    {
+        $url = sprintf(
+            'https://api.github.com/repos/%s/contents/.github/workflows',
+            $repo
+        );
+        $response = $this->client->request('GET', $url);
+        if ($response->getStatusCode() === 404) {
+            throw new \Exception('Failed to determine the workflow file, maybe the repo doesn\'t exist?');
+        }
+
+        foreach (json_decode($response->getBody(), true) as $workflow) {
+            if ($job = $this->getJobFromWorkflowFile($repo, $ref, $workflow['name'])) {
+                return $job;
+            }
+        }
+        return null;
+    }
+
+    private function getJobFromWorkflowFile(string $repo, string $ref, string $workflowFile): ?array
+    {
+        $url = sprintf(
+            'https://raw.githubusercontent.com/%s/%s/.github/workflows/%s',
+            $repo,
+            $ref,
+            $workflowFile,
+        );
+
+        $response = $this->client->request('GET', $url);
+        if ($response->getStatusCode() === 404) {
+            throw new \Exception(sprintf(
+                'Failed to fetch the workflow file at "%s", maybe it doesn\'t exist? '
+                . 'Try supplying the "--workflow-file" option.',
+                $url
+            ));
+        }
+        $workflow = Yaml::parse($response->getBody());
+
+        foreach ($workflow['jobs'] as $id => $job) {
+            if (str_contains($job['uses'] ?? '', '.github/workflows/code-standards.yml')) {
+                $job['name'] ??= $id;
+                $job['file'] = $workflowFile;
+                return $job;
+            }
+        }
+        return null;
     }
 }
