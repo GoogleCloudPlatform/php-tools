@@ -88,7 +88,7 @@ jobs:
                  "from the root of your ${{ github.repository }} repo:"
             echo ""
             echo "    composer global require google/cloud-tools"
-            echo "    ~/.composer/vendor/bin/php-tools cs-fixer ${{ github.repository }} --ref ${{ github.ref_name }}"
+            echo "    ~/.composer/vendor/bin/php-tools cs-fixer ${{ github.repository }} --ref ${{ github.head_ref || github.ref_name }}"
             echo ""
             exit 1
           fi

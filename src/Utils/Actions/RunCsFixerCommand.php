@@ -106,7 +106,7 @@ class RunCsFixerCommand extends Command
         foreach ($defaultWorkflow['on']['workflow_call']['inputs'] as $name => $inputOptions) {
             $defaults[$name] = $inputOptions['default'] ?? '';
         }
-        $options = array_merge($defaults, $job['with']);
+        $options = array_merge($defaults, $job['with'] ?? []);
 
         if (str_starts_with($options['config'], 'GoogleCloudPlatform/php-tools/')) {
             // use local file
