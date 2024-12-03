@@ -70,7 +70,7 @@ class CloudFunction
         string $entryPoint,
         string $functionSignatureType,
         string $region,
-        string $dir = null
+        ?string $dir = null
     ) {
         $this->projectId = $projectId;
         $this->entryPoint = $entryPoint;
@@ -137,7 +137,7 @@ class CloudFunction
      *
      * @return bool true if deployment suceeds, false upon failure
      */
-    public function deploy(array $flags = [], string $trigger = self::DEFAULT_TRIGGER, int $retries = 3, string $channel = null)
+    public function deploy(array $flags = [], string $trigger = self::DEFAULT_TRIGGER, int $retries = 3, ?string $channel = null)
     {
         if ($this->deployed) {
             $this->errorLog('The function has already been deployed.');
@@ -237,7 +237,7 @@ class CloudFunction
      * @param array $args
      * @return \Symfony\Component\Process\Process
      */
-    private function gcloudCommand(array $args, string $channel = null)
+    private function gcloudCommand(array $args, ?string $channel = null)
     {
         if (!in_array($channel, [null, 'alpha', 'beta'])) {
             $this->errorLog('gcloud channel must use product (null), "alpha" or "beta". Defaulting to production.');
@@ -271,7 +271,7 @@ class CloudFunction
      * @return \Symfony\Component\Process\Process returns the php server process
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function run(array $env = [], string $port = self::DEFAULT_PORT, string $phpBin = null)
+    public function run(array $env = [], string $port = self::DEFAULT_PORT, ?string $phpBin = null)
     {
         $this->localUri = 'localhost:' . $port;
 
@@ -306,7 +306,7 @@ class CloudFunction
      * @return \Symfony\Component\Process\Process returns the php server process
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function runCloudEventFunction(string $port = self::DEFAULT_PORT, string $phpBin = null)
+    public function runCloudEventFunction(string $port = self::DEFAULT_PORT, ?string $phpBin = null)
     {
         return $this->run(true, $port, $phpBin);
     }

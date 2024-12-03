@@ -53,7 +53,7 @@ trait ExponentialBackoffTrait
         });
     }
 
-    private function useBackoff($retries = null, callable $retryFunction = null)
+    private function useBackoff($retries = null, ?callable $retryFunction = null)
     {
         $backoff = new ExponentialBackoff(
             $retries ?: $this->expontentialBackoffRetryCount,

@@ -153,7 +153,7 @@ trait CloudFunctionDeploymentTrait
      * @param int $retries the number of times to retry entry lookup
      * @param int sleep the number of seconds sleep before executing the log lookup
      */
-    private function processFunctionLogs(string $startTime, callable $process, int $retries = null, int $sleep = null)
+    private function processFunctionLogs(string $startTime, callable $process, ?int $retries = null, ?int $sleep = null)
     {
         if (empty(self::$loggingClient)) {
             self::$loggingClient = new LoggingClient([

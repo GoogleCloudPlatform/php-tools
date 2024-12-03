@@ -46,7 +46,7 @@ class FlexExecCommand extends Command
     /* @var Gcloud */
     private $gcloud;
 
-    public function __construct(Gcloud $gcloud = null)
+    public function __construct(?Gcloud $gcloud = null)
     {
         parent::__construct();
         $this->gcloud = ($gcloud == null) ? new Gcloud() : $gcloud;

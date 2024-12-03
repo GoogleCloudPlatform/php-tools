@@ -30,14 +30,14 @@ class FileUtil
         return join('', $array);
     }
 
-    public static function cloneDirectoryIntoTmp($projectDir = '.', ProgressBar $progress = null)
+    public static function cloneDirectoryIntoTmp($projectDir = '.', ?ProgressBar $progress = null)
     {
         $tmpDir = sys_get_temp_dir() . '/test-' . self::randomName(8);
         self::copyDir($projectDir, $tmpDir, $progress);
         return $tmpDir;
     }
 
-    public static function copyDir($src, $dst, ProgressBar $progress = null)
+    public static function copyDir($src, $dst, ?ProgressBar $progress = null)
     {
         @mkdir($dst);
         $dir = opendir($src);
