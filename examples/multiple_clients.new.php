@@ -1,6 +1,6 @@
 <?php
 
-namespace Google\Cloud\Samples\Dlp;
+namespace Google\Cloud\Samples\MultipleClients;
 
 // new client surface doesn't exist (yet)
 use Google\ApiCore\LongRunning\OperationsClient;
