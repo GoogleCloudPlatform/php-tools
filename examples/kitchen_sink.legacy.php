@@ -1,6 +1,6 @@
 <?php
 
-namespace Google\Cloud\Samples\Dlp;
+namespace Google\Cloud\Samples\KitchenSink;
 
 use Google\Cloud\Dlp\V2\DlpServiceClient;
 use Google\Cloud\Dlp\V2\InspectConfig;

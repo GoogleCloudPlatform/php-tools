@@ -59,7 +59,7 @@ class ExponentialBackoff
      * @param int $retries [optional] Number of retries for a failed request.
      * @param callable $retryFunction [optional] returns bool for whether or not to retry
      */
-    public function __construct($retries = null, callable $retryFunction = null)
+    public function __construct($retries = null, ?callable $retryFunction = null)
     {
         $this->retries = $retries !== null ? (int) $retries : 3;
         $this->retryFunction = $retryFunction;

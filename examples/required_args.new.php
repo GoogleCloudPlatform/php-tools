@@ -1,6 +1,6 @@
 <?php
 
-namespace Google\Cloud\Samples\Dlp;
+namespace Google\Cloud\Samples\RequiredArgs;
 
 use Google\Cloud\Dlp\V2\Client\DlpServiceClient;
 use Google\Cloud\Dlp\V2\CreateDlpJobRequest;

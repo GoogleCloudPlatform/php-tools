@@ -1,6 +1,6 @@
 <?php
 
-namespace Google\Cloud\Samples\Dlp;
+namespace Google\Cloud\Samples\Mixins;
 
 use Google\Cloud\SecretManager\V1\SecretManagerServiceClient;
 use Google\Cloud\Iam\V1\Binding;

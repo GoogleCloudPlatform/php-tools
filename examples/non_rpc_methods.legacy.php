@@ -1,6 +1,6 @@
 <?php
 
-namespace Google\Cloud\Samples\Dlp;
+namespace Google\Cloud\Samples\NonRpcMethods;
 
 
 use Google\Cloud\Dlp\V2\DlpServiceClient;
