@@ -38,7 +38,7 @@ class AppEngineTest extends TestCase
             ->setMethods(array('start', 'isRunning', 'stop'))
             ->disableOriginalConstructor()
             ->getMock();
-        $this->mockProcess->method('start')->willReturn(null);
+        $this->mockProcess->method('start');
         $this->mockProcess->method('isRunning')->willReturn(true);
         $this->mockProcess->method('stop')->willReturn(null);
     }
