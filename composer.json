@@ -43,7 +43,7 @@
         "phpunit/phpunit": "^9",
         "phpspec/prophecy-phpunit": "^2.0",
         "friendsofphp/php-cs-fixer": "^3.62",
-        "google/cloud-dlp": "^1.10",
+        "google/cloud-dlp": "^2.0",
         "google/cloud-storage": "^1.33",
         "google/cloud-secret-manager": "^1.12"
     }
