@@ -45,6 +45,6 @@
         "friendsofphp/php-cs-fixer": "^3.62",
         "google/cloud-dlp": "^1.10",
         "google/cloud-storage": "^1.33",
-        "google/cloud-secret-manager": "^1.12"
+        "google/cloud-secret-manager": "^2.0"
     }
 }
