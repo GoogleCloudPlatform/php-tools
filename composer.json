@@ -40,7 +40,7 @@
         "google/cloud-core": "^1.20",
         "google/gax": "^1.0.0",
         "paragonie/random_compat": ">=2",
-        "phpunit/phpunit": "^9",
+        "phpunit/phpunit": "^12",
         "phpspec/prophecy-phpunit": "^2.0",
         "friendsofphp/php-cs-fixer": "^3.62",
         "google/cloud-dlp": "^1.10",
