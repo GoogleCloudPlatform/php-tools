@@ -25,9 +25,6 @@ on:
               type: string
               description: "exclude a file from documentation"
 
-permissions:
-  contents: write
-
 jobs:
     docs:
         name: "Generate and Deploy Documentation"
