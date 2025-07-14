@@ -35,7 +35,7 @@ jobs:
         uses: ./.github/workflows/code-standards.yml
         with:
             path: src
-            exclude-patterns: "Fixers/ClientUpgradeFixer/examples"
+            exclude-patterns: '["Fixers/ClientUpgradeFixer/examples"]'
 
     code-standards-with-config:
         uses: ./.github/workflows/code-standards.yml

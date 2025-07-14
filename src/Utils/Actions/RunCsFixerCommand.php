@@ -65,7 +65,7 @@ class RunCsFixerCommand extends Command
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $repo = $input->getArgument('repo');
         if (false === strpos($repo, '/')) {
