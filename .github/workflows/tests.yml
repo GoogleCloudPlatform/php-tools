@@ -35,6 +35,7 @@ jobs:
         uses: ./.github/workflows/code-standards.yml
         with:
             path: src
+            config: .php-cs-fixer.default.php
             exclude-patterns: '["Fixers\/ClientUpgradeFixer\/examples"]'
 
     code-standards-with-config:
