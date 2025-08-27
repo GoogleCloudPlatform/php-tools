@@ -48,6 +48,11 @@ jobs:
     static-analysis:
         uses: ./.github/workflows/static-analysis.yml
 
+    release_checks:
+        uses: ./.github/workflows/release-checks.yml
+        with:
+            next-release-label-check: true
+
     build_docs:
       uses: ./.github/workflows/doctum.yml
       with:
