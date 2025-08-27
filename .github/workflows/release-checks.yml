@@ -12,7 +12,7 @@ permissions:
 
 jobs:
     next-release-label-check:
-        name: Check for "next release" labels
+        name: Check for "next release" label
         runs-on: ubuntu-latest
         if: inputs.next-release-label-check
         steps:
