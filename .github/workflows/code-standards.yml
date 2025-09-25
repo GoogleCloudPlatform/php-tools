@@ -63,7 +63,7 @@ jobs:
           composer global require google/cloud-tools:dev-${BRANCH#*@} -q
           echo "CONFIG=$HOME/.composer/vendor/google/cloud-tools/${BRANCH%@*}" >> $GITHUB_ENV
       - name: 'Setup jq'
-        uses: dcarbone/install-jq-action@v2
+        uses: dcarbone/install-jq-action@v3
       - name: Install PHP CS Fixer
         run: composer global require friendsofphp/php-cs-fixer:${{ inputs.version }}
       - name: Run PHP CS Fixer
