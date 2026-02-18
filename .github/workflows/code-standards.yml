@@ -65,12 +65,14 @@ jobs:
       - name: 'Setup jq'
         uses: dcarbone/install-jq-action@v2
       - name: Install PHP CS Fixer
-        run: composer global require friendsofphp/php-cs-fixer:${{ inputs.version }}
+        run: composer global require friendsofphp/php-cs-fixer:${INPUTS_VERSION}
+        env:
+          INPUTS_VERSION: ${{ inputs.version }}
       - name: Run PHP CS Fixer
         run: |
           # set environment variables in script
-          export RULES=$(echo $'${{ inputs.rules }} ${{ inputs.add-rules }}'|tr -d '\n\t\r '|jq -s '.[0] * .[1]' -crM)
-          export EXCLUDE_PATTERNS=$(echo $'${{ inputs.exclude-patterns }}'|tr -d '\n\t\r ')
+          export RULES=$(echo $'${INPUTS_RULES} ${INPUTS_ADD_RULES}'|tr -d '\n\t\r '|jq -s '.[0] * .[1]' -crM)
+          export EXCLUDE_PATTERNS=$(echo $'${INPUTS_EXCLUDE_PATTERNS}'|tr -d '\n\t\r ')
 
           # use config path only if EXCLUDE_PATTERN is empty
           CMD_PATH=$([ "$EXCLUDE_PATTERNS" = "" ] && echo "$CONFIG_PATH" || echo "")
@@ -93,3 +95,7 @@ jobs:
             echo ""
             exit 1
           fi
+        env:
+          INPUTS_RULES: ${{ inputs.rules }}
+          INPUTS_ADD_RULES: ${{ inputs.add-rules }}
+          INPUTS_EXCLUDE_PATTERNS: ${{ inputs.exclude-patterns }}
