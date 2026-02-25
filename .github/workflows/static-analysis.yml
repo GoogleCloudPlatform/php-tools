@@ -28,6 +28,10 @@ jobs:
       - name: Run Script
         run: |
           composer install -q
-          composer global require phpstan/phpstan:${{ inputs.version }} -q
-          ~/.composer/vendor/bin/phpstan analyse ${{ inputs.paths }} \
-            --autoload-file=${{ inputs.autoload-file }}
+          composer global require phpstan/phpstan:${INPUTS_VERSION} -q
+          ~/.composer/vendor/bin/phpstan analyse ${INPUTS_PATHS} \
+            --autoload-file=${INPUTS_AUTOLOAD_FILE}
+        env:
+          INPUTS_VERSION: ${{ inputs.version }}
+          INPUTS_PATHS: ${{ inputs.paths }}
+          INPUTS_AUTOLOAD_FILE: ${{ inputs.autoload-file }}
