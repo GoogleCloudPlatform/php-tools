@@ -71,8 +71,8 @@ jobs:
       - name: Run PHP CS Fixer
         run: |
           # set environment variables in script
-          export RULES=$(echo $'${INPUTS_RULES} ${INPUTS_ADD_RULES}'|tr -d '\n\t\r '|jq -s '.[0] * .[1]' -crM)
-          export EXCLUDE_PATTERNS=$(echo $'${INPUTS_EXCLUDE_PATTERNS}'|tr -d '\n\t\r ')
+          export RULES=$(echo ${INPUTS_RULES} ${INPUTS_ADD_RULES}|tr -d '\n\t\r '|jq -s '.[0] * .[1]' -crM)
+          export EXCLUDE_PATTERNS=$(echo ${INPUTS_EXCLUDE_PATTERNS}|tr -d '\n\t\r ')
 
           # use config path only if EXCLUDE_PATTERN is empty
           CMD_PATH=$([ "$EXCLUDE_PATTERNS" = "" ] && echo "$CONFIG_PATH" || echo "")

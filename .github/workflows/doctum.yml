@@ -52,13 +52,13 @@ jobs:
             use Doctum\Version\GitVersionCollection;
             use Symfony\Component\Finder\Finder;
 
-            $defaultVersion = '${INPUTS_DEFAULT_VERSION}';
-            $tagPattern = '${INPUTS_TAG_PATTERN}';
+            $defaultVersion = getenv('INPUTS_DEFAULT_VERSION');
+            $tagPattern = getenv('INPUTS_TAG_PATTERN');
 
             $iterator = Finder::create()
                 ->files()
                 ->name('*.php')
-                ->notName('${INPUTS_EXCLUDE_FILE}')
+                ->notName(getenv('INPUTS_EXCLUDE_FILE'))
                 ->exclude('GPBMetadata')
                 ->in(__DIR__ . '/src');
 
@@ -71,8 +71,8 @@ jobs:
             }
 
             return new Doctum($iterator, [
-                'title'                => '${INPUTS_TITLE}',
-                'theme'                => '${INPUTS_THEME}',
+                'title'                => getenv('INPUTS_TITLE'),
+                'theme'                => getenv('INPUTS_THEME'),
                 'versions'             => $versions,
                 'build_dir'            => __DIR__ . '/.build/%version%',
                 'cache_dir'            => __DIR__ . '/.cache/%version%',
@@ -84,12 +84,6 @@ jobs:
             )
             echo "$DOCTUM_CONFIG"; # for debugging
             echo "$DOCTUM_CONFIG" > doctum-config.php;
-          env:
-            INPUTS_DEFAULT_VERSION: ${{ inputs.default_version }}
-            INPUTS_TAG_PATTERN: ${{ inputs.tag_pattern }}
-            INPUTS_EXCLUDE_FILE: ${{ inputs.exclude_file }}
-            INPUTS_TITLE: ${{ inputs.title }}
-            INPUTS_THEME: ${{ inputs.theme }}
         - name: Run Doctum to Generate Documentation
           run: |
             php doctum.phar update doctum-config.php --ignore-parse-errors
@@ -97,6 +91,12 @@ jobs:
               echo "Action did not generate any documentation. Did you forget to provide a default_version or tag_pattern?";
               exit 1;
             fi
+          env:
+            INPUTS_DEFAULT_VERSION: ${{ inputs.default_version }}
+            INPUTS_TAG_PATTERN: ${{ inputs.tag_pattern }}
+            INPUTS_EXCLUDE_FILE: ${{ inputs.exclude_file }}
+            INPUTS_TITLE: ${{ inputs.title }}
+            INPUTS_THEME: ${{ inputs.theme }}
         - if: inputs.default_version
           name: Redirect Index to Latest Version
           run: |
