@@ -52,13 +52,13 @@ jobs:
             use Doctum\Version\GitVersionCollection;
             use Symfony\Component\Finder\Finder;
 
-            $defaultVersion = '${INPUTS_DEFAULT_VERSION}';
-            $tagPattern = '${INPUTS_TAG_PATTERN}';
+            $defaultVersion = getenv('INPUTS_DEFAULT_VERSION');
+            $tagPattern = getenv('INPUTS_TAG_PATTERN');
 
             $iterator = Finder::create()
                 ->files()
                 ->name('*.php')
-                ->notName('${INPUTS_EXCLUDE_FILE}')
+                ->notName(getenv('INPUTS_EXCLUDE_FILE'))
                 ->exclude('GPBMetadata')
                 ->in(__DIR__ . '/src');
 
@@ -71,8 +71,8 @@ jobs:
             }
 
             return new Doctum($iterator, [
-                'title'                => '${INPUTS_TITLE}',
-                'theme'                => '${INPUTS_THEME}',
+                'title'                => getenv('INPUTS_TITLE'),
+                'theme'                => getenv('INPUTS_THEME'),
                 'versions'             => $versions,
                 'build_dir'            => __DIR__ . '/.build/%version%',
                 'cache_dir'            => __DIR__ . '/.cache/%version%',
