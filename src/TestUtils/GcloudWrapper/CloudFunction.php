@@ -181,20 +181,29 @@ class CloudFunction
     /**
      * Delete the deployed function.
      *
+     * @param array $flags optional flags to inject into the deploy command
      * @param int $retries optional The number of retries upon failure
      *
      * @return bool true if the function is succesfully deleted, otherwise false
      */
-    public function delete($retries = 3)
+    public function delete(array $flags = [], $retries = 3)
     {
         if (!$this->deployed) {
             $this->errorLog('Nothing to delete: function not deployed during test');
 
             return false;
         }
-
+        
+        $flattenedFlags = [];
+        foreach ($flags as $name => $value) {
+            $flattenedFlags[] = empty($value) ? $name : "$name=$value";
+        }
+        $args = [
+            'delete',
+            $this->functionName
+        ] + $flattenedFlags;
         try {
-            $cmd = $this->gcloudCommand(['delete', $this->functionName]);
+            $cmd = $this->gcloudCommand($args);
             $this->runWithRetry($cmd, $retries);
             $this->deployed = false;
         } catch (ProcessFailedException $e) {
