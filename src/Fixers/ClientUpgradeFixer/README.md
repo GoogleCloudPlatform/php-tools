@@ -45,7 +45,7 @@ Next run this fixer with the following command:
 
 ```sh
 # use the examples provided in this repo
-export DIR=vendor/google/cloud-tools/examples/ClientUpgradeFixer
+export DIR=vendor/google/cloud-tools/examples
 
 # run the CS fixer for that directory using the config above
 vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.google.php --dry-run --diff $DIR -vv
