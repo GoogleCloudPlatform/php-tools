@@ -1,0 +1,5 @@
+/.gitattributes export-ignore
+/.gitignore export-ignore
+/test export-ignore
+/*.xml.dist export-ignore
+/.github export-ignore
