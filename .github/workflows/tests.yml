@@ -21,7 +21,7 @@ jobs:
                 php-version: ${{ matrix.php }}
                 extensions: zip
             - name: Install Dependencies
-              uses: nick-invision/retry@v3
+              uses: nick-invision/retry@v4
               with:
                 timeout_minutes: 10
                 max_attempts: 3
